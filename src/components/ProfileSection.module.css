@@ -1,0 +1,213 @@
+.profileCard {
+  padding: 2rem;
+  border-radius: 28px;
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.profileActions {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.profileInput {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.85rem 1rem;
+  color: #f8fafc;
+}
+
+.profileInput:focus {
+  outline: none;
+  border-color: rgba(96, 165, 250, 0.7);
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.12);
+}
+
+.editButton,
+.saveButton,
+.cancelButton {
+  border: none;
+  border-radius: 14px;
+  padding: 0.7rem 1rem;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: transform 150ms ease, background 150ms ease, color 150ms ease;
+}
+
+.editButton,
+.saveButton {
+  background: rgba(59, 130, 246, 0.2);
+  color: #f8fafc;
+}
+
+.cancelButton {
+  background: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+}
+
+.editButton:hover,
+.saveButton:hover,
+.cancelButton:hover {
+  transform: translateY(-1px);
+}
+
+.headerRow h2 {
+  margin: 0 0 0.35rem;
+}
+
+.subtitle {
+  margin: 0;
+  color: #94a3b8;
+}
+
+.summaryGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 1.5rem;
+}
+
+.profileInfo,
+.performanceBox {
+  padding: 1.4rem;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.profileInfo h3,
+.performanceBox h3 {
+  margin: 0 0 1rem;
+  color: #f8fafc;
+}
+
+.profileInfo dl {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.profileInfo dt {
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.profileInfo dd {
+  margin: 0;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.metricRow {
+  display: grid;
+  gap: 1rem;
+}
+
+.metricRow div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+
+.metricRow span {
+  color: #94a3b8;
+}
+
+.metricRow strong {
+  font-size: 1.2rem;
+  color: #f8fafc;
+}
+
+.recentSection h3 {
+  margin: 0 0 1rem;
+}
+
+.historyList {
+  display: grid;
+  gap: 0.95rem;
+}
+
+.historyItem {
+  padding: 1rem;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.historyHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+  color: #dbeafe;
+  align-items: center;
+}
+
+.historyMetaRight {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.highScoreBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(134, 239, 172, 0.16);
+  color: #dcfce7;
+  border: 1px solid rgba(84, 211, 148, 0.24);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.scoreBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.2rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.2);
+  color: #f8fafc;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.historyGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  color: #cbd5e1;
+}
+
+.historyGrid span {
+  display: block;
+}
+
+.empty {
+  color: #94a3b8;
+}
+
+.statusBanner {
+  margin: 1rem 0;
+  padding: 1rem 1.1rem;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+}

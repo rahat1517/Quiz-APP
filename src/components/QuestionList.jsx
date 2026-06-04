@@ -1,5 +1,6 @@
 ﻿import { useMemo, useState } from 'react';
 import styles from './QuestionBank.module.css';
+import { getSubjectBadgeStyle } from '../lib/subjectColors';
 
 export default function QuestionList({ questions, subjects, selectedSubject, onSubjectChange, onDelete, onEdit, isAdmin }) {
   const [search, setSearch] = useState('');
@@ -16,10 +17,11 @@ export default function QuestionList({ questions, subjects, selectedSubject, onS
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
   const pageData = filtered.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+  const startIndex = (page - 1) * itemsPerPage;
 
   function handleDelete(id) {
     if (window.confirm('Delete this question permanently?')) {
-      onDelete?.(id);
+      if (onDelete) onDelete(id);
     }
   }
 
@@ -76,32 +78,40 @@ export default function QuestionList({ questions, subjects, selectedSubject, onS
         <p className={styles.emptyState}>No questions match this filter.</p>
       ) : (
         <div className={styles.questionList}>
-          {pageData.map((question) => (
-            <article key={question.id} className={styles.questionItem}>
-              <h3>{question.question_text}</h3>
-              <div className={styles.metaRow}>
-                <span>Subject: {question.subject || 'General'}</span>
-                <span>Class: {question.class_level || 'N/A'}</span>
-                <span>Correct: {question.correct_answer}</span>
-              </div>
-              <div className={styles.optionList}>
-                <p>A. {question.option_a}</p>
-                <p>B. {question.option_b}</p>
-                <p>C. {question.option_c}</p>
-                <p>D. {question.option_d}</p>
-              </div>
-              {isAdmin && (
-                <div className={styles.actionRow}>
-                  <button type="button" className={`${styles.actionButton} ${styles.edit}`} onClick={() => onEdit?.(question)}>
-                    Edit
-                  </button>
-                  <button type="button" className={`${styles.actionButton} ${styles.delete}`} onClick={() => handleDelete(question.id)}>
-                    Delete
-                  </button>
+          {pageData.map((question, idx) => {
+            const number = startIndex + idx + 1;
+            return (
+              <article key={question.id} className={styles.questionItem}>
+                <h3>{number}. {question.question_text}</h3>
+
+                <div className={styles.metaRow}>
+                  <span className={styles.subjectBadge} style={getSubjectBadgeStyle(question.subject)}>
+                    {question.subject || 'General'}
+                  </span>
+                  <span>Class: {question.class_level || 'N/A'}</span>
+                  <span>Correct: {question.correct_answer}</span>
                 </div>
-              )}
-            </article>
-          ))}
+
+                <div className={styles.optionList}>
+                  <p>A. {question.option_a}</p>
+                  <p>B. {question.option_b}</p>
+                  <p>C. {question.option_c}</p>
+                  <p>D. {question.option_d}</p>
+                </div>
+
+                {isAdmin && (
+                  <div className={styles.actionRow}>
+                    <button type="button" className={`${styles.actionButton} ${styles.edit}`} onClick={() => onEdit && onEdit(question)}>
+                      Edit
+                    </button>
+                    <button type="button" className={`${styles.actionButton} ${styles.delete}`} onClick={() => handleDelete(question.id)}>
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </article>
+            );
+          })}
         </div>
       )}
 

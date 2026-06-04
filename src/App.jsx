@@ -1,14 +1,16 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+﻿import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabase } from './lib/supabaseClient';
 import { getQuestions, deleteQuestion, getRandomQuestions } from './services/questionService';
+import { normalizeChapter } from './lib/normalizeChapter';
 import { getSession, signOut } from './services/authService';
-import { getCurrentProfile } from './services/profileService';
+import { getCurrentProfile, updateUserProfile } from './services/profileService';
 import { saveQuizResult, getMyQuizResults, getAllQuizResultsForAdmin } from './services/resultService';
 import Auth from './components/Auth';
 import AddQuestion from './components/AddQuestion';
 import QuestionList from './components/QuestionList';
-import Quiz from './components/Quiz';
+import QuizFullScreen from './components/QuizFullScreen';
 import Result from './components/Result';
+import ProfileSection from './components/ProfileSection';
 import Footer from './components/Footer';
 import Toast from './components/Toast';
 import SkeletonLoader from './components/SkeletonLoader';
@@ -22,6 +24,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedSubject, setSelectedSubject] = useState('All Subjects');
   const [selectedClassLevel, setSelectedClassLevel] = useState('6');
+  const [selectedChapter, setSelectedChapter] = useState('All Chapters');
   const [selectedQuestionCount, setSelectedQuestionCount] = useState(5);
   const [selectedTimeLimit, setSelectedTimeLimit] = useState(5);
   const [quizQuestions, setQuizQuestions] = useState([]);
@@ -37,6 +40,7 @@ export default function App() {
   const [quizHistory, setQuizHistory] = useState([]);
   const [resultsLoading, setResultsLoading] = useState(false);
   const [resultsError, setResultsError] = useState('');
+  const [footerActive, setFooterActive] = useState(false);
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -47,6 +51,11 @@ export default function App() {
   const subjects = useMemo(() => {
     const unique = Array.from(new Set(questions.map((question) => question.subject || 'General')));
     return ['All Subjects', ...unique];
+  }, [questions]);
+
+  const chapters = useMemo(() => {
+    const unique = Array.from(new Set(questions.map((q) => normalizeChapter(q.chapter || 'General'))));
+    return ['All Chapters', ...unique];
   }, [questions]);
 
   const filteredQuestions = useMemo(() => {
@@ -136,9 +145,25 @@ export default function App() {
     }
   }
 
+  async function handleProfileSave(updates) {
+    try {
+      const updatedUser = await updateUserProfile(updates);
+      setUser(updatedUser);
+      showToast('Profile updated successfully.', 'success');
+    } catch (err) {
+      showToast(err.message || 'Unable to update profile.', 'error');
+      throw err;
+    }
+  }
+
   function handleRestartQuiz() {
     setQuizResult(null);
     setActiveTab('quiz');
+  }
+
+  function handleThemeToggle() {
+    setDarkMode((value) => !value);
+    setFooterActive(true);
   }
 
   function handleTabChange(tab) {
@@ -167,7 +192,8 @@ export default function App() {
 
     try {
       const subjectFilter = selectedSubject === 'All Subjects' ? null : selectedSubject;
-      const questions = await getRandomQuestions(Number(selectedClassLevel), subjectFilter, Number(selectedQuestionCount));
+      const chapterFilter = selectedChapter === 'All Chapters' ? null : selectedChapter;
+      const questions = await getRandomQuestions(Number(selectedClassLevel), subjectFilter, chapterFilter, Number(selectedQuestionCount));
 
       if (!questions || questions.length === 0) {
         setQuizError('No questions were found for this class and subject. Try a different selection.');
@@ -186,7 +212,7 @@ export default function App() {
     }
   }
 
-  async function loadQuizResults() {
+  const loadQuizResults = useCallback(async () => {
     setResultsLoading(true);
     setResultsError('');
 
@@ -199,7 +225,7 @@ export default function App() {
     } finally {
       setResultsLoading(false);
     }
-  }
+  }, [isAdmin]);
 
   useEffect(() => {
     async function initializeAuth() {
@@ -241,16 +267,19 @@ export default function App() {
   }, [user]);
 
   useEffect(() => {
-    if (activeTab !== 'results' || !user) {
+    if (!user) {
+      return;
+    }
+
+    if (activeTab !== 'results' && activeTab !== 'profile') {
       return;
     }
 
     loadQuizResults();
-  }, [activeTab, user, isAdmin]);
+  }, [activeTab, user, isAdmin, loadQuizResults]);
 
   useEffect(() => {
     if (!user) {
-      setProfile(null);
       return;
     }
 
@@ -269,8 +298,10 @@ export default function App() {
 
   useEffect(() => {
     if (!isAdmin && activeTab === 'add') {
-      setActiveTab('dashboard');
-      setEditingQuestion(null);
+      Promise.resolve().then(() => {
+        setActiveTab('dashboard');
+        setEditingQuestion(null);
+      });
     }
   }, [isAdmin, activeTab]);
 
@@ -310,16 +341,16 @@ export default function App() {
       <div className={styles.pageShell}>
         <header className={styles.topBar}>
           <div className={styles.titleBlock}>
-            <h1>Quiz World Dashboard</h1>
-            <p>Modern SaaS quiz experience with subjects, score tracking, and polished interactions.</p>
+            <h1>Quiz World</h1>
+            <p>Modern quizzes · Subjects · Scores</p>
           </div>
           <div className={styles.controlsRow}>
             <div className={styles.userLabel}>
-              <span>Signed in as</span>
-              <strong>{user?.email}</strong>
+              <span className={styles.userIcon}>👤</span>
+              <strong>{user?.email?.split('@')?.[0] ?? user?.email}</strong>
               {profile ? (
                 <small className={profile.role === 'admin' ? styles.userRole : styles.userRoleInfo}>
-                  {profile.role === 'admin' ? 'Admin user' : profile.role}
+                  {profile.role === 'admin' ? '🛡️ Admin' : '👤 User'}
                 </small>
               ) : (
                 <small className={styles.userRoleWarning}>Profile missing</small>
@@ -336,17 +367,23 @@ export default function App() {
                 >
                   {subjects.map((subject) => (
                     <option key={subject} value={subject}>
-                      {subject}
+                      {subject === 'All Subjects' ? '📚 All' : `📚 ${subject}`}
                     </option>
                   ))}
                 </select>
               </>
             )}
-            <button className={styles.toggleButton} type="button" onClick={() => setDarkMode((value) => !value)}>
-              {darkMode ? 'Light Mode' : 'Dark Mode'}
+            <button
+              className={`${styles.toggleButton} ${footerActive ? styles.pulseActive : ''}`}
+              type="button"
+              onClick={handleThemeToggle}
+              title={darkMode ? 'Switch to light theme' : 'Switch to dark theme'}
+              data-tooltip={darkMode ? 'Switch to light theme' : 'Switch to dark theme'}
+            >
+              <span className={styles.toggleIcon} aria-hidden>{darkMode ? '☀️' : '🌙'}</span>
             </button>
-            <button className={styles.signOutButton} type="button" onClick={handleSignOut}>
-              Sign out
+            <button className={styles.signOutButton} type="button" onClick={handleSignOut} aria-label="Sign out" title="Sign out">
+              ⏻
             </button>
           </div>
         </header>
@@ -402,6 +439,19 @@ export default function App() {
           </section>
         )}
 
+        {!loading && !error && activeTab === 'profile' && (
+          <section className={styles.sectionGap}>
+            <ProfileSection
+              user={user}
+              profile={profile}
+              history={quizHistory}
+              loading={resultsLoading}
+              error={resultsError}
+              onSave={handleProfileSave}
+            />
+          </section>
+        )}
+
         {!loading && !error && activeTab === 'quiz' && (
           <section className={styles.sectionGap}>
             <div className={styles.quizSelection}>
@@ -440,6 +490,27 @@ export default function App() {
                     {subjects.map((subject) => (
                       <option key={subject} value={subject}>
                         {subject}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className={styles.field}>
+                  <label htmlFor="quiz-chapter" className={styles.fieldLabel}>
+                    Chapter
+                  </label>
+                  <select
+                    id="quiz-chapter"
+                    className={styles.subjectSelect}
+                    value={selectedChapter}
+                    onChange={(event) => {
+                      setSelectedChapter(event.target.value);
+                      setQuizStarted(false);
+                    }}
+                  >
+                    {chapters.map((chapter) => (
+                      <option key={chapter} value={chapter}>
+                        {chapter}
                       </option>
                     ))}
                   </select>
@@ -494,7 +565,7 @@ export default function App() {
               <p className={styles.statusBanner}>Choose class, subject, number of questions, and time limit to start the quiz.</p>
             </div>
             {quizStarted && quizQuestions.length > 0 && (
-              <Quiz
+              <QuizFullScreen
                 key={`quiz-${selectedClassLevel}-${selectedSubject}-${selectedQuestionCount}-${selectedTimeLimit}-${quizQuestions.length}`}
                 questions={quizQuestions}
                 subject={selectedSubject}
@@ -519,7 +590,7 @@ export default function App() {
           </section>
         )}
 
-        <Footer />
+        <Footer honorActive={footerActive} />
       </div>
       <TabNav activeTab={activeTab} onChange={handleTabChange} variant="bottom" isAdmin={isAdmin} />
       <Toast toast={toast} />

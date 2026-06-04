@@ -73,6 +73,16 @@ export default function Result({ result, history = [], loading, error, onRestart
               <span>Wrong</span>
               <strong>{result.wrong}</strong>
             </div>
+            {typeof result.skipped === 'number' && (
+              <div className={styles.summaryItem}>
+                <span>Skipped</span>
+                <strong>{result.skipped}</strong>
+              </div>
+            )}
+            <div className={styles.summaryItem}>
+              <span>Marks</span>
+              <strong className={styles.scoreBadge}>{result.score} / {result.total}</strong>
+            </div>
             <div className={styles.summaryItemBadge}>
               <span>Performance</span>
               <strong className={styles[badge.tone]}>{badge.label}</strong>
@@ -102,7 +112,7 @@ export default function Result({ result, history = [], loading, error, onRestart
                           <div className={styles.historyGrid}>
                             <div>
                               <span>Score</span>
-                              <strong>{item.score}</strong>
+                              <strong>{item.score} / {item.total_questions ?? item.total}</strong>
                             </div>
                             <div>
                               <span>Correct</span>
@@ -111,6 +121,10 @@ export default function Result({ result, history = [], loading, error, onRestart
                             <div>
                               <span>Wrong</span>
                               <strong>{item.wrong_answers}</strong>
+                            </div>
+                            <div>
+                              <span>Skipped</span>
+                              <strong>{(item.total_questions ?? item.total) - (item.correct_answers ?? 0) - (item.wrong_answers ?? 0)}</strong>
                             </div>
                             <div>
                               <span>Percentage</span>

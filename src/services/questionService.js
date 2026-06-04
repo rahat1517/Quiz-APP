@@ -1,4 +1,5 @@
 ﻿import { supabase } from '../lib/supabaseClient';
+import { normalizeChapter } from '../lib/normalizeChapter';
 
 // Frontend role checks are useful for UI gating,
 // but Supabase row-level security must be configured
@@ -17,6 +18,9 @@ export async function getQuestions() {
 }
 
 export async function updateQuestion(questionId, updates) {
+  if (updates && typeof updates.chapter !== 'undefined') {
+    updates.chapter = normalizeChapter(updates.chapter);
+  }
   const { data, error } = await supabase
     .from('questions')
     .update(updates)
@@ -45,9 +49,14 @@ export async function deleteQuestion(questionId) {
 }
 
 export async function addQuestion(question) {
+  const payload = {
+    ...question,
+    chapter: normalizeChapter(question.chapter),
+  };
+
   const { data, error } = await supabase
     .from('questions')
-    .insert([question])
+    .insert([payload])
     .select()
     .single();
 
@@ -58,10 +67,11 @@ export async function addQuestion(question) {
   return data;
 }
 
-export async function getRandomQuestions(classLevel, subject, limit) {
+export async function getRandomQuestions(classLevel, subject, chapter, limit) {
   const { data, error } = await supabase.rpc('get_random_questions', {
     p_class_level: classLevel,
     p_subject: subject || null,
+    p_chapter: chapter || null,
     p_limit: limit,
   });
 

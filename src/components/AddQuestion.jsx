@@ -4,6 +4,7 @@ import styles from './AddQuestion.module.css';
 
 const initialForm = {
   class_level: '6',
+  chapter: '',
   subject: '',
   question_text: '',
   option_a: '',
@@ -24,6 +25,7 @@ const subjectOptions = [
 export default function AddQuestion({ onQuestionAdded, subjects, questionToEdit, onCancel }) {
   const [form, setForm] = useState(() => ({
     class_level: questionToEdit?.class_level ? String(questionToEdit.class_level) : '6',
+    chapter: questionToEdit?.chapter || '',
     subject: questionToEdit?.subject || '',
     question_text: questionToEdit?.question_text || '',
     option_a: questionToEdit?.option_a || '',
@@ -182,6 +184,16 @@ export default function AddQuestion({ onQuestionAdded, subjects, questionToEdit,
                   required
                 />
                 <label>Custom subject</label>
+              </div>
+
+              <div className={styles.field}>
+                <input
+                  name="chapter"
+                  placeholder="Chapter or topic (e.g., Chapter 1)"
+                  value={form.chapter}
+                  onChange={handleChange}
+                />
+                <label>Chapter / Topic</label>
               </div>
             </div>
 

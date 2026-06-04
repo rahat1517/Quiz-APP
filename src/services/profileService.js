@@ -23,3 +23,13 @@ export async function getCurrentProfile() {
 
   return data || null;
 }
+
+export async function updateUserProfile(updates) {
+  const { data, error } = await supabase.auth.updateUser({ data: updates });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data.user;
+}

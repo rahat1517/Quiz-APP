@@ -2,6 +2,7 @@ import styles from './TabNav.module.css';
 
 const tabs = [
   { id: 'dashboard', label: 'Dashboard' },
+  { id: 'profile', label: 'Profile' },
   { id: 'add', label: 'Add Question' },
   { id: 'bank', label: 'Question Bank' },
   { id: 'quiz', label: 'Start Quiz' },

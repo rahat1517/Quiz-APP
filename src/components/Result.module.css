@@ -189,6 +189,18 @@
   margin-top: 0.35rem;
 }
 
+.scoreBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 4rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.2);
+  color: #f8fafc;
+  font-size: 1.2rem;
+}
+
 .excellent {
   color: #bef264;
 }
