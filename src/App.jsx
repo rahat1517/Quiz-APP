@@ -3,6 +3,7 @@ import { supabase } from './lib/supabaseClient';
 import { getQuestions, deleteQuestion } from './services/questionService';
 import { getSession, signOut } from './services/authService';
 import { getCurrentProfile } from './services/profileService';
+import { saveQuizResult, getMyQuizResults, getAllQuizResultsForAdmin } from './services/resultService';
 import Auth from './components/Auth';
 import AddQuestion from './components/AddQuestion';
 import QuestionList from './components/QuestionList';
@@ -27,6 +28,9 @@ export default function App() {
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [quizResult, setQuizResult] = useState(null);
   const [quizStarted, setQuizStarted] = useState(false);
+  const [quizHistory, setQuizHistory] = useState([]);
+  const [resultsLoading, setResultsLoading] = useState(false);
+  const [resultsError, setResultsError] = useState('');
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -102,10 +106,17 @@ export default function App() {
     }
   }
 
-  function handleQuizComplete(result) {
+  async function handleQuizComplete(result) {
     setQuizResult(result);
     setActiveTab('results');
-    showToast('Quiz complete! See your results.', 'success');
+
+    try {
+      await saveQuizResult(result);
+      showToast('Quiz complete! Your score was saved.', 'success');
+      await loadQuizResults();
+    } catch (err) {
+      showToast(err.message || 'Quiz complete, but could not save the result.', 'error');
+    }
   }
 
   function handleRestartQuiz() {
@@ -130,6 +141,21 @@ export default function App() {
   function handleEditQuestion(question) {
     setEditingQuestion(question);
     setActiveTab('add');
+  }
+
+  async function loadQuizResults() {
+    setResultsLoading(true);
+    setResultsError('');
+
+    try {
+      const data = isAdmin ? await getAllQuizResultsForAdmin() : await getMyQuizResults();
+      setQuizHistory(data || []);
+    } catch (err) {
+      setResultsError(err.message || 'Failed to load quiz results.');
+      setQuizHistory([]);
+    } finally {
+      setResultsLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -170,6 +196,14 @@ export default function App() {
 
     return () => window.clearTimeout(refresh);
   }, [user]);
+
+  useEffect(() => {
+    if (activeTab !== 'results' || !user) {
+      return;
+    }
+
+    loadQuizResults();
+  }, [activeTab, user, isAdmin]);
 
   useEffect(() => {
     if (!user) {
@@ -371,7 +405,13 @@ export default function App() {
 
         {!loading && !error && activeTab === 'results' && (
           <section className={styles.sectionGap}>
-            <Result result={quizResult} onRestart={handleRestartQuiz} />
+            <Result
+              result={quizResult}
+              history={quizHistory}
+              loading={resultsLoading}
+              error={resultsError}
+              onRestart={handleRestartQuiz}
+            />
           </section>
         )}
 

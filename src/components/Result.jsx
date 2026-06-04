@@ -7,8 +7,12 @@ function getBadge(percentage) {
   return { label: 'Keep Trying', tone: 'strive' };
 }
 
-export default function Result({ result, onRestart }) {
-  if (!result) {
+export default function Result({ result, history = [], loading, error, onRestart }) {
+  const hasHistory = Array.isArray(history) && history.length > 0;
+  const currentPercentage = result ? Math.round((result.score / result.total) * 100) : 0;
+  const badge = result ? getBadge(currentPercentage) : null;
+
+  if (!result && !hasHistory) {
     return (
       <section className={styles.resultCard}>
         <h2>Results</h2>
@@ -17,9 +21,6 @@ export default function Result({ result, onRestart }) {
     );
   }
 
-  const percentage = Math.round((result.score / result.total) * 100);
-  const badge = getBadge(percentage);
-
   return (
     <section className={styles.resultCard}>
       <div className={styles.headerRow}>
@@ -27,37 +28,78 @@ export default function Result({ result, onRestart }) {
           <h2>Quiz Results</h2>
           <p className={styles.subtitle}>Your performance summary is ready.</p>
         </div>
-        <button type="button" className={styles.restartButton} onClick={onRestart}>
-          Restart Quiz
-        </button>
+        {result && (
+          <button type="button" className={styles.restartButton} onClick={onRestart}>
+            Restart Quiz
+          </button>
+        )}
       </div>
 
-      <div className={styles.resultBody}>
-        <div className={styles.chartWrapper}>
-          <div className={styles.chartBase}>
-            <div className={styles.chartProgress} style={{ '--progress': `${percentage}%` }} />
-            <div className={styles.chartCenter}>
-              <span>{percentage}%</span>
-              <small>Score</small>
+      {error && <div className={styles.statusBanner}>{error}</div>}
+      {loading && <div className={styles.loading}>Loading previous quiz results…</div>}
+
+      {result && (
+        <div className={styles.resultBody}>
+          <div className={styles.chartWrapper}>
+            <div className={styles.chartBase}>
+              <div className={styles.chartProgress} style={{ '--progress': `${currentPercentage}%` }} />
+              <div className={styles.chartCenter}>
+                <span>{currentPercentage}%</span>
+                <small>Score</small>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.summaryGrid}>
+            <div className={styles.summaryItem}>
+              <span>Correct</span>
+              <strong>{result.correct}</strong>
+            </div>
+            <div className={styles.summaryItem}>
+              <span>Wrong</span>
+              <strong>{result.wrong}</strong>
+            </div>
+            <div className={styles.summaryItemBadge}>
+              <span>Performance</span>
+              <strong className={styles[badge.tone]}>{badge.label}</strong>
             </div>
           </div>
         </div>
+      )}
 
-        <div className={styles.summaryGrid}>
-          <div className={styles.summaryItem}>
-            <span>Correct</span>
-            <strong>{result.correct}</strong>
-          </div>
-          <div className={styles.summaryItem}>
-            <span>Wrong</span>
-            <strong>{result.wrong}</strong>
-          </div>
-          <div className={styles.summaryItemBadge}>
-            <span>Performance</span>
-            <strong className={styles[badge.tone]}>{badge.label}</strong>
+      {hasHistory && (
+        <div className={styles.historySection}>
+          <h3>Past quiz results</h3>
+          <div className={styles.historyList}>
+            {history.map((item) => (
+              <article key={item.id} className={styles.historyItem}>
+                <div className={styles.historyHeader}>
+                  <strong>{item.subject || 'General'}</strong>
+                  <time dateTime={item.created_at}>{new Date(item.created_at).toLocaleString()}</time>
+                </div>
+                <div className={styles.historyGrid}>
+                  <div>
+                    <span>Score</span>
+                    <strong>{item.score}</strong>
+                  </div>
+                  <div>
+                    <span>Correct</span>
+                    <strong>{item.correct_answers}</strong>
+                  </div>
+                  <div>
+                    <span>Wrong</span>
+                    <strong>{item.wrong_answers}</strong>
+                  </div>
+                  <div>
+                    <span>Percentage</span>
+                    <strong>{Number(item.percentage)}%</strong>
+                  </div>
+                </div>
+              </article>
+            ))}
           </div>
         </div>
-      </div>
+      )}
     </section>
   );
 }

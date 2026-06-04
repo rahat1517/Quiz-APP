@@ -103,6 +103,78 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.statusBanner {
+  margin-top: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+}
+
+.loading {
+  margin-top: 1rem;
+  color: #94a3b8;
+}
+
+.historySection {
+  margin-top: 2rem;
+}
+
+.historyList {
+  display: grid;
+  gap: 1rem;
+}
+
+.historyItem {
+  padding: 1.35rem 1.4rem;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.historyHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  color: #f8fafc;
+}
+
+.historyHeader strong {
+  font-size: 1rem;
+}
+
+.historyHeader time {
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.historyGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.historyGrid div {
+  padding: 0.85rem 0.95rem;
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.historyGrid span {
+  display: block;
+  color: #94a3b8;
+  margin-bottom: 0.35rem;
+}
+
+.historyGrid strong {
+  display: block;
+  font-size: 1.2rem;
+}
+
 .summaryItem span,
 .summaryItemBadge span {
   display: block;

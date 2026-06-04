@@ -12,14 +12,21 @@ export default function Quiz({ questions, onComplete }) {
   const currentQuestion = questions[currentIndex];
 
   const result = useMemo(() => {
-    const correct = questions.reduce((total, question) => {
+    const correctAnswers = questions.reduce((total, question) => {
       return answers[question.id] === question.correct_answer ? total + 1 : total;
     }, 0);
+    const totalQuestions = questions.length;
+    const wrongAnswers = totalQuestions - correctAnswers;
+    const percentage = totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
+
     return {
-      score: correct,
-      total: questions.length,
-      correct,
-      wrong: questions.length - correct,
+      score: correctAnswers,
+      total: totalQuestions,
+      correct: correctAnswers,
+      wrong: wrongAnswers,
+      percentage,
+      subject: questions[0]?.subject || 'General',
+      answers,
     };
   }, [answers, questions]);
 
