@@ -1,4 +1,4 @@
-import styles from './Result.module.css';
+﻿import styles from './Result.module.css';
 
 function getBadge(percentage) {
   if (percentage >= 85) return { label: 'Mastermind', tone: 'excellent' };
@@ -11,6 +11,20 @@ export default function Result({ result, history = [], loading, error, onRestart
   const hasHistory = Array.isArray(history) && history.length > 0;
   const currentPercentage = result ? Math.round((result.score / result.total) * 100) : 0;
   const badge = result ? getBadge(currentPercentage) : null;
+
+  const groupedHistory = history.reduce((groups, item) => {
+    const classLevel = item.class_level ?? 'Unknown';
+    const subject = item.subject ?? 'General';
+
+    if (!groups[classLevel]) {
+      groups[classLevel] = {};
+    }
+    if (!groups[classLevel][subject]) {
+      groups[classLevel][subject] = [];
+    }
+    groups[classLevel][subject].push(item);
+    return groups;
+  }, {});
 
   if (!result && !hasHistory) {
     return (
@@ -69,35 +83,47 @@ export default function Result({ result, history = [], loading, error, onRestart
 
       {hasHistory && (
         <div className={styles.historySection}>
-          <h3>Past quiz results</h3>
-          <div className={styles.historyList}>
-            {history.map((item) => (
-              <article key={item.id} className={styles.historyItem}>
-                <div className={styles.historyHeader}>
-                  <strong>{item.subject || 'General'}</strong>
-                  <time dateTime={item.created_at}>{new Date(item.created_at).toLocaleString()}</time>
-                </div>
-                <div className={styles.historyGrid}>
-                  <div>
-                    <span>Score</span>
-                    <strong>{item.score}</strong>
+          <h3>Past exams</h3>
+          {Object.entries(groupedHistory)
+            .sort((a, b) => Number(a[0]) - Number(b[0]))
+            .map(([classLevel, subjects]) => (
+              <div key={classLevel} className={styles.historyGroup}>
+                <h4>Class {classLevel}</h4>
+                {Object.entries(subjects).map(([subject, items]) => (
+                  <div key={subject} className={styles.historyGroupSubject}>
+                    <h5>{subject}</h5>
+                    <div className={styles.historyList}>
+                      {items.map((item) => (
+                        <article key={item.id} className={styles.historyItem}>
+                          <div className={styles.historyHeader}>
+                            <strong>{item.subject || 'General'}</strong>
+                            <time dateTime={item.created_at}>{new Date(item.created_at).toLocaleString()}</time>
+                          </div>
+                          <div className={styles.historyGrid}>
+                            <div>
+                              <span>Score</span>
+                              <strong>{item.score}</strong>
+                            </div>
+                            <div>
+                              <span>Correct</span>
+                              <strong>{item.correct_answers}</strong>
+                            </div>
+                            <div>
+                              <span>Wrong</span>
+                              <strong>{item.wrong_answers}</strong>
+                            </div>
+                            <div>
+                              <span>Percentage</span>
+                              <strong>{Number(item.percentage)}%</strong>
+                            </div>
+                          </div>
+                        </article>
+                      ))}
+                    </div>
                   </div>
-                  <div>
-                    <span>Correct</span>
-                    <strong>{item.correct_answers}</strong>
-                  </div>
-                  <div>
-                    <span>Wrong</span>
-                    <strong>{item.wrong_answers}</strong>
-                  </div>
-                  <div>
-                    <span>Percentage</span>
-                    <strong>{Number(item.percentage)}%</strong>
-                  </div>
-                </div>
-              </article>
+                ))}
+              </div>
             ))}
-          </div>
         </div>
       )}
     </section>

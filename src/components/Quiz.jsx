@@ -1,13 +1,11 @@
 ﻿import { useEffect, useMemo, useState } from 'react';
 import styles from './Quiz.module.css';
 
-const QUIZ_TIME = 90;
-
-export default function Quiz({ questions, onComplete }) {
+export default function Quiz({ questions, onComplete, subject = 'General', classLevel = '6', questionLimit = questions.length, durationMinutes = 5 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(QUIZ_TIME);
+  const [timeLeft, setTimeLeft] = useState(durationMinutes * 60);
 
   const currentQuestion = questions[currentIndex];
 
@@ -25,10 +23,13 @@ export default function Quiz({ questions, onComplete }) {
       correct: correctAnswers,
       wrong: wrongAnswers,
       percentage,
-      subject: questions[0]?.subject || 'General',
+      subject,
+      class_level: classLevel,
+      question_limit: questionLimit,
+      duration_minutes: durationMinutes,
       answers,
     };
-  }, [answers, questions]);
+  }, [answers, questions, subject, classLevel, questionLimit, durationMinutes]);
 
   const answeredCount = Object.keys(answers).length;
   const currentScore = questions.reduce((total, question) => {
@@ -91,6 +92,8 @@ export default function Quiz({ questions, onComplete }) {
       <div className={styles.quizHeader}>
         <div>
           <h2>Quiz Mode</h2>
+          <p className={styles.timer}>Class: {classLevel}</p>
+          <p className={styles.timer}>Subject: {subject}</p>
           <p className={styles.timer}>Time left: {minutes}:{seconds.toString().padStart(2, '0')}</p>
           <p className={styles.timer}>
             Marks: {currentScore} / {questions.length}

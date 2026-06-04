@@ -81,6 +81,7 @@ export default function QuestionList({ questions, subjects, selectedSubject, onS
               <h3>{question.question_text}</h3>
               <div className={styles.metaRow}>
                 <span>Subject: {question.subject || 'General'}</span>
+                <span>Class: {question.class_level || 'N/A'}</span>
                 <span>Correct: {question.correct_answer}</span>
               </div>
               <div className={styles.optionList}>

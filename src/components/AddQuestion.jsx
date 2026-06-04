@@ -3,6 +3,7 @@ import { addQuestion, updateQuestion } from '../services/questionService';
 import styles from './AddQuestion.module.css';
 
 const initialForm = {
+  class_level: '6',
   subject: '',
   question_text: '',
   option_a: '',
@@ -22,6 +23,7 @@ const subjectOptions = [
 
 export default function AddQuestion({ onQuestionAdded, subjects, questionToEdit, onCancel }) {
   const [form, setForm] = useState(() => ({
+    class_level: questionToEdit?.class_level ? String(questionToEdit.class_level) : '6',
     subject: questionToEdit?.subject || '',
     question_text: questionToEdit?.question_text || '',
     option_a: questionToEdit?.option_a || '',
@@ -128,6 +130,26 @@ export default function AddQuestion({ onQuestionAdded, subjects, questionToEdit,
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.fieldGroup}>
             <div className={styles.subjectHub}>
+              <div className={styles.subjectCaption}>
+                <span className={styles.fieldLabel}>Class level</span>
+                <small>Select the student grade for this question.</small>
+              </div>
+              <div className={styles.field}>
+                <select
+                  name="class_level"
+                  value={form.class_level}
+                  onChange={handleChange}
+                  required
+                >
+                  {['6','7','8','9','10','11','12'].map((level) => (
+                    <option key={level} value={level}>
+                      Class {level}
+                    </option>
+                  ))}
+                </select>
+                <label>Class level</label>
+              </div>
+
               <div className={styles.subjectCaption}>
                 <span className={styles.fieldLabel}>Subject</span>
                 <small>Tap a subject pill or type a custom category.</small>

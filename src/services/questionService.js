@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabaseClient';
+﻿import { supabase } from '../lib/supabaseClient';
 
 // Frontend role checks are useful for UI gating,
 // but Supabase row-level security must be configured
@@ -50,6 +50,20 @@ export async function addQuestion(question) {
     .insert([question])
     .select()
     .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+export async function getRandomQuestions(classLevel, subject, limit) {
+  const { data, error } = await supabase.rpc('get_random_questions', {
+    p_class_level: classLevel,
+    p_subject: subject || null,
+    p_limit: limit,
+  });
 
   if (error) {
     throw new Error(error.message);

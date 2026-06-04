@@ -1,7 +1,10 @@
 import { supabase } from '../lib/supabaseClient';
 
 export async function saveQuizResult({
+  classLevel,
   subject,
+  questionLimit,
+  durationMinutes,
   totalQuestions,
   correctAnswers,
   wrongAnswers,
@@ -26,7 +29,10 @@ export async function saveQuizResult({
     .from('quiz_results')
     .insert({
       user_id: user.id,
+      class_level: classLevel,
       subject,
+      question_limit: questionLimit,
+      duration_minutes: durationMinutes,
       total_questions: totalQuestions,
       correct_answers: correctAnswers,
       wrong_answers: wrongAnswers,

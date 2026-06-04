@@ -1,6 +1,6 @@
 ﻿import { useEffect, useMemo, useState } from 'react';
 import { supabase } from './lib/supabaseClient';
-import { getQuestions, deleteQuestion } from './services/questionService';
+import { getQuestions, deleteQuestion, getRandomQuestions } from './services/questionService';
 import { getSession, signOut } from './services/authService';
 import { getCurrentProfile } from './services/profileService';
 import { saveQuizResult, getMyQuizResults, getAllQuizResultsForAdmin } from './services/resultService';
@@ -21,6 +21,12 @@ export default function App() {
   const [questions, setQuestions] = useState([]);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedSubject, setSelectedSubject] = useState('All Subjects');
+  const [selectedClassLevel, setSelectedClassLevel] = useState('6');
+  const [selectedQuestionCount, setSelectedQuestionCount] = useState(5);
+  const [selectedTimeLimit, setSelectedTimeLimit] = useState(5);
+  const [quizQuestions, setQuizQuestions] = useState([]);
+  const [quizLoading, setQuizLoading] = useState(false);
+  const [quizError, setQuizError] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [toast, setToast] = useState(null);
@@ -111,7 +117,18 @@ export default function App() {
     setActiveTab('results');
 
     try {
-      await saveQuizResult(result);
+      await saveQuizResult({
+        classLevel: selectedClassLevel,
+        subject: selectedSubject === 'All Subjects' ? 'All Subjects' : selectedSubject,
+        questionLimit: Number(selectedQuestionCount),
+        durationMinutes: Number(selectedTimeLimit),
+        totalQuestions: result.total,
+        correctAnswers: result.correct,
+        wrongAnswers: result.wrong,
+        score: result.score,
+        percentage: result.percentage,
+        answers: result.answers,
+      });
       showToast('Quiz complete! Your score was saved.', 'success');
       await loadQuizResults();
     } catch (err) {
@@ -141,6 +158,32 @@ export default function App() {
   function handleEditQuestion(question) {
     setEditingQuestion(question);
     setActiveTab('add');
+  }
+
+  async function handleStartQuiz() {
+    setQuizError('');
+    setQuizLoading(true);
+    setQuizQuestions([]);
+
+    try {
+      const subjectFilter = selectedSubject === 'All Subjects' ? null : selectedSubject;
+      const questions = await getRandomQuestions(Number(selectedClassLevel), subjectFilter, Number(selectedQuestionCount));
+
+      if (!questions || questions.length === 0) {
+        setQuizError('No questions were found for this class and subject. Try a different selection.');
+        setQuizStarted(false);
+        return;
+      }
+
+      setQuizQuestions(questions);
+      setQuizStarted(true);
+      setActiveTab('quiz');
+    } catch (err) {
+      setQuizError(err.message || 'Unable to load quiz questions.');
+      setQuizStarted(false);
+    } finally {
+      setQuizLoading(false);
+    }
   }
 
   async function loadQuizResults() {
@@ -362,43 +405,104 @@ export default function App() {
         {!loading && !error && activeTab === 'quiz' && (
           <section className={styles.sectionGap}>
             <div className={styles.quizSelection}>
-              <label htmlFor="quiz-subject" className={styles.fieldLabel}>
-                Choose a subject to start the quiz
-              </label>
-              <select
-                id="quiz-subject"
-                className={styles.subjectSelect}
-                value={selectedSubject}
-                onChange={(event) => {
-                  setSelectedSubject(event.target.value);
-                  setQuizStarted(false);
-                }}
-              >
-                {subjects.map((subject) => (
-                  <option key={subject} value={subject}>
-                    {subject}
-                  </option>
-                ))}
-              </select>
+              <div className={styles.fieldGroupInline}>
+                <div className={styles.field}>
+                  <label htmlFor="quiz-class" className={styles.fieldLabel}>
+                    Class
+                  </label>
+                  <select
+                    id="quiz-class"
+                    className={styles.subjectSelect}
+                    value={selectedClassLevel}
+                    onChange={(event) => setSelectedClassLevel(event.target.value)}
+                  >
+                    {['6', '7', '8', '9', '10', '11', '12'].map((level) => (
+                      <option key={level} value={level}>
+                        Class {level}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className={styles.field}>
+                  <label htmlFor="quiz-subject" className={styles.fieldLabel}>
+                    Subject
+                  </label>
+                  <select
+                    id="quiz-subject"
+                    className={styles.subjectSelect}
+                    value={selectedSubject}
+                    onChange={(event) => {
+                      setSelectedSubject(event.target.value);
+                      setQuizStarted(false);
+                    }}
+                  >
+                    {subjects.map((subject) => (
+                      <option key={subject} value={subject}>
+                        {subject}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className={styles.field}>
+                  <label htmlFor="quiz-count" className={styles.fieldLabel}>
+                    Questions
+                  </label>
+                  <select
+                    id="quiz-count"
+                    className={styles.subjectSelect}
+                    value={selectedQuestionCount}
+                    onChange={(event) => setSelectedQuestionCount(Number(event.target.value))}
+                  >
+                    {[5, 10, 20, 30].map((count) => (
+                      <option key={count} value={count}>
+                        {count}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className={styles.field}>
+                  <label htmlFor="quiz-time" className={styles.fieldLabel}>
+                    Time limit
+                  </label>
+                  <select
+                    id="quiz-time"
+                    className={styles.subjectSelect}
+                    value={selectedTimeLimit}
+                    onChange={(event) => setSelectedTimeLimit(Number(event.target.value))}
+                  >
+                    {[5, 10, 15, 30].map((minutes) => (
+                      <option key={minutes} value={minutes}>
+                        {minutes} min
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
               <button
                 type="button"
                 className={styles.toggleButton}
-                disabled={selectedSubject === 'All Subjects' || filteredQuestions.length === 0}
-                onClick={() => setQuizStarted(true)}
+                disabled={quizLoading}
+                onClick={handleStartQuiz}
               >
-                Start quiz
+                {quizLoading ? 'Loading exam…' : 'Start quiz'}
               </button>
-              {selectedSubject === 'All Subjects' && (
-                <p className={styles.statusBanner}>Please choose a subject before starting the quiz.</p>
-              )}
-              {selectedSubject !== 'All Subjects' && filteredQuestions.length === 0 && (
-                <p className={styles.statusBanner}>
-                  No questions are available for {selectedSubject}. Add questions first.
-                </p>
-              )}
+              {quizError && <p className={styles.statusBanner}>{quizError}</p>}
+              <p className={styles.statusBanner}>Choose class, subject, number of questions, and time limit to start the quiz.</p>
             </div>
-            {quizStarted && filteredQuestions.length > 0 && (
-              <Quiz questions={filteredQuestions} onComplete={handleQuizComplete} />
+            {quizStarted && quizQuestions.length > 0 && (
+              <Quiz
+                key={`quiz-${selectedClassLevel}-${selectedSubject}-${selectedQuestionCount}-${selectedTimeLimit}-${quizQuestions.length}`}
+                questions={quizQuestions}
+                subject={selectedSubject}
+                classLevel={selectedClassLevel}
+                questionLimit={selectedQuestionCount}
+                durationMinutes={selectedTimeLimit}
+                onComplete={handleQuizComplete}
+              />
             )}
           </section>
         )}
