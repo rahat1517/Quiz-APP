@@ -23,6 +23,12 @@ export default function Quiz({ questions, onComplete }) {
     };
   }, [answers, questions]);
 
+  const answeredCount = Object.keys(answers).length;
+  const currentScore = questions.reduce((total, question) => {
+    if (!answers[question.id]) return total;
+    return answers[question.id] === question.correct_answer ? total + 1 : total;
+  }, 0);
+
   useEffect(() => {
     if (submitted || questions.length === 0) {
       return undefined;
@@ -79,6 +85,12 @@ export default function Quiz({ questions, onComplete }) {
         <div>
           <h2>Quiz Mode</h2>
           <p className={styles.timer}>Time left: {minutes}:{seconds.toString().padStart(2, '0')}</p>
+          <p className={styles.timer}>
+            Marks: {currentScore} / {questions.length}
+          </p>
+          <p className={styles.timer}>
+            Answered: {answeredCount} / {questions.length}
+          </p>
         </div>
         <div className={styles.timer}>Question {currentIndex + 1} of {questions.length}</div>
       </div>

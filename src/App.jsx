@@ -25,6 +25,7 @@ export default function App() {
   const [darkMode, setDarkMode] = useState(true);
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [quizResult, setQuizResult] = useState(null);
+  const [quizStarted, setQuizStarted] = useState(false);
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [isAuthCallback, setIsAuthCallback] = useState(() => window.location.pathname === '/auth/callback');
@@ -110,6 +111,9 @@ export default function App() {
   function handleTabChange(tab) {
     if (tab !== 'add') {
       setEditingQuestion(null);
+    }
+    if (tab !== 'quiz') {
+      setQuizStarted(false);
     }
     setActiveTab(tab);
   }
@@ -202,19 +206,23 @@ export default function App() {
               <span>Signed in as</span>
               <strong>{user?.email}</strong>
             </div>
-            <label htmlFor="top-subject-filter" className="sr-only">Filter subject</label>
-            <select
-              id="top-subject-filter"
-              className={styles.subjectSelect}
-              value={selectedSubject}
-              onChange={(event) => setSelectedSubject(event.target.value)}
-            >
-              {subjects.map((subject) => (
-                <option key={subject} value={subject}>
-                  {subject}
-                </option>
-              ))}
-            </select>
+            {activeTab !== 'quiz' && (
+              <>
+                <label htmlFor="top-subject-filter" className="sr-only">Filter subject</label>
+                <select
+                  id="top-subject-filter"
+                  className={styles.subjectSelect}
+                  value={selectedSubject}
+                  onChange={(event) => setSelectedSubject(event.target.value)}
+                >
+                  {subjects.map((subject) => (
+                    <option key={subject} value={subject}>
+                      {subject}
+                    </option>
+                  ))}
+                </select>
+              </>
+            )}
             <button className={styles.toggleButton} type="button" onClick={() => setDarkMode((value) => !value)}>
               {darkMode ? 'Light Mode' : 'Dark Mode'}
             </button>
@@ -265,7 +273,45 @@ export default function App() {
 
         {!loading && !error && activeTab === 'quiz' && (
           <section className={styles.sectionGap}>
-            <Quiz questions={filteredQuestions} onComplete={handleQuizComplete} />
+            <div className={styles.quizSelection}>
+              <label htmlFor="quiz-subject" className={styles.fieldLabel}>
+                Choose a subject to start the quiz
+              </label>
+              <select
+                id="quiz-subject"
+                className={styles.subjectSelect}
+                value={selectedSubject}
+                onChange={(event) => {
+                  setSelectedSubject(event.target.value);
+                  setQuizStarted(false);
+                }}
+              >
+                {subjects.map((subject) => (
+                  <option key={subject} value={subject}>
+                    {subject}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                className={styles.toggleButton}
+                disabled={selectedSubject === 'All Subjects' || filteredQuestions.length === 0}
+                onClick={() => setQuizStarted(true)}
+              >
+                Start quiz
+              </button>
+              {selectedSubject === 'All Subjects' && (
+                <p className={styles.statusBanner}>Please choose a subject before starting the quiz.</p>
+              )}
+              {selectedSubject !== 'All Subjects' && filteredQuestions.length === 0 && (
+                <p className={styles.statusBanner}>
+                  No questions are available for {selectedSubject}. Add questions first.
+                </p>
+              )}
+            </div>
+            {quizStarted && filteredQuestions.length > 0 && (
+              <Quiz questions={filteredQuestions} onComplete={handleQuizComplete} />
+            )}
           </section>
         )}
 
