@@ -1,5 +1,8 @@
 ﻿import { useEffect, useMemo, useState } from 'react';
+import { supabase } from './lib/supabaseClient';
 import { getQuestions, deleteQuestion } from './services/questionService';
+import { getSession, signOut } from './services/authService';
+import Auth from './components/Auth';
 import AddQuestion from './components/AddQuestion';
 import QuestionList from './components/QuestionList';
 import Quiz from './components/Quiz';
@@ -16,12 +19,14 @@ export default function App() {
   const [questions, setQuestions] = useState([]);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedSubject, setSelectedSubject] = useState('All Subjects');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [toast, setToast] = useState(null);
   const [darkMode, setDarkMode] = useState(true);
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [quizResult, setQuizResult] = useState(null);
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
   const subjects = useMemo(() => {
     const unique = Array.from(new Set(questions.map((question) => question.subject || 'General')));
@@ -75,6 +80,21 @@ export default function App() {
     loadQuestions();
   }
 
+  async function handleSignOut() {
+    try {
+      await signOut();
+      setUser(null);
+      setQuestions([]);
+      setSelectedSubject('All Subjects');
+      setEditingQuestion(null);
+      setQuizResult(null);
+      setActiveTab('dashboard');
+      showToast('Signed out successfully.', 'success');
+    } catch (err) {
+      showToast(err.message || 'Could not sign out.', 'error');
+    }
+  }
+
   function handleQuizComplete(result) {
     setQuizResult(result);
     setActiveTab('results');
@@ -99,12 +119,54 @@ export default function App() {
   }
 
   useEffect(() => {
-    async function fetchData() {
-      await loadQuestions();
+    async function initializeAuth() {
+      try {
+        const session = await getSession();
+        setUser(session?.user ?? null);
+      } catch (authError) {
+        console.warn(authError.message || authError);
+      } finally {
+        setAuthLoading(false);
+      }
     }
 
-    fetchData();
+    initializeAuth();
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => data?.subscription?.unsubscribe?.();
   }, []);
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    const refresh = window.setTimeout(() => {
+      loadQuestions();
+    }, 0);
+
+    return () => window.clearTimeout(refresh);
+  }, [user]);
+
+  if (authLoading) {
+    return (
+      <div className={`${styles.appRoot} ${styles.dark}`}>
+        <div className={styles.pageShell}>
+          <SkeletonLoader />
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className={`${styles.appRoot} ${styles.dark}`}>
+        <Auth onAuthSuccess={setUser} />
+      </div>
+    );
+  }
 
   return (
     <div className={darkMode ? `${styles.appRoot} ${styles.dark}` : `${styles.appRoot} ${styles.light}`}>
@@ -115,6 +177,10 @@ export default function App() {
             <p>Modern SaaS quiz experience with subjects, score tracking, and polished interactions.</p>
           </div>
           <div className={styles.controlsRow}>
+            <div className={styles.userLabel}>
+              <span>Signed in as</span>
+              <strong>{user?.email}</strong>
+            </div>
             <label htmlFor="top-subject-filter" className="sr-only">Filter subject</label>
             <select
               id="top-subject-filter"
@@ -130,6 +196,9 @@ export default function App() {
             </select>
             <button className={styles.toggleButton} type="button" onClick={() => setDarkMode((value) => !value)}>
               {darkMode ? 'Light Mode' : 'Dark Mode'}
+            </button>
+            <button className={styles.signOutButton} type="button" onClick={handleSignOut}>
+              Sign out
             </button>
           </div>
         </header>

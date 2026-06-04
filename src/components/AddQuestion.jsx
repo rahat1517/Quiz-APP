@@ -42,6 +42,13 @@ export default function AddQuestion({ onQuestionAdded, subjects, questionToEdit,
     }));
   }
 
+  function handleSubject(subject) {
+    setForm((prev) => ({
+      ...prev,
+      subject,
+    }));
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
     setLoading(true);
@@ -120,18 +127,40 @@ export default function AddQuestion({ onQuestionAdded, subjects, questionToEdit,
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.fieldGroup}>
-            <div className={styles.field}>
-              <label htmlFor="subject-select" className={styles.fieldLabel}>
-                Subject
-              </label>
-              <select id="subject-select" name="subject" value={form.subject} onChange={handleChange} required>
-                <option value="">Choose a subject</option>
+            <div className={styles.subjectHub}>
+              <div className={styles.subjectCaption}>
+                <span className={styles.fieldLabel}>Subject</span>
+                <small>Tap a subject pill or type a custom category.</small>
+              </div>
+
+              <div className={styles.subjectCardGrid}>
                 {availableSubjects.map((option) => (
-                  <option key={option.label} value={option.label}>
+                  <button
+                    key={option.label}
+                    type="button"
+                    className={
+                      form.subject === option.label
+                        ? `${styles.subjectChoice} ${styles.active}`
+                        : styles.subjectChoice
+                    }
+                    onClick={() => handleSubject(option.label)}
+                  >
+                    <span>{option.icon}</span>
                     {option.label}
-                  </option>
+                  </button>
                 ))}
-              </select>
+              </div>
+
+              <div className={styles.field}>
+                <input
+                  name="subject"
+                  placeholder="Type a custom subject"
+                  value={form.subject}
+                  onChange={handleChange}
+                  required
+                />
+                <label>Custom subject</label>
+              </div>
             </div>
 
             <div className={styles.field}>

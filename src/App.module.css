@@ -48,8 +48,22 @@
   align-items: center;
 }
 
+.userLabel {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.userLabel strong {
+  color: #f8fafc;
+  font-weight: 700;
+}
+
 .subjectSelect,
-.toggleButton {
+.toggleButton,
+.signOutButton {
   border: none;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.06);
@@ -60,6 +74,10 @@
 
 .subjectSelect {
   min-width: 180px;
+}
+
+.signOutButton {
+  background: rgba(248, 113, 113, 0.18);
 }
 
 .toggleButton {
