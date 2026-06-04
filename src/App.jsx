@@ -240,8 +240,12 @@ export default function App() {
             <div className={styles.userLabel}>
               <span>Signed in as</span>
               <strong>{user?.email}</strong>
-              {profile?.role && (
-                <small className={styles.userRole}>{profile.role}</small>
+              {profile ? (
+                <small className={profile.role === 'admin' ? styles.userRole : styles.userRoleInfo}>
+                  {profile.role === 'admin' ? 'Admin user' : profile.role}
+                </small>
+              ) : (
+                <small className={styles.userRoleWarning}>Profile missing</small>
               )}
             </div>
             {activeTab !== 'quiz' && (
@@ -274,6 +278,11 @@ export default function App() {
 
         {loading && <SkeletonLoader />}
         {error && <div className={styles.statusBanner}>{error}</div>}
+        {!loading && !error && !profile && (
+          <div className={styles.statusBanner}>
+            Your account profile was not found. If you should have admin access, ask the site administrator to add your profile row.
+          </div>
+        )}
 
         {!loading && !error && activeTab === 'dashboard' && (
           <section className={styles.sectionGap}>

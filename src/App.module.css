@@ -61,6 +61,32 @@
   font-weight: 700;
 }
 
+.userRole,
+.userRoleInfo,
+.userRoleWarning {
+  display: inline-block;
+  margin-top: 0.25rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+.userRole {
+  color: #bef264;
+  background: rgba(190, 242, 100, 0.14);
+}
+
+.userRoleInfo {
+  color: #60a5fa;
+  background: rgba(96, 165, 250, 0.12);
+}
+
+.userRoleWarning {
+  color: #fecaca;
+  background: rgba(248, 113, 113, 0.16);
+}
+
 .subjectSelect,
 .toggleButton,
 .signOutButton {
