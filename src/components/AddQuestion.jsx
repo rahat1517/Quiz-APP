@@ -1,7 +1,9 @@
-import { useState } from 'react';
-import { addQuestion } from '../services/questionService';
+﻿import { useState } from 'react';
+import { addQuestion, updateQuestion } from '../services/questionService';
+import styles from './AddQuestion.module.css';
 
 const initialForm = {
+  subject: '',
   question_text: '',
   option_a: '',
   option_b: '',
@@ -10,15 +12,30 @@ const initialForm = {
   correct_answer: 'A',
 };
 
-export default function AddQuestion({ onQuestionAdded }) {
-  const [form, setForm] = useState(initialForm);
+const subjectOptions = [
+  { label: 'Math', icon: '➗' },
+  { label: 'Science', icon: '🧪' },
+  { label: 'History', icon: '📜' },
+  { label: 'Language', icon: '✍️' },
+  { label: 'Technology', icon: '💡' },
+];
+
+export default function AddQuestion({ onQuestionAdded, subjects, questionToEdit, onCancel }) {
+  const [form, setForm] = useState(() => ({
+    subject: questionToEdit?.subject || '',
+    question_text: questionToEdit?.question_text || '',
+    option_a: questionToEdit?.option_a || '',
+    option_b: questionToEdit?.option_b || '',
+    option_c: questionToEdit?.option_c || '',
+    option_d: questionToEdit?.option_d || '',
+    correct_answer: questionToEdit?.correct_answer || 'A',
+  }));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   function handleChange(event) {
     const { name, value } = event.target;
-
     setForm((prev) => ({
       ...prev,
       [name]: value,
@@ -27,86 +44,166 @@ export default function AddQuestion({ onQuestionAdded }) {
 
   async function handleSubmit(event) {
     event.preventDefault();
-
     setLoading(true);
     setError('');
     setSuccess('');
 
     try {
-      await addQuestion(form);
-      setSuccess('Question added successfully!');
+      const payload = { ...form };
+      if (questionToEdit?.id) {
+        await updateQuestion(questionToEdit.id, payload);
+        setSuccess('Question updated successfully!');
+        onQuestionAdded('Question updated successfully.');
+      } else {
+        await addQuestion(payload);
+        setSuccess('Question added successfully!');
+        onQuestionAdded('Question added successfully.');
+      }
       setForm(initialForm);
-      onQuestionAdded();
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Could not save the question.');
     } finally {
       setLoading(false);
     }
   }
 
+  const knownOptionLabels = subjectOptions.map((option) => option.label);
+  const availableSubjects = [
+    ...subjectOptions,
+    ...subjects
+      .filter((subject) => subject && !knownOptionLabels.includes(subject))
+      .map((label) => ({ label, icon: '📚' })),
+  ];
+
   return (
-    <section className="card">
-      <h2>Add Question</h2>
+    <section className={styles.card}>
+      <div className={styles.headerRow}>
+        <div>
+          <h2>{questionToEdit ? 'Edit Question' : 'Add Question'}</h2>
+          <p>
+            {questionToEdit
+              ? 'Refine the text, update the options, and choose the correct answer for a better quiz experience.'
+              : 'Add a new multiple-choice question with strong subject alignment and a clean preview of your work.'}
+          </p>
+        </div>
+        <span className={styles.statusBadge}>{questionToEdit ? 'Editing mode' : 'New question'}</span>
+      </div>
 
-      <form onSubmit={handleSubmit} className="form">
-        <input
-          name="question_text"
-          placeholder="Question"
-          value={form.question_text}
-          onChange={handleChange}
-          required
-        />
+      <div className={styles.innerGrid}>
+        <aside className={styles.panel}>
+          <div className={styles.panelBlock}>
+            <h3>Subject guidance</h3>
+            <p>Pick a subject that keeps questions grouped and quizzes relevant. Add a custom subject if a category is missing.</p>
+            <div className={styles.subjectChips}>
+              {availableSubjects.slice(0, 6).map((option) => (
+                <span key={option.label} className={styles.subjectChip}>
+                  <span>{option.icon}</span> {option.label}
+                </span>
+              ))}
+            </div>
+          </div>
 
-        <input
-          name="option_a"
-          placeholder="Option A"
-          value={form.option_a}
-          onChange={handleChange}
-          required
-        />
+          <div className={styles.panelBlock}>
+            <h3>Live preview</h3>
+            <div className={styles.previewCard}>
+              <strong>{form.subject || 'General'}</strong>
+              <p className={styles.previewQuestion}>{form.question_text || 'Enter a question to preview the card.'}</p>
+              <ol>
+                <li className={form.correct_answer === 'A' ? styles.previewCorrect : ''}>{form.option_a || 'Option A'}</li>
+                <li className={form.correct_answer === 'B' ? styles.previewCorrect : ''}>{form.option_b || 'Option B'}</li>
+                <li className={form.correct_answer === 'C' ? styles.previewCorrect : ''}>{form.option_c || 'Option C'}</li>
+                <li className={form.correct_answer === 'D' ? styles.previewCorrect : ''}>{form.option_d || 'Option D'}</li>
+              </ol>
+            </div>
+          </div>
+        </aside>
 
-        <input
-          name="option_b"
-          placeholder="Option B"
-          value={form.option_b}
-          onChange={handleChange}
-          required
-        />
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <div className={styles.fieldGroup}>
+            <div className={styles.field}>
+              <label htmlFor="subject-select" className={styles.fieldLabel}>
+                Subject
+              </label>
+              <select id="subject-select" name="subject" value={form.subject} onChange={handleChange} required>
+                <option value="">Choose a subject</option>
+                {availableSubjects.map((option) => (
+                  <option key={option.label} value={option.label}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        <input
-          name="option_c"
-          placeholder="Option C"
-          value={form.option_c}
-          onChange={handleChange}
-          required
-        />
+            <div className={styles.field}>
+              <label htmlFor="question-text" className={styles.fieldLabel}>
+                Question text
+              </label>
+              <textarea
+                id="question-text"
+                name="question_text"
+                placeholder="Write a crisp, clear multiple-choice question"
+                value={form.question_text}
+                onChange={handleChange}
+                rows={3}
+                required
+              />
+            </div>
+          </div>
 
-        <input
-          name="option_d"
-          placeholder="Option D"
-          value={form.option_d}
-          onChange={handleChange}
-          required
-        />
+          <div className={styles.optionsGrid}>
+            {['a', 'b', 'c', 'd'].map((key) => (
+              <div key={key} className={styles.optionBox}>
+                <span className={styles.optionBadge}>{key.toUpperCase()}</span>
+                <input
+                  name={`option_${key}`}
+                  placeholder={`Option ${key.toUpperCase()}`}
+                  value={form[`option_${key}`]}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            ))}
+          </div>
 
-        <select
-          name="correct_answer"
-          value={form.correct_answer}
-          onChange={handleChange}
-        >
-          <option value="A">Correct Answer: A</option>
-          <option value="B">Correct Answer: B</option>
-          <option value="C">Correct Answer: C</option>
-          <option value="D">Correct Answer: D</option>
-        </select>
+          <div className={styles.controlBlock}>
+            <div>
+              <p className={styles.controlLabel}>Correct answer</p>
+              <div className={styles.answerGrid}>
+                {['A', 'B', 'C', 'D'].map((letter) => (
+                  <label key={letter} className={styles.answerOption}>
+                    <input
+                      type="radio"
+                      name="correct_answer"
+                      value={letter}
+                      checked={form.correct_answer === letter}
+                      onChange={handleChange}
+                    />
+                    <span>{letter}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className={styles.metaPanel}>
+              <p className={styles.metaLabel}>Tip</p>
+              <p>Choose the most accurate correct answer and keep wrong options plausible.</p>
+            </div>
+          </div>
 
-        <button disabled={loading}>
-          {loading ? 'Adding...' : 'Add Question'}
-        </button>
-      </form>
+          <div className={styles.submitRow}>
+            {questionToEdit && (
+              <button type="button" className={styles.cancelButton} onClick={onCancel} disabled={loading}>
+                Cancel edit
+              </button>
+            )}
+            <button type="submit" className={styles.submitButton} disabled={loading}>
+              {loading ? (questionToEdit ? 'Saving question…' : 'Adding question…') : questionToEdit ? 'Save question' : 'Add question'}
+            </button>
+          </div>
 
-      {success && <p className="success">{success}</p>}
-      {error && <p className="error">{error}</p>}
+          {success && <div className={`${styles.statusMessage} ${styles.success}`}>{success}</div>}
+          {error && <div className={`${styles.statusMessage} ${styles.error}`}>{error}</div>}
+        </form>
+      </div>
     </section>
   );
 }

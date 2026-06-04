@@ -1,24 +1,112 @@
-export default function QuestionList({ questions }) {
-  return (
-    <section className="card">
-      <h2>All Questions</h2>
+﻿import { useMemo, useState } from 'react';
+import styles from './QuestionBank.module.css';
 
-      {questions.length === 0 ? (
-        <p>No questions found.</p>
+export default function QuestionList({ questions, subjects, selectedSubject, onSubjectChange, onDelete, onEdit }) {
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 5;
+
+  const filtered = useMemo(() => {
+    return questions.filter((question) => {
+      const matchesSubject = selectedSubject === 'All Subjects' || question.subject === selectedSubject;
+      const matchesSearch = question.question_text.toLowerCase().includes(search.toLowerCase());
+      return matchesSubject && matchesSearch;
+    });
+  }, [questions, selectedSubject, search]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
+  const pageData = filtered.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+
+  function handleDelete(id) {
+    if (window.confirm('Delete this question permanently?')) {
+      onDelete?.(id);
+    }
+  }
+
+  function updatePage(direction) {
+    setPage((current) => Math.min(totalPages, Math.max(1, current + direction)));
+  }
+
+  return (
+    <section className={styles.bankCard}>
+      <div className={styles.titles}>
+        <div>
+          <h2>Question Bank</h2>
+          <p>Search, filter, and manage your quizzes with a modern card view.</p>
+        </div>
+        <div className={styles.filterField}>
+          <label htmlFor="subject-filter" className="sr-only">Filter subject</label>
+          <select
+            id="subject-filter"
+            value={selectedSubject}
+            onChange={(event) => {
+              onSubjectChange(event.target.value);
+              setPage(1);
+            }}
+          >
+            {subjects.map((subject) => (
+              <option key={subject} value={subject}>
+                {subject}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className={styles.controls}>
+        <div className={styles.searchField}>
+          <span>🔎</span>
+          <input
+            type="text"
+            placeholder="Search questions"
+            value={search}
+            onChange={(event) => {
+              setSearch(event.target.value);
+              setPage(1);
+            }}
+          />
+        </div>
+      </div>
+
+      {pageData.length === 0 ? (
+        <p className={styles.emptyState}>No questions match this filter.</p>
       ) : (
-        <div className="question-list">
-          {questions.map((q) => (
-            <div key={q.id} className="question-item">
-              <h3>{q.question_text}</h3>
-              <p>A. {q.option_a}</p>
-              <p>B. {q.option_b}</p>
-              <p>C. {q.option_c}</p>
-              <p>D. {q.option_d}</p>
-              <strong>Correct: {q.correct_answer}</strong>
-            </div>
+        <div className={styles.questionList}>
+          {pageData.map((question) => (
+            <article key={question.id} className={styles.questionItem}>
+              <h3>{question.question_text}</h3>
+              <div className={styles.metaRow}>
+                <span>Subject: {question.subject || 'General'}</span>
+                <span>Correct: {question.correct_answer}</span>
+              </div>
+              <div className={styles.optionList}>
+                <p>A. {question.option_a}</p>
+                <p>B. {question.option_b}</p>
+                <p>C. {question.option_c}</p>
+                <p>D. {question.option_d}</p>
+              </div>
+              <div className={styles.actionRow}>
+                <button type="button" className={`${styles.actionButton} ${styles.edit}`} onClick={() => onEdit?.(question)}>
+                  Edit
+                </button>
+                <button type="button" className={`${styles.actionButton} ${styles.delete}`} onClick={() => handleDelete(question.id)}>
+                  Delete
+                </button>
+              </div>
+            </article>
           ))}
         </div>
       )}
+
+      <div className={styles.pagination}>
+        <button type="button" className={styles.pagerButton} onClick={() => updatePage(-1)} disabled={page === 1}>
+          Previous
+        </button>
+        <span>{page} / {totalPages}</span>
+        <button type="button" className={styles.pagerButton} onClick={() => updatePage(1)} disabled={page === totalPages}>
+          Next
+        </button>
+      </div>
     </section>
   );
 }

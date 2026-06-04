@@ -1,0 +1,136 @@
+.bankCard {
+  background: rgba(15, 23, 42, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 30px;
+  padding: 2rem;
+  color: #e2e8f0;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.18);
+}
+
+.bankCard h2 {
+  margin-top: 0;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.searchField,
+.filterField {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  padding: 0.95rem 1rem;
+}
+
+.searchField input,
+.filterField select {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: #f8fafc;
+}
+
+.searchField input::placeholder {
+  color: #94a3b8;
+}
+
+.titles {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 160px;
+  gap: 1rem;
+  align-items: center;
+}
+
+.questionList {
+  display: grid;
+  gap: 1rem;
+}
+
+.questionItem {
+  padding: 1.4rem;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.questionItem h3 {
+  margin: 0 0 0.7rem;
+}
+
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  color: #94a3b8;
+  font-size: 0.95rem;
+}
+
+.optionList {
+  display: grid;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.actionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.actionButton {
+  border: none;
+  cursor: pointer;
+  border-radius: 16px;
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+}
+
+.edit {
+  background: rgba(37, 99, 235, 0.16);
+  color: #bfdbfe;
+}
+
+.delete {
+  background: rgba(244, 63, 94, 0.16);
+  color: #fecaca;
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  gap: 1rem;
+}
+
+.pagerButton {
+  border: none;
+  border-radius: 16px;
+  padding: 0.85rem 1.1rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: #f8fafc;
+  cursor: pointer;
+}
+
+.emptyState {
+  color: #94a3b8;
+  margin: 1.4rem 0;
+}
+
+@media (max-width: 800px) {
+  .controls {
+    grid-template-columns: 1fr;
+  }
+
+  .titles {
+    grid-template-columns: 1fr;
+  }
+}

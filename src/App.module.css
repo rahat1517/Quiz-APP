@@ -1,0 +1,109 @@
+.appRoot {
+  min-height: 100vh;
+  color: #e2e8f0;
+  background: radial-gradient(circle at top left, rgba(37, 99, 235, 0.18), transparent 26%),
+    radial-gradient(circle at bottom right, rgba(79, 70, 229, 0.12), transparent 30%),
+    #0f172a;
+}
+
+.pageShell {
+  width: min(1200px, 94%);
+  margin: 0 auto;
+  padding: 1.25rem 0 2rem;
+}
+
+@media (max-width: 720px) {
+  .pageShell {
+    padding-bottom: 110px;
+  }
+}
+
+.topBar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  padding: 1.15rem 1.25rem;
+  border-radius: 28px;
+  background: rgba(15, 23, 42, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.18);
+}
+
+.titleBlock h1 {
+  margin: 0 0 0.25rem;
+  font-size: clamp(1.75rem, 2.4vw, 2.6rem);
+}
+
+.titleBlock p {
+  margin: 0;
+  color: #94a3b8;
+}
+
+.controlsRow {
+  display: flex;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.subjectSelect,
+.toggleButton {
+  border: none;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #f8fafc;
+  padding: 0.9rem 1.15rem;
+  cursor: pointer;
+}
+
+.subjectSelect {
+  min-width: 180px;
+}
+
+.toggleButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.sectionGap {
+  margin-top: 1.5rem;
+}
+
+.statusBanner {
+  margin-top: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+}
+
+.dark {
+  color-scheme: dark;
+  background: radial-gradient(circle at top left, rgba(37, 99, 235, 0.18), transparent 26%),
+    radial-gradient(circle at bottom right, rgba(79, 70, 229, 0.12), transparent 30%),
+    #0f172a;
+  color: #e2e8f0;
+}
+
+.light {
+  color-scheme: light;
+  background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 26%),
+    radial-gradient(circle at bottom right, rgba(192, 132, 252, 0.16), transparent 30%),
+    #f8fafc;
+  color: #0f172a;
+}
+
+@media (max-width: 780px) {
+  .topBar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .controlsRow {
+    justify-content: space-between;
+  }
+}

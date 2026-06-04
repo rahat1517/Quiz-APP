@@ -1,0 +1,28 @@
+import styles from './TabNav.module.css';
+
+const tabs = [
+  { id: 'dashboard', label: 'Dashboard' },
+  { id: 'add', label: 'Add Question' },
+  { id: 'bank', label: 'Question Bank' },
+  { id: 'quiz', label: 'Start Quiz' },
+  { id: 'results', label: 'Results' },
+];
+
+export default function TabNav({ activeTab, onChange, variant }) {
+  const navClass = variant === 'bottom' ? `${styles.tabNav} ${styles.bottomNav}` : styles.tabNav;
+
+  return (
+    <nav className={navClass} aria-label="Main navigation">
+      {tabs.map((tab) => (
+        <button
+          key={tab.id}
+          type="button"
+          className={activeTab === tab.id ? `${styles.tabItem} ${styles.active}` : styles.tabItem}
+          onClick={() => onChange(tab.id)}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </nav>
+  );
+}

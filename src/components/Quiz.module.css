@@ -1,0 +1,135 @@
+.quizWrapper {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 30px;
+  padding: 2rem;
+  color: #e2e8f0;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.2);
+}
+
+.quizHeader {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.progressBar {
+  width: 100%;
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.progressFill {
+  height: 100%;
+  width: var(--percent);
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  transition: width 0.4s ease;
+}
+
+.timer {
+  font-size: 0.95rem;
+  color: #94a3b8;
+}
+
+.questionCard {
+  margin-top: 1.8rem;
+  padding: 1.8rem;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.questionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.questionHeader h3 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.optionsGrid {
+  display: grid;
+  gap: 1rem;
+}
+
+.optionItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.optionItem:hover {
+  transform: translateY(-1px);
+}
+
+.optionItem input {
+  accent-color: #4f46e5;
+}
+
+.optionItem.selected {
+  background: rgba(37, 99, 235, 0.16);
+  border-color: rgba(37, 99, 235, 0.45);
+}
+
+.navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 1.75rem;
+  justify-content: space-between;
+}
+
+.navButton,
+.submitButton {
+  border: none;
+  border-radius: 18px;
+  padding: 1rem 1.35rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: #fff;
+}
+
+.navButton {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.submitButton {
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.emptyState {
+  color: #94a3b8;
+  padding: 1.4rem 0;
+}
+
+@media (max-width: 760px) {
+  .questionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .navigation {
+    flex-direction: column;
+  }
+}

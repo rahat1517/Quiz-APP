@@ -1,0 +1,32 @@
+.toast {
+  position: fixed;
+  right: 1.25rem;
+  top: 1.25rem;
+  padding: 1rem 1.2rem;
+  border-radius: 18px;
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 240px;
+  color: #f8fafc;
+  z-index: 20;
+  animation: slideIn 0.4s ease;
+}
+
+.success {
+  background: rgba(37, 99, 235, 0.95);
+}
+
+.error {
+  background: rgba(220, 38, 38, 0.95);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
