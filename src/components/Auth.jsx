@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './Auth.module.css';
-import { signInWithEmail, signUpWithEmail, getSession, sendMagicLink } from '../services/authService';
+import { signInWithEmail, signUpWithEmail, getSession, resendSignupVerification } from '../services/authService';
 
 export default function Auth({ onAuthSuccess }) {
   const [view, setView] = useState('login');
@@ -10,6 +10,36 @@ export default function Auth({ onAuthSuccess }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const COOLDOWN_SECONDS = 60;
+  const [resendCooldown, setResendCooldown] = useState(() => {
+    try {
+      const ts = localStorage.getItem('resend_ts');
+      if (!ts) return 0;
+      const remaining = Math.ceil((Number(ts) - Date.now()) / 1000);
+      return remaining > 0 ? remaining : 0;
+    } catch {
+      return 0;
+    }
+  });
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return undefined;
+    const t = setInterval(() => {
+      setResendCooldown((s) => {
+        if (s <= 1) {
+          try {
+            localStorage.removeItem('resend_ts');
+          } catch {
+            // ignore localStorage cleanup failures
+          }
+          clearInterval(t);
+          return 0;
+        }
+        return s - 1;
+      });
+    }, 1000);
+    return () => clearInterval(t);
+  }, [resendCooldown]);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -27,8 +57,16 @@ export default function Auth({ onAuthSuccess }) {
         if (password !== confirmPassword) {
           throw new Error('Passwords do not match.');
         }
-        await signUpWithEmail({ email, password });
-        setMessage('Registration successful. Please check your email to verify and then sign in.');
+        const result = await signUpWithEmail({ email, password });
+
+        if (result.user && !result.session) {
+          setMessage('Registration successful. Please confirm your email before signing in.');
+        } else if (result.user && result.session) {
+          setMessage('Registration successful. Signed in automatically.');
+          onAuthSuccess?.(result.user);
+        } else {
+          setMessage('Registration successful. Please check your email to verify and then sign in.');
+        }
       }
     } catch (err) {
       setError(err.message || 'Something went wrong.');
@@ -40,10 +78,25 @@ export default function Auth({ onAuthSuccess }) {
   async function handleResend() {
     setError('');
     setMessage('');
+    if (!email) {
+      setError('Please enter an email to send the link to.');
+      return;
+    }
+    if (resendCooldown > 0) {
+      setError(`Please wait ${resendCooldown}s before trying again.`);
+      return;
+    }
     setLoading(true);
     try {
-      await sendMagicLink(email);
-      setMessage('A sign-in link was sent to your email. Check your inbox.');
+      await resendSignupVerification(email);
+      setMessage('A verification email was resent. Check your inbox.');
+      const expireAt = Date.now() + COOLDOWN_SECONDS * 1000;
+      try {
+        localStorage.setItem('resend_ts', String(expireAt));
+      } catch {
+        // ignore localStorage write failures
+      }
+      setResendCooldown(COOLDOWN_SECONDS);
     } catch (err) {
       setError(err.message || 'Unable to send verification link.');
     } finally {
@@ -130,8 +183,13 @@ export default function Auth({ onAuthSuccess }) {
               {/* Show a resend option after registration prompt */}
               {message.toLowerCase().includes('check your email') && (
                 <div className={styles.resendRow}>
-                  <button type="button" className={styles.resendButton} onClick={handleResend} disabled={loading}>
-                    Resend verification / send sign-in link
+                  <button
+                    type="button"
+                    className={styles.resendButton}
+                    onClick={handleResend}
+                    disabled={loading || resendCooldown > 0 || !email}
+                  >
+                    {resendCooldown > 0 ? `Resend available in ${resendCooldown}s` : 'Resend verification / send sign-in link'}
                   </button>
                 </div>
               )}

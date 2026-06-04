@@ -27,6 +27,7 @@ export default function App() {
   const [quizResult, setQuizResult] = useState(null);
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [isAuthCallback, setIsAuthCallback] = useState(() => window.location.pathname === '/auth/callback');
 
   const subjects = useMemo(() => {
     const unique = Array.from(new Set(questions.map((question) => question.subject || 'General')));
@@ -122,7 +123,14 @@ export default function App() {
     async function initializeAuth() {
       try {
         const session = await getSession();
-        setUser(session?.user ?? null);
+        const userFromSession = session?.user ?? null;
+        setUser(userFromSession);
+
+        if (userFromSession && window.location.pathname === '/auth/callback') {
+          setActiveTab('dashboard');
+          window.history.replaceState({}, '', '/');
+          setIsAuthCallback(false);
+        }
       } catch (authError) {
         console.warn(authError.message || authError);
       } finally {
@@ -155,6 +163,19 @@ export default function App() {
       <div className={`${styles.appRoot} ${styles.dark}`}>
         <div className={styles.pageShell}>
           <SkeletonLoader />
+        </div>
+      </div>
+    );
+  }
+
+  if (!authLoading && isAuthCallback && !user) {
+    return (
+      <div className={`${styles.appRoot} ${styles.dark}`}>
+        <div className={styles.pageShell}>
+          <div className={styles.statusBanner}>
+            Email verification callback received. Checking your session...
+          </div>
+          <Auth onAuthSuccess={setUser} />
         </div>
       </div>
     );

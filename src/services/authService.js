@@ -13,10 +13,29 @@ export async function signInWithEmail({ email, password }) {
   return data;
 }
 
-export async function signUpWithEmail({ email, password }) {
-  const { data, error } = await supabase.auth.signUp({
+export async function signUpWithEmail({ email, password, emailRedirectTo } = {}) {
+  const redirectTarget =
+    emailRedirectTo || window.location.origin + '/auth/callback';
+
+  const { data, error } = await supabase.auth.signUp(
+    { email, password },
+    { emailRedirectTo: redirectTarget }
+  );
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+export async function resendSignupVerification(email) {
+  const { data, error } = await supabase.auth.resend({
+    type: 'signup',
     email,
-    password,
+    options: {
+      emailRedirectTo: window.location.origin + '/auth/callback',
+    },
   });
 
   if (error) {
@@ -24,6 +43,14 @@ export async function signUpWithEmail({ email, password }) {
   }
 
   return data;
+}
+
+export async function getCurrentUser() {
+  const { data, error } = await supabase.auth.getUser();
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data.user;
 }
 
 export async function signOut() {
@@ -40,13 +67,4 @@ export async function getSession() {
     throw new Error(error.message);
   }
   return data.session;
-}
-
-export async function sendMagicLink(email) {
-  // Sends a magic link to the user's email. Useful as a "resend verification" option
-  const { data, error } = await supabase.auth.signInWithOtp({ email });
-  if (error) {
-    throw new Error(error.message);
-  }
-  return data;
 }
