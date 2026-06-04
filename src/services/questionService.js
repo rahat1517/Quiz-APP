@@ -1,5 +1,8 @@
 import { supabase } from '../lib/supabaseClient';
 
+// Frontend role checks are useful for UI gating,
+// but Supabase row-level security must be configured
+// server-side so only admins can insert/update/delete.
 export async function getQuestions() {
   const { data, error } = await supabase
     .from('questions')

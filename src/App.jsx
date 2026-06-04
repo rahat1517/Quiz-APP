@@ -2,6 +2,7 @@
 import { supabase } from './lib/supabaseClient';
 import { getQuestions, deleteQuestion } from './services/questionService';
 import { getSession, signOut } from './services/authService';
+import { getCurrentProfile } from './services/profileService';
 import Auth from './components/Auth';
 import AddQuestion from './components/AddQuestion';
 import QuestionList from './components/QuestionList';
@@ -27,8 +28,11 @@ export default function App() {
   const [quizResult, setQuizResult] = useState(null);
   const [quizStarted, setQuizStarted] = useState(false);
   const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [isAuthCallback, setIsAuthCallback] = useState(() => window.location.pathname === '/auth/callback');
+
+  const isAdmin = profile?.role === 'admin';
 
   const subjects = useMemo(() => {
     const unique = Array.from(new Set(questions.map((question) => question.subject || 'General')));
@@ -86,6 +90,7 @@ export default function App() {
     try {
       await signOut();
       setUser(null);
+      setProfile(null);
       setQuestions([]);
       setSelectedSubject('All Subjects');
       setEditingQuestion(null);
@@ -109,6 +114,10 @@ export default function App() {
   }
 
   function handleTabChange(tab) {
+    if (tab === 'add' && !isAdmin) {
+      return;
+    }
+
     if (tab !== 'add') {
       setEditingQuestion(null);
     }
@@ -162,6 +171,32 @@ export default function App() {
     return () => window.clearTimeout(refresh);
   }, [user]);
 
+  useEffect(() => {
+    if (!user) {
+      setProfile(null);
+      return;
+    }
+
+    async function fetchProfile() {
+      try {
+        const currentProfile = await getCurrentProfile();
+        setProfile(currentProfile);
+      } catch (profileError) {
+        console.warn(profileError.message || profileError);
+        setProfile(null);
+      }
+    }
+
+    fetchProfile();
+  }, [user]);
+
+  useEffect(() => {
+    if (!isAdmin && activeTab === 'add') {
+      setActiveTab('dashboard');
+      setEditingQuestion(null);
+    }
+  }, [isAdmin, activeTab]);
+
   if (authLoading) {
     return (
       <div className={`${styles.appRoot} ${styles.dark}`}>
@@ -205,6 +240,9 @@ export default function App() {
             <div className={styles.userLabel}>
               <span>Signed in as</span>
               <strong>{user?.email}</strong>
+              {profile?.role && (
+                <small className={styles.userRole}>{profile.role}</small>
+              )}
             </div>
             {activeTab !== 'quiz' && (
               <>
@@ -232,7 +270,7 @@ export default function App() {
           </div>
         </header>
 
-        <TabNav activeTab={activeTab} onChange={handleTabChange} />
+        <TabNav activeTab={activeTab} onChange={handleTabChange} isAdmin={isAdmin} />
 
         {loading && <SkeletonLoader />}
         {error && <div className={styles.statusBanner}>{error}</div>}
@@ -243,7 +281,7 @@ export default function App() {
           </section>
         )}
 
-        {!loading && !error && activeTab === 'add' && (
+        {!loading && !error && activeTab === 'add' && isAdmin && (
           <section className={styles.sectionGap}>
             <AddQuestion
               key={editingQuestion?.id ?? 'new'}
@@ -258,6 +296,12 @@ export default function App() {
           </section>
         )}
 
+        {!loading && !error && activeTab === 'add' && !isAdmin && (
+          <section className={styles.sectionGap}>
+            <div className={styles.statusBanner}>Only admin users may add or edit quiz questions.</div>
+          </section>
+        )}
+
         {!loading && !error && activeTab === 'bank' && (
           <section className={styles.sectionGap}>
             <QuestionList
@@ -265,8 +309,9 @@ export default function App() {
               subjects={subjects}
               selectedSubject={selectedSubject}
               onSubjectChange={setSelectedSubject}
-              onDelete={handleDeleteQuestion}
-              onEdit={handleEditQuestion}
+              onDelete={isAdmin ? handleDeleteQuestion : undefined}
+              onEdit={isAdmin ? handleEditQuestion : undefined}
+              isAdmin={isAdmin}
             />
           </section>
         )}
@@ -323,7 +368,7 @@ export default function App() {
 
         <Footer />
       </div>
-      <TabNav activeTab={activeTab} onChange={handleTabChange} variant="bottom" />
+      <TabNav activeTab={activeTab} onChange={handleTabChange} variant="bottom" isAdmin={isAdmin} />
       <Toast toast={toast} />
     </div>
   );

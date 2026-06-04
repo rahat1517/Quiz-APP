@@ -1,7 +1,7 @@
 ﻿import { useMemo, useState } from 'react';
 import styles from './QuestionBank.module.css';
 
-export default function QuestionList({ questions, subjects, selectedSubject, onSubjectChange, onDelete, onEdit }) {
+export default function QuestionList({ questions, subjects, selectedSubject, onSubjectChange, onDelete, onEdit, isAdmin }) {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const itemsPerPage = 5;
@@ -32,7 +32,11 @@ export default function QuestionList({ questions, subjects, selectedSubject, onS
       <div className={styles.titles}>
         <div>
           <h2>Question Bank</h2>
-          <p>Search, filter, and manage your quizzes with a modern card view.</p>
+          <p>
+            {isAdmin
+              ? 'Search, filter, and manage your quizzes with a modern card view.'
+              : 'Search and review the question bank in read-only mode.'}
+          </p>
         </div>
         <div className={styles.filterField}>
           <label htmlFor="subject-filter" className="sr-only">Filter subject</label>
@@ -85,14 +89,16 @@ export default function QuestionList({ questions, subjects, selectedSubject, onS
                 <p>C. {question.option_c}</p>
                 <p>D. {question.option_d}</p>
               </div>
-              <div className={styles.actionRow}>
-                <button type="button" className={`${styles.actionButton} ${styles.edit}`} onClick={() => onEdit?.(question)}>
-                  Edit
-                </button>
-                <button type="button" className={`${styles.actionButton} ${styles.delete}`} onClick={() => handleDelete(question.id)}>
-                  Delete
-                </button>
-              </div>
+              {isAdmin && (
+                <div className={styles.actionRow}>
+                  <button type="button" className={`${styles.actionButton} ${styles.edit}`} onClick={() => onEdit?.(question)}>
+                    Edit
+                  </button>
+                  <button type="button" className={`${styles.actionButton} ${styles.delete}`} onClick={() => handleDelete(question.id)}>
+                    Delete
+                  </button>
+                </div>
+              )}
             </article>
           ))}
         </div>

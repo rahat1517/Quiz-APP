@@ -170,15 +170,21 @@
 }
 
 @media (max-width: 780px) {
+  .pageShell {
+    padding-bottom: 120px;
+  }
+
   .topBar {
     flex-direction: column;
     align-items: stretch;
+    padding: 1rem;
   }
 
   .controlsRow {
     justify-content: space-between;
     flex-direction: column;
     gap: 0.75rem;
+    align-items: stretch;
   }
 
   .subjectSelect {
@@ -186,7 +192,17 @@
     min-width: auto;
   }
 
-  .quizSelection select {
+  .toggleButton,
+  .signOutButton {
+    width: 100%;
+  }
+
+  .quizSelection {
+    padding: 1rem;
+  }
+
+  .quizSelection select,
+  .quizSelection button {
     width: 100%;
   }
 }

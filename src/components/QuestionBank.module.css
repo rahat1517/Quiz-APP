@@ -133,4 +133,26 @@
   .titles {
     grid-template-columns: 1fr;
   }
+
+  .searchField,
+  .filterField {
+    width: 100%;
+  }
+
+  .filterField select {
+    width: 100%;
+  }
+
+  .actionRow {
+    flex-direction: column;
+  }
+
+  .pagination {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pagerButton {
+    width: 100%;
+  }
 }
