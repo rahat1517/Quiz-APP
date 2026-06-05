@@ -635,7 +635,32 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
                     Class / Exam
                   </label>
 
-                  disabled={isClassRestricted}
+                  <select
+  id="quiz-class"
+  className={styles.subjectSelect}
+  value={selectedClass}
+  onChange={(event) => {
+    if (isClassRestricted) return;
+
+    setSelectedClassLevel(event.target.value);
+    setSelectedSubject('All Subjects');
+    setSelectedChapter('All Chapters');
+    setQuizStarted(false);
+  }}
+  disabled={isClassRestricted}
+>
+  {classLevels.length === 0 ? (
+    <option value="">
+      {isClassRestricted ? assignedClassLabel || 'No assigned class' : 'No class found'}
+    </option>
+  ) : (
+    classLevels.map((level) => (
+      <option key={level} value={level}>
+        {level}
+      </option>
+    ))
+  )}
+</select>
 
                   <small className={styles.fieldHint}>
                     Select the class or exam category.
