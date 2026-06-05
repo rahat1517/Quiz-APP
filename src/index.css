@@ -119,3 +119,13 @@ video {
     font-size: 16px;
   }
 }
+select {
+  color: #f8fafc;
+  background-color: #0f172a;
+  color-scheme: dark;
+}
+
+select option {
+  color: #f8fafc;
+  background-color: #0f172a;
+}

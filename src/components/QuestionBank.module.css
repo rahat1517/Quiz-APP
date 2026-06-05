@@ -206,3 +206,21 @@
   color: #0f172a;
   background: #ffffff;
 }
+
+.filterField select {
+  color: #f8fafc;
+  background-color: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  color-scheme: dark;
+}
+
+.filterField select option {
+  color: #f8fafc;
+  background-color: #0f172a;
+}
+
+.filterField select:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22);
+  outline: none;
+}
