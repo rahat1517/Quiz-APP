@@ -46,36 +46,64 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [isAuthCallback, setIsAuthCallback] = useState(() => window.location.pathname === '/auth/callback');
+  const [isAuthCallback, setIsAuthCallback] = useState(
+    () => window.location.pathname === '/auth/callback'
+  );
 
-const profileRole = String(profile?.role || '').trim().toLowerCase();
-const isAdmin = profileRole === 'admin';
+  const profileRole = String(profile?.role || '').trim().toLowerCase();
+  const isAdmin = profileRole === 'admin';
 
-  const assignedClassLevel = profile?.class_level ?? user?.user_metadata?.class_level ?? user?.user_metadata?.classLevel;
+  const assignedClassLevel =
+    profile?.class_level ??
+    user?.user_metadata?.class_level ??
+    user?.user_metadata?.classLevel;
+
   const assignedClassLabel = assignedClassLevel ? `Class ${assignedClassLevel}` : null;
   const isClassRestricted = !isAdmin && assignedClassLevel != null;
   const selectedClass = isClassRestricted ? String(assignedClassLevel) : selectedClassLevel;
 
   const availableQuestions = useMemo(() => {
     if (isAdmin) return questions;
-    return questions.filter((question) => String(question.class_level) === String(selectedClass));
+
+    return questions.filter(
+      (question) => String(question.class_level) === String(selectedClass)
+    );
   }, [questions, isAdmin, selectedClass]);
 
   const subjects = useMemo(() => {
-    const unique = Array.from(new Set(availableQuestions.map((question) => question.subject || 'General')));
+    const unique = Array.from(
+      new Set(availableQuestions.map((question) => question.subject || 'General'))
+    );
+
     return ['All Subjects', ...unique];
   }, [availableQuestions]);
 
   const chapters = useMemo(() => {
-    const filtered = selectedSubject === 'All Subjects' ? availableQuestions : availableQuestions.filter((q) => q.subject === selectedSubject);
-    const unique = Array.from(new Set(filtered.map((q) => normalizeChapter(q.chapter || 'General'))));
+    const filtered =
+      selectedSubject === 'All Subjects'
+        ? availableQuestions
+        : availableQuestions.filter((question) => question.subject === selectedSubject);
+
+    const unique = Array.from(
+      new Set(filtered.map((question) => normalizeChapter(question.chapter || 'General')))
+    );
+
     return ['All Chapters', ...unique];
   }, [availableQuestions, selectedSubject]);
 
   const filteredQuestions = useMemo(() => {
-    if (selectedSubject === 'All Subjects') return availableQuestions;
-    return availableQuestions.filter((question) => question.subject === selectedSubject);
-  }, [availableQuestions, selectedSubject]);
+    return availableQuestions.filter((question) => {
+      const subjectMatched =
+        selectedSubject === 'All Subjects' || question.subject === selectedSubject;
+
+      const questionChapter = normalizeChapter(question.chapter || 'General');
+
+      const chapterMatched =
+        selectedChapter === 'All Chapters' || questionChapter === selectedChapter;
+
+      return subjectMatched && chapterMatched;
+    });
+  }, [availableQuestions, selectedSubject, selectedChapter]);
 
   const totalQuestions = availableQuestions.length;
   const totalSubjects = subjects.length > 1 ? subjects.length - 1 : 0;
@@ -126,6 +154,7 @@ const isAdmin = profileRole === 'admin';
       setProfile(null);
       setQuestions([]);
       setSelectedSubject('All Subjects');
+      setSelectedChapter('All Chapters');
       setEditingQuestion(null);
       setQuizResult(null);
       setActiveTab('dashboard');
@@ -135,36 +164,36 @@ const isAdmin = profileRole === 'admin';
     }
   }
 
- async function handleQuizComplete(result) {
-  setQuizResult(result);
-  setReviewQuestions(quizQuestions);
-  setActiveTab('results');
+  async function handleQuizComplete(result) {
+    setQuizResult(result);
+    setReviewQuestions(quizQuestions);
+    setActiveTab('results');
 
-  try {
-    const classLevelToSave = isClassRestricted
-      ? Number(selectedClass)
-      : Number(selectedClassLevel);
+    try {
+      const classLevelToSave = isClassRestricted
+        ? Number(selectedClass)
+        : Number(selectedClassLevel);
 
-    await saveQuizResult({
-      classLevel: classLevelToSave,
-      subject: selectedSubject === 'All Subjects' ? 'All Subjects' : selectedSubject,
-      questionLimit: Number(selectedQuestionCount),
-      durationMinutes: Number(selectedTimeLimit),
-      totalQuestions: result.total,
-      correctAnswers: result.correct,
-      wrongAnswers: result.wrong,
-      skippedAnswers: result.skipped,
-      score: result.score,
-      percentage: result.percentage,
-      answers: result.answers,
-    });
+      await saveQuizResult({
+        classLevel: classLevelToSave,
+        subject: selectedSubject === 'All Subjects' ? 'All Subjects' : selectedSubject,
+        questionLimit: Number(selectedQuestionCount),
+        durationMinutes: Number(selectedTimeLimit),
+        totalQuestions: result.total,
+        correctAnswers: result.correct,
+        wrongAnswers: result.wrong,
+        skippedAnswers: result.skipped,
+        score: result.score,
+        percentage: result.percentage,
+        answers: result.answers,
+      });
 
-    showToast('Quiz complete! Your score was saved.', 'success');
-    await loadQuizResults();
-  } catch (err) {
-    showToast(err.message || 'Quiz complete, but could not save the result.', 'error');
+      showToast('Quiz complete! Your score was saved.', 'success');
+      await loadQuizResults();
+    } catch (err) {
+      showToast(err.message || 'Quiz complete, but could not save the result.', 'error');
+    }
   }
-}
 
   async function handleProfileSave(updates) {
     try {
@@ -196,9 +225,11 @@ const isAdmin = profileRole === 'admin';
     if (tab !== 'add') {
       setEditingQuestion(null);
     }
+
     if (tab !== 'quiz') {
       setQuizStarted(false);
     }
+
     setActiveTab(tab);
   }
 
@@ -215,11 +246,21 @@ const isAdmin = profileRole === 'admin';
     try {
       const subjectFilter = selectedSubject === 'All Subjects' ? null : selectedSubject;
       const chapterFilter = selectedChapter === 'All Chapters' ? null : selectedChapter;
-      const classLevelToUse = isClassRestricted ? Number(selectedClass) : Number(selectedClassLevel);
-      const questions = await getRandomQuestions(classLevelToUse, subjectFilter, chapterFilter, Number(selectedQuestionCount));
+      const classLevelToUse = isClassRestricted
+        ? Number(selectedClass)
+        : Number(selectedClassLevel);
+
+      const questions = await getRandomQuestions(
+        classLevelToUse,
+        subjectFilter,
+        chapterFilter,
+        Number(selectedQuestionCount)
+      );
 
       if (!questions || questions.length === 0) {
-        setQuizError('No questions were found for this class and subject. Try a different selection.');
+        setQuizError(
+          'No questions were found for this class, subject, and chapter. Try a different selection.'
+        );
         setQuizStarted(false);
         return;
       }
@@ -270,6 +311,7 @@ const isAdmin = profileRole === 'admin';
     }
 
     initializeAuth();
+
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
@@ -318,14 +360,17 @@ const isAdmin = profileRole === 'admin';
         setProfile({
           role: 'user',
           email: user.email,
-          class_level: user.user_metadata?.class_level ?? user.user_metadata?.classLevel ?? null,
+          class_level:
+            user.user_metadata?.class_level ?? user.user_metadata?.classLevel ?? null,
         });
       } catch (profileError) {
         console.warn(profileError.message || profileError);
+
         setProfile({
           role: 'user',
           email: user.email,
-          class_level: user.user_metadata?.class_level ?? user.user_metadata?.classLevel ?? null,
+          class_level:
+            user.user_metadata?.class_level ?? user.user_metadata?.classLevel ?? null,
         });
       }
     }
@@ -374,36 +419,56 @@ const isAdmin = profileRole === 'admin';
   }
 
   return (
-    <div className={darkMode ? `${styles.appRoot} ${styles.dark}` : `${styles.appRoot} ${styles.light}`}>
+    <div
+      className={
+        darkMode
+          ? `${styles.appRoot} ${styles.dark}`
+          : `${styles.appRoot} ${styles.light}`
+      }
+    >
       <div className={styles.pageShell}>
         <header className={styles.topBar}>
           <div className={styles.titleBlock}>
             <h1>Quiz World</h1>
             <p>Modern quizzes · Subjects · Scores</p>
           </div>
+
           <div className={styles.controlsRow}>
             <div className={styles.userLabel}>
               <span className={styles.userIcon}>👤</span>
               <strong>{user?.email?.split('@')?.[0] ?? user?.email}</strong>
+
               {assignedClassLabel && !isAdmin && (
                 <small className={styles.userRoleInfo}>{assignedClassLabel}</small>
               )}
+
               {profile ? (
-                <small className={profile.role === 'admin' ? styles.userRole : styles.userRoleInfo}>
+                <small
+                  className={
+                    profile.role === 'admin' ? styles.userRole : styles.userRoleInfo
+                  }
+                >
                   {profile.role === 'admin' ? '🛡️ Admin' : '👤 User'}
                 </small>
               ) : (
                 <small className={styles.userRoleWarning}>Profile missing</small>
               )}
             </div>
+
             {activeTab !== 'quiz' && (
               <>
-                <label htmlFor="top-subject-filter" className="sr-only">Filter subject</label>
+                <label htmlFor="top-subject-filter" className="sr-only">
+                  Filter subject
+                </label>
+
                 <select
                   id="top-subject-filter"
                   className={styles.subjectSelect}
                   value={selectedSubject}
-                  onChange={(event) => setSelectedSubject(event.target.value)}
+                  onChange={(event) => {
+                    setSelectedSubject(event.target.value);
+                    setSelectedChapter('All Chapters');
+                  }}
                 >
                   {subjects.map((subject) => (
                     <option key={subject} value={subject}>
@@ -413,17 +478,29 @@ const isAdmin = profileRole === 'admin';
                 </select>
               </>
             )}
+
             <button
-              className={`${styles.toggleButton} ${darkMode ? styles.themeToggleDark : styles.themeToggleLight} ${footerActive ? styles.pulseActive : ''}`}
+              className={`${styles.toggleButton} ${
+                darkMode ? styles.themeToggleDark : styles.themeToggleLight
+              } ${footerActive ? styles.pulseActive : ''}`}
               type="button"
               onClick={handleThemeToggle}
               title={darkMode ? 'Switch to light theme' : 'Switch to dark theme'}
               aria-label={darkMode ? 'Switch to light theme' : 'Switch to dark theme'}
               data-tooltip={darkMode ? 'Switch to light theme' : 'Switch to dark theme'}
             >
-              <span className={styles.toggleIcon} aria-hidden>{darkMode ? '☀️' : '🌙'}</span>
+              <span className={styles.toggleIcon} aria-hidden>
+                {darkMode ? '☀️' : '🌙'}
+              </span>
             </button>
-            <button className={styles.signOutButton} type="button" onClick={handleSignOut} aria-label="Log out" title="Log out">
+
+            <button
+              className={styles.signOutButton}
+              type="button"
+              onClick={handleSignOut}
+              aria-label="Log out"
+              title="Log out"
+            >
               🚪 Log out
             </button>
           </div>
@@ -432,16 +509,23 @@ const isAdmin = profileRole === 'admin';
         <TabNav activeTab={activeTab} onChange={handleTabChange} isAdmin={isAdmin} />
 
         {loading && <SkeletonLoader />}
+
         {error && <div className={styles.statusBanner}>{error}</div>}
+
         {!loading && !error && !profile && (
           <div className={styles.statusBanner}>
-            Your account profile was not found. If you should have admin access, ask the site administrator to add your profile row.
+            Your account profile was not found. If you should have admin access,
+            ask the site administrator to add your profile row.
           </div>
         )}
 
         {!loading && !error && activeTab === 'dashboard' && (
           <section className={styles.sectionGap}>
-            <Hero totalQuestions={totalQuestions} totalSubjects={totalSubjects} totalQuizzes={totalQuizzes} />
+            <Hero
+              totalQuestions={totalQuestions}
+              totalSubjects={totalSubjects}
+              totalQuizzes={totalQuizzes}
+            />
           </section>
         )}
 
@@ -462,7 +546,9 @@ const isAdmin = profileRole === 'admin';
 
         {!loading && !error && activeTab === 'add' && !isAdmin && (
           <section className={styles.sectionGap}>
-            <div className={styles.statusBanner}>Only admin users may add or edit quiz questions.</div>
+            <div className={styles.statusBanner}>
+              Only admin users may add or edit quiz questions.
+            </div>
           </section>
         )}
 
@@ -471,8 +557,14 @@ const isAdmin = profileRole === 'admin';
             <QuestionList
               questions={filteredQuestions}
               subjects={subjects}
+              chapters={chapters}
               selectedSubject={selectedSubject}
-              onSubjectChange={setSelectedSubject}
+              selectedChapter={selectedChapter}
+              onSubjectChange={(subject) => {
+                setSelectedSubject(subject);
+                setSelectedChapter('All Chapters');
+              }}
+              onChapterChange={setSelectedChapter}
               onDelete={isAdmin ? handleDeleteQuestion : undefined}
               onEdit={isAdmin ? handleEditQuestion : undefined}
               isAdmin={isAdmin}
@@ -502,6 +594,7 @@ const isAdmin = profileRole === 'admin';
                   <label htmlFor="quiz-class" className={styles.fieldLabel}>
                     Class
                   </label>
+
                   <select
                     id="quiz-class"
                     className={styles.subjectSelect}
@@ -509,17 +602,26 @@ const isAdmin = profileRole === 'admin';
                     onChange={(event) => setSelectedClassLevel(event.target.value)}
                     disabled={isClassRestricted}
                   >
-                    {(isClassRestricted ? [selectedClass] : ['6', '7', '8', '9', '10', '11', '12']).map((level) => (
+                    {(isClassRestricted
+                      ? [selectedClass]
+                      : ['6', '7', '8', '9', '10', '11', '12']
+                    ).map((level) => (
                       <option key={level} value={level}>
                         Class {level}
                       </option>
                     ))}
                   </select>
+
                   {assignedClassLabel && (
-                    <small className={styles.assignedClassNote}>Assigned class: {assignedClassLabel}</small>
+                    <small className={styles.assignedClassNote}>
+                      Assigned class: {assignedClassLabel}
+                    </small>
                   )}
+
                   {isClassRestricted && (
-                    <small className={styles.fieldHint}>This class is locked by your account.</small>
+                    <small className={styles.fieldHint}>
+                      This class is locked by your account.
+                    </small>
                   )}
                 </div>
 
@@ -527,12 +629,14 @@ const isAdmin = profileRole === 'admin';
                   <label htmlFor="quiz-subject" className={styles.fieldLabel}>
                     Subject
                   </label>
+
                   <select
                     id="quiz-subject"
                     className={styles.subjectSelect}
                     value={selectedSubject}
                     onChange={(event) => {
                       setSelectedSubject(event.target.value);
+                      setSelectedChapter('All Chapters');
                       setQuizStarted(false);
                     }}
                   >
@@ -548,6 +652,7 @@ const isAdmin = profileRole === 'admin';
                   <label htmlFor="quiz-chapter" className={styles.fieldLabel}>
                     Chapter
                   </label>
+
                   <select
                     id="quiz-chapter"
                     className={styles.subjectSelect}
@@ -569,11 +674,14 @@ const isAdmin = profileRole === 'admin';
                   <label htmlFor="quiz-count" className={styles.fieldLabel}>
                     Questions
                   </label>
+
                   <select
                     id="quiz-count"
                     className={styles.subjectSelect}
                     value={selectedQuestionCount}
-                    onChange={(event) => setSelectedQuestionCount(Number(event.target.value))}
+                    onChange={(event) =>
+                      setSelectedQuestionCount(Number(event.target.value))
+                    }
                   >
                     {[5, 10, 20, 30].map((count) => (
                       <option key={count} value={count}>
@@ -587,11 +695,14 @@ const isAdmin = profileRole === 'admin';
                   <label htmlFor="quiz-time" className={styles.fieldLabel}>
                     Time limit
                   </label>
+
                   <select
                     id="quiz-time"
                     className={styles.subjectSelect}
                     value={selectedTimeLimit}
-                    onChange={(event) => setSelectedTimeLimit(Number(event.target.value))}
+                    onChange={(event) =>
+                      setSelectedTimeLimit(Number(event.target.value))
+                    }
                   >
                     {[5, 10, 15, 30].map((minutes) => (
                       <option key={minutes} value={minutes}>
@@ -610,12 +721,18 @@ const isAdmin = profileRole === 'admin';
               >
                 {quizLoading ? 'Loading exam…' : 'Start quiz'}
               </button>
+
               {quizError && <p className={styles.statusBanner}>{quizError}</p>}
-              <p className={styles.statusBanner}>Choose class, subject, number of questions, and time limit to start the quiz.</p>
+
+              <p className={styles.statusBanner}>
+                Choose class, subject, chapter, number of questions, and time limit
+                to start the quiz.
+              </p>
             </div>
+
             {quizStarted && quizQuestions.length > 0 && (
               <QuizFullScreen
-                key={`quiz-${selectedClassLevel}-${selectedSubject}-${selectedQuestionCount}-${selectedTimeLimit}-${quizQuestions.length}`}
+                key={`quiz-${selectedClassLevel}-${selectedSubject}-${selectedChapter}-${selectedQuestionCount}-${selectedTimeLimit}-${quizQuestions.length}`}
                 questions={quizQuestions}
                 subject={selectedSubject}
                 classLevel={selectedClassLevel}
@@ -642,7 +759,14 @@ const isAdmin = profileRole === 'admin';
 
         <Footer honorActive={footerActive} />
       </div>
-      <TabNav activeTab={activeTab} onChange={handleTabChange} variant="bottom" isAdmin={isAdmin} />
+
+      <TabNav
+        activeTab={activeTab}
+        onChange={handleTabChange}
+        variant="bottom"
+        isAdmin={isAdmin}
+      />
+
       <Toast toast={toast} />
     </div>
   );

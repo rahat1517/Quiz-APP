@@ -168,3 +168,14 @@
     width: 100%;
   }
 }
+
+.filterGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filterField select {
+  min-width: 170px;
+}
