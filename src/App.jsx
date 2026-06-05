@@ -5,6 +5,7 @@ import { normalizeChapter } from './lib/normalizeChapter';
 import { getSession, signOut } from './services/authService';
 import { getCurrentProfile, updateUserProfile } from './services/profileService';
 import { saveQuizResult, getMyQuizResults, getAllQuizResultsForAdmin } from './services/resultService';
+
 import Auth from './components/Auth';
 import AddQuestion from './components/AddQuestion';
 import QuestionList from './components/QuestionList';
@@ -36,6 +37,7 @@ export default function App() {
   const [darkMode, setDarkMode] = useState(true);
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [quizResult, setQuizResult] = useState(null);
+  const [reviewQuestions, setReviewQuestions] = useState([]);
   const [quizStarted, setQuizStarted] = useState(false);
   const [quizHistory, setQuizHistory] = useState([]);
   const [resultsLoading, setResultsLoading] = useState(false);
@@ -46,24 +48,36 @@ export default function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const [isAuthCallback, setIsAuthCallback] = useState(() => window.location.pathname === '/auth/callback');
 
-  const isAdmin = profile?.role === 'admin';
+const profileRole = String(profile?.role || '').trim().toLowerCase();
+const isAdmin = profileRole === 'admin';
+
+  const assignedClassLevel = profile?.class_level ?? user?.user_metadata?.class_level ?? user?.user_metadata?.classLevel;
+  const assignedClassLabel = assignedClassLevel ? `Class ${assignedClassLevel}` : null;
+  const isClassRestricted = !isAdmin && assignedClassLevel != null;
+  const selectedClass = isClassRestricted ? String(assignedClassLevel) : selectedClassLevel;
+
+  const availableQuestions = useMemo(() => {
+    if (isAdmin) return questions;
+    return questions.filter((question) => String(question.class_level) === String(selectedClass));
+  }, [questions, isAdmin, selectedClass]);
 
   const subjects = useMemo(() => {
-    const unique = Array.from(new Set(questions.map((question) => question.subject || 'General')));
+    const unique = Array.from(new Set(availableQuestions.map((question) => question.subject || 'General')));
     return ['All Subjects', ...unique];
-  }, [questions]);
+  }, [availableQuestions]);
 
   const chapters = useMemo(() => {
-    const unique = Array.from(new Set(questions.map((q) => normalizeChapter(q.chapter || 'General'))));
+    const filtered = selectedSubject === 'All Subjects' ? availableQuestions : availableQuestions.filter((q) => q.subject === selectedSubject);
+    const unique = Array.from(new Set(filtered.map((q) => normalizeChapter(q.chapter || 'General'))));
     return ['All Chapters', ...unique];
-  }, [questions]);
+  }, [availableQuestions, selectedSubject]);
 
   const filteredQuestions = useMemo(() => {
-    if (selectedSubject === 'All Subjects') return questions;
-    return questions.filter((question) => question.subject === selectedSubject);
-  }, [questions, selectedSubject]);
+    if (selectedSubject === 'All Subjects') return availableQuestions;
+    return availableQuestions.filter((question) => question.subject === selectedSubject);
+  }, [availableQuestions, selectedSubject]);
 
-  const totalQuestions = questions.length;
+  const totalQuestions = availableQuestions.length;
   const totalSubjects = subjects.length > 1 ? subjects.length - 1 : 0;
   const totalQuizzes = totalSubjects;
 
@@ -121,29 +135,36 @@ export default function App() {
     }
   }
 
-  async function handleQuizComplete(result) {
-    setQuizResult(result);
-    setActiveTab('results');
+ async function handleQuizComplete(result) {
+  setQuizResult(result);
+  setReviewQuestions(quizQuestions);
+  setActiveTab('results');
 
-    try {
-      await saveQuizResult({
-        classLevel: selectedClassLevel,
-        subject: selectedSubject === 'All Subjects' ? 'All Subjects' : selectedSubject,
-        questionLimit: Number(selectedQuestionCount),
-        durationMinutes: Number(selectedTimeLimit),
-        totalQuestions: result.total,
-        correctAnswers: result.correct,
-        wrongAnswers: result.wrong,
-        score: result.score,
-        percentage: result.percentage,
-        answers: result.answers,
-      });
-      showToast('Quiz complete! Your score was saved.', 'success');
-      await loadQuizResults();
-    } catch (err) {
-      showToast(err.message || 'Quiz complete, but could not save the result.', 'error');
-    }
+  try {
+    const classLevelToSave = isClassRestricted
+      ? Number(selectedClass)
+      : Number(selectedClassLevel);
+
+    await saveQuizResult({
+      classLevel: classLevelToSave,
+      subject: selectedSubject === 'All Subjects' ? 'All Subjects' : selectedSubject,
+      questionLimit: Number(selectedQuestionCount),
+      durationMinutes: Number(selectedTimeLimit),
+      totalQuestions: result.total,
+      correctAnswers: result.correct,
+      wrongAnswers: result.wrong,
+      skippedAnswers: result.skipped,
+      score: result.score,
+      percentage: result.percentage,
+      answers: result.answers,
+    });
+
+    showToast('Quiz complete! Your score was saved.', 'success');
+    await loadQuizResults();
+  } catch (err) {
+    showToast(err.message || 'Quiz complete, but could not save the result.', 'error');
   }
+}
 
   async function handleProfileSave(updates) {
     try {
@@ -158,6 +179,7 @@ export default function App() {
 
   function handleRestartQuiz() {
     setQuizResult(null);
+    setReviewQuestions([]);
     setActiveTab('quiz');
   }
 
@@ -193,7 +215,8 @@ export default function App() {
     try {
       const subjectFilter = selectedSubject === 'All Subjects' ? null : selectedSubject;
       const chapterFilter = selectedChapter === 'All Chapters' ? null : selectedChapter;
-      const questions = await getRandomQuestions(Number(selectedClassLevel), subjectFilter, chapterFilter, Number(selectedQuestionCount));
+      const classLevelToUse = isClassRestricted ? Number(selectedClass) : Number(selectedClassLevel);
+      const questions = await getRandomQuestions(classLevelToUse, subjectFilter, chapterFilter, Number(selectedQuestionCount));
 
       if (!questions || questions.length === 0) {
         setQuizError('No questions were found for this class and subject. Try a different selection.');
@@ -286,10 +309,24 @@ export default function App() {
     async function fetchProfile() {
       try {
         const currentProfile = await getCurrentProfile();
-        setProfile(currentProfile);
+
+        if (currentProfile) {
+          setProfile(currentProfile);
+          return;
+        }
+
+        setProfile({
+          role: 'user',
+          email: user.email,
+          class_level: user.user_metadata?.class_level ?? user.user_metadata?.classLevel ?? null,
+        });
       } catch (profileError) {
         console.warn(profileError.message || profileError);
-        setProfile(null);
+        setProfile({
+          role: 'user',
+          email: user.email,
+          class_level: user.user_metadata?.class_level ?? user.user_metadata?.classLevel ?? null,
+        });
       }
     }
 
@@ -348,6 +385,9 @@ export default function App() {
             <div className={styles.userLabel}>
               <span className={styles.userIcon}>👤</span>
               <strong>{user?.email?.split('@')?.[0] ?? user?.email}</strong>
+              {assignedClassLabel && !isAdmin && (
+                <small className={styles.userRoleInfo}>{assignedClassLabel}</small>
+              )}
               {profile ? (
                 <small className={profile.role === 'admin' ? styles.userRole : styles.userRoleInfo}>
                   {profile.role === 'admin' ? '🛡️ Admin' : '👤 User'}
@@ -374,16 +414,17 @@ export default function App() {
               </>
             )}
             <button
-              className={`${styles.toggleButton} ${footerActive ? styles.pulseActive : ''}`}
+              className={`${styles.toggleButton} ${darkMode ? styles.themeToggleDark : styles.themeToggleLight} ${footerActive ? styles.pulseActive : ''}`}
               type="button"
               onClick={handleThemeToggle}
               title={darkMode ? 'Switch to light theme' : 'Switch to dark theme'}
+              aria-label={darkMode ? 'Switch to light theme' : 'Switch to dark theme'}
               data-tooltip={darkMode ? 'Switch to light theme' : 'Switch to dark theme'}
             >
               <span className={styles.toggleIcon} aria-hidden>{darkMode ? '☀️' : '🌙'}</span>
             </button>
-            <button className={styles.signOutButton} type="button" onClick={handleSignOut} aria-label="Sign out" title="Sign out">
-              ⏻
+            <button className={styles.signOutButton} type="button" onClick={handleSignOut} aria-label="Log out" title="Log out">
+              🚪 Log out
             </button>
           </div>
         </header>
@@ -448,6 +489,7 @@ export default function App() {
               loading={resultsLoading}
               error={resultsError}
               onSave={handleProfileSave}
+              isAdmin={isAdmin}
             />
           </section>
         )}
@@ -463,15 +505,22 @@ export default function App() {
                   <select
                     id="quiz-class"
                     className={styles.subjectSelect}
-                    value={selectedClassLevel}
+                    value={selectedClass}
                     onChange={(event) => setSelectedClassLevel(event.target.value)}
+                    disabled={isClassRestricted}
                   >
-                    {['6', '7', '8', '9', '10', '11', '12'].map((level) => (
+                    {(isClassRestricted ? [selectedClass] : ['6', '7', '8', '9', '10', '11', '12']).map((level) => (
                       <option key={level} value={level}>
                         Class {level}
                       </option>
                     ))}
                   </select>
+                  {assignedClassLabel && (
+                    <small className={styles.assignedClassNote}>Assigned class: {assignedClassLabel}</small>
+                  )}
+                  {isClassRestricted && (
+                    <small className={styles.fieldHint}>This class is locked by your account.</small>
+                  )}
                 </div>
 
                 <div className={styles.field}>
@@ -582,6 +631,7 @@ export default function App() {
           <section className={styles.sectionGap}>
             <Result
               result={quizResult}
+              questions={reviewQuestions}
               history={quizHistory}
               loading={resultsLoading}
               error={resultsError}

@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import styles from './ProfileSection.module.css';
 
-export default function ProfileSection({ user, profile, history = [], loading, error, onSave }) {
+export default function ProfileSection({ user, profile, history = [], loading, error, onSave, isAdmin = false }) {
   const displayName = user?.user_metadata?.full_name || '';
+  const assignedClass = profile?.class_level ?? user?.user_metadata?.class_level ?? user?.user_metadata?.classLevel;
   const [editMode, setEditMode] = useState(false);
   const [name, setName] = useState(displayName);
+  const [assignClassMode, setAssignClassMode] = useState(false);
+  const [selectedClassToAssign, setSelectedClassToAssign] = useState(assignedClass || '6');
   const [saveLoading, setSaveLoading] = useState(false);
   const [saveError, setSaveError] = useState('');
   const [saveSuccess, setSaveSuccess] = useState('');
@@ -12,6 +15,21 @@ export default function ProfileSection({ user, profile, history = [], loading, e
   const totalQuizzes = history.length;
   const bestScore = history.reduce((best, item) => Math.max(best, item.score || 0), 0);
   const lastQuiz = history[0];
+
+  async function handleAssignClass() {
+    setSaveLoading(true);
+    setSaveError('');
+    setSaveSuccess('');
+    try {
+      await onSave({ class_level: selectedClassToAssign });
+      setSaveSuccess(`Class ${selectedClassToAssign} assigned successfully.`);
+      setAssignClassMode(false);
+    } catch (err) {
+      setSaveError(err.message || 'Unable to assign class.');
+    } finally {
+      setSaveLoading(false);
+    }
+  }
 
   return (
     <section className={styles.profileCard}>
@@ -98,6 +116,57 @@ export default function ProfileSection({ user, profile, history = [], loading, e
               <dd>{profile?.role || 'Student'}</dd>
             </div>
             <div>
+              <dt>Assigned class</dt>
+              <dd>
+                {assignClassMode && isAdmin ? (
+                  <div className={styles.classAssignField}>
+                    <select
+                      value={selectedClassToAssign}
+                      onChange={(e) => setSelectedClassToAssign(e.target.value)}
+                    >
+                      {['6', '7', '8', '9', '10', '11', '12'].map((level) => (
+                        <option key={level} value={level}>
+                          Class {level}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      className={styles.saveButton}
+                      onClick={handleAssignClass}
+                      disabled={saveLoading}
+                    >
+                      {saveLoading ? 'Assigning…' : 'Assign'}
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.cancelButton}
+                      onClick={() => {
+                        setAssignClassMode(false);
+                        setSelectedClassToAssign(assignedClass || '6');
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    {assignedClass ? `Class ${assignedClass}` : 'Not assigned'}
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        className={styles.assignButton}
+                        onClick={() => setAssignClassMode(true)}
+                        title="Assign a class to this user"
+                      >
+                        {assignedClass ? '✏️ Change' : '➕ Assign'}
+                      </button>
+                    )}
+                  </>
+                )}
+              </dd>
+            </div>
+            <div>
               <dt>Last active</dt>
               <dd>{lastQuiz ? new Date(lastQuiz.created_at).toLocaleDateString() : 'No quiz yet'}</dd>
             </div>
@@ -123,6 +192,11 @@ export default function ProfileSection({ user, profile, history = [], loading, e
       {saveError && <div className={styles.statusBanner}>{saveError}</div>}
       {saveSuccess && <div className={styles.statusBanner}>{saveSuccess}</div>}
       {loading && <div className={styles.statusBanner}>Loading profile history…</div>}
+      {assignedClass && profile?.role !== 'admin' && (
+        <div className={styles.statusBanner}>
+          Your account is restricted to Class {assignedClass}. You will only see questions for this class.
+        </div>
+      )}
 
       {history.length > 0 ? (
         <div className={styles.recentSection}>

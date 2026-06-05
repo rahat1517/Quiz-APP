@@ -24,16 +24,47 @@ body {
   color: #e2e8f0;
 }
 
-button, input, select {
+button, input, select, textarea {
   font: inherit;
+  font-size: clamp(0.95rem, 0.9vw, 1rem);
+  line-height: 1.6;
+  letter-spacing: 0.01em;
 }
 
 button {
   outline: none;
 }
 
-input, select {
+input, select, textarea {
   color: #ede9ff;
+}
+
+html {
+  font-size: clamp(14px, 1.1vw, 18px);
+}
+
+body {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+h2 {
+  font-size: clamp(1.7rem, 3vw, 2.3rem);
+}
+
+p,
+label,
+small,
+span,
+button,
+input,
+select,
+textarea {
+  font-size: clamp(0.9rem, 0.95vw, 1rem);
 }
 
 ::selection {

@@ -156,7 +156,16 @@ export default function QuizFullScreen(props) {
             <p>Are you sure you want to submit your answers? This will end the exam.</p>
             <div className={styles.confirmActions}>
               <button type="button" className={styles.cancelButton} onClick={() => setConfirmOpen(false)}>Cancel</button>
-              <button type="button" className={styles.primaryButton} onClick={handleSubmit}>Yes, submit</button>
+             <button
+                type="button"
+                className={styles.primaryButton}
+                onClick={() => {
+                  setConfirmOpen(false);
+                  handleSubmit();
+                }}
+              >
+                Yes, submit
+            </button>
             </div>
           </div>
         </div>

@@ -8,6 +8,7 @@ export async function saveQuizResult({
   totalQuestions,
   correctAnswers,
   wrongAnswers,
+  skippedAnswers,
   score,
   percentage,
   answers,
@@ -36,6 +37,7 @@ export async function saveQuizResult({
       total_questions: totalQuestions,
       correct_answers: correctAnswers,
       wrong_answers: wrongAnswers,
+      skipped_answers: skippedAnswers,
       score,
       percentage,
       answers,
@@ -74,7 +76,7 @@ export async function getMyQuizResults() {
     throw new Error(error.message);
   }
 
-  return data;
+  return data || [];
 }
 
 export async function getAllQuizResultsForAdmin() {
@@ -87,5 +89,5 @@ export async function getAllQuizResultsForAdmin() {
     throw new Error(error.message);
   }
 
-  return data;
+  return data || [];
 }

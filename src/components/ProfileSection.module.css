@@ -211,3 +211,50 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: #cbd5e1;
 }
+
+.classAssignField {
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.classAssignField select {
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.6rem 0.85rem;
+  color: #f8fafc;
+  cursor: pointer;
+  font-size: 0.9rem;
+  flex: 1;
+  min-width: 120px;
+}
+
+.classAssignField select:focus {
+  outline: none;
+  border-color: rgba(96, 165, 250, 0.6);
+  background: rgba(96, 165, 250, 0.08);
+}
+
+.classAssignField select option {
+  background: #1e293b;
+  color: #f8fafc;
+}
+
+.assignButton {
+  border: none;
+  border-radius: 12px;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.9rem;
+  background: rgba(168, 85, 247, 0.2);
+  color: #ddd6fe;
+  cursor: pointer;
+  transition: background 150ms ease, transform 150ms ease;
+  min-width: auto;
+}
+
+.assignButton:hover {
+  background: rgba(168, 85, 247, 0.3);
+  transform: translateY(-1px);
+}

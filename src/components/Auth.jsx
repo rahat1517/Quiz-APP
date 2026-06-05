@@ -109,11 +109,11 @@ export default function Auth({ onAuthSuccess }) {
       <div className={styles.authCard}>
         <div className={styles.authHeader}>
           <div>
-            <h1>{view === 'login' ? 'Welcome back' : 'Create an account'}</h1>
+            <h1>{view === 'login' ? 'Welcome back' : 'Create your account'}</h1>
             <p>
               {view === 'login'
-                ? 'Log in to manage your quizzes, add questions, and track results.'
-                : 'Register to securely save your quiz activity and control access.'}
+                ? 'Log in to manage quizzes, save your scores, and continue where you left off.'
+                : 'Sign up to save your quiz progress, track results, and access your personal dashboard.'}
             </p>
           </div>
           <button
@@ -125,7 +125,7 @@ export default function Auth({ onAuthSuccess }) {
               setMessage('');
             }}
           >
-            {view === 'login' ? 'Register' : 'Login'}
+            {view === 'login' ? 'New here? Sign up' : 'Already have an account? Log in'}
           </button>
         </div>
 
@@ -174,7 +174,7 @@ export default function Auth({ onAuthSuccess }) {
           )}
 
           <button type="submit" className={styles.authSubmit} disabled={loading}>
-            {loading ? (view === 'login' ? 'Signing in…' : 'Registering…') : view === 'login' ? 'Sign in' : 'Create account'}
+            {loading ? (view === 'login' ? 'Logging in…' : 'Signing up…') : view === 'login' ? 'Log in' : 'Sign up'}
           </button>
 
           {message && (
