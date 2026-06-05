@@ -1,4 +1,5 @@
-﻿import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { supabase } from './lib/supabaseClient';
 import { getQuestions, deleteQuestion, getRandomQuestions } from './services/questionService';
 import { normalizeChapter } from './lib/normalizeChapter';
@@ -768,6 +769,7 @@ export default function App() {
       />
 
       <Toast toast={toast} />
+      <Analytics />
     </div>
   );
 }
