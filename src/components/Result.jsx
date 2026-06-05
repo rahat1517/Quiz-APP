@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 import styles from './Result.module.css';
 
 export default function Result({
@@ -30,6 +30,26 @@ export default function Result({
     };
   }, [result]);
 
+  useEffect(() => {
+    if (!selectedExam) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    function handleEscape(event) {
+      if (event.key === 'Escape') {
+        setSelectedExam(null);
+      }
+    }
+
+    window.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleEscape);
+    };
+  }, [selectedExam]);
+
   function formatDate(dateValue) {
     if (!dateValue) return '-';
 
@@ -37,26 +57,6 @@ export default function Result({
       dateStyle: 'medium',
       timeStyle: 'short',
     });
-  }
-
-  function getStatusClass(status) {
-    const normalizedStatus = String(status || '').toLowerCase();
-
-    if (normalizedStatus === 'correct') return styles.correct;
-    if (normalizedStatus === 'wrong') return styles.wrong;
-    if (normalizedStatus === 'skipped') return styles.skipped;
-
-    return styles.neutral;
-  }
-
-  function getStatusLabel(status) {
-    const normalizedStatus = String(status || '').toLowerCase();
-
-    if (normalizedStatus === 'correct') return 'Correct';
-    if (normalizedStatus === 'wrong') return 'Wrong';
-    if (normalizedStatus === 'skipped') return 'Skipped';
-
-    return 'Unknown';
   }
 
   function getAnswerList(exam) {
@@ -74,6 +74,26 @@ export default function Result({
     }
   }
 
+  function getStatusClass(status) {
+    const normalized = String(status || '').toLowerCase();
+
+    if (normalized === 'correct') return styles.correct;
+    if (normalized === 'wrong') return styles.wrong;
+    if (normalized === 'skipped') return styles.skipped;
+
+    return styles.neutral;
+  }
+
+  function getStatusLabel(status) {
+    const normalized = String(status || '').toLowerCase();
+
+    if (normalized === 'correct') return 'Correct';
+    if (normalized === 'wrong') return 'Wrong';
+    if (normalized === 'skipped') return 'Skipped';
+
+    return 'Unknown';
+  }
+
   function normalizeOptions(options) {
     if (!options) return [];
 
@@ -81,8 +101,8 @@ export default function Result({
       return options.map((option, index) => {
         if (typeof option === 'object' && option !== null) {
           return {
-            key: option.key || String.fromCharCode(65 + index),
-            text: option.text || '',
+            key: String(option.key || String.fromCharCode(65 + index)).toUpperCase(),
+            text: String(option.text || ''),
           };
         }
 
@@ -102,50 +122,79 @@ export default function Result({
 
     return [
       {
-        key: 'Option',
+        key: 'A',
         text: String(options),
       },
     ];
   }
 
-  function getAnswerDisplay(answer, type) {
-    if (type === 'user') {
-      if (answer.user_answer_text) {
-        return `${answer.user_answer || ''} - ${answer.user_answer_text}`;
-      }
+  function getAnswerText(answer, answerKey) {
+    if (!answerKey) return null;
 
-      if (answer.selected_answer_text) {
-        return `${answer.selected_answer || ''} - ${answer.selected_answer_text}`;
-      }
+    const options = normalizeOptions(answer.options);
+    const found = options.find(
+      (option) =>
+        String(option.key).toUpperCase() === String(answerKey).toUpperCase()
+    );
 
-      if (answer.user_answer) {
-        return answer.user_answer;
-      }
+    return found?.text || null;
+  }
 
-      if (answer.selected_answer) {
-        return answer.selected_answer;
-      }
+  function getUserAnswerKey(answer) {
+    return answer.user_answer || answer.selected_answer || null;
+  }
 
-      return 'Skipped';
+  function getCorrectAnswerKey(answer) {
+    return answer.correct_answer || answer.correctAnswer || null;
+  }
+
+  function getUserAnswerDisplay(answer) {
+    const userKey = getUserAnswerKey(answer);
+
+    if (!userKey) return 'Skipped';
+
+    const userText =
+      answer.user_answer_text ||
+      answer.selected_answer_text ||
+      getAnswerText(answer, userKey);
+
+    return userText ? `${userKey} - ${userText}` : userKey;
+  }
+
+  function getCorrectAnswerDisplay(answer) {
+    const correctKey = getCorrectAnswerKey(answer);
+
+    if (!correctKey) return '-';
+
+    const correctText =
+      answer.correct_answer_text ||
+      answer.correctAnswerText ||
+      getAnswerText(answer, correctKey);
+
+    return correctText ? `${correctKey} - ${correctText}` : correctKey;
+  }
+
+  function getOptionClass(answer, optionKey) {
+    const userKey = getUserAnswerKey(answer);
+    const correctKey = getCorrectAnswerKey(answer);
+    const status = String(answer.status || '').toLowerCase();
+
+    const isUserOption =
+      userKey && String(userKey).toUpperCase() === String(optionKey).toUpperCase();
+
+    const isCorrectOption =
+      correctKey &&
+      String(correctKey).toUpperCase() === String(optionKey).toUpperCase();
+
+    if (isCorrectOption) {
+      return styles.correctOption;
     }
 
-    if (answer.correct_answer_text) {
-      return `${answer.correct_answer || ''} - ${answer.correct_answer_text}`;
+    if (status === 'wrong' && isUserOption) {
+      return styles.wrongOption;
     }
 
-    if (answer.correctAnswerText) {
-      return `${answer.correctAnswer || ''} - ${answer.correctAnswerText}`;
-    }
-
-    if (answer.correct_answer) {
-      return answer.correct_answer;
-    }
-
-    if (answer.correctAnswer) {
-      return answer.correctAnswer;
-    }
-
-    return '-';
+    return styles.normalOption;
   }
 
   const selectedExamAnswers = getAnswerList(selectedExam);
@@ -155,7 +204,7 @@ export default function Result({
       <div className={styles.headerRow}>
         <div>
           <h2>Quiz Results</h2>
-          <p>See your current result and previous exam history.</p>
+          <p>See current result and previous exam history.</p>
         </div>
 
         {onRestart && (
@@ -211,10 +260,7 @@ export default function Result({
         <div className={styles.sectionTitleRow}>
           <div>
             <h3>Past Exams</h3>
-            <p>
-              Overall result list. Click details to see all questions, answers,
-              right, wrong, and skipped status.
-            </p>
+            <p>Click Details to open a question-wise review.</p>
           </div>
         </div>
 
@@ -247,36 +293,56 @@ export default function Result({
               </thead>
 
               <tbody>
-                {history.map((exam) => (
-                  <tr key={exam.id}>
-                    <td>{formatDate(exam.created_at)}</td>
-                    <td>
-                      {exam.class_level ? `Class ${exam.class_level}` : '-'}
-                    </td>
-                    <td>{exam.subject || '-'}</td>
-                    <td>{exam.total_questions ?? 0}</td>
-                    <td className={styles.correctText}>
-                      {exam.correct_answers ?? 0}
-                    </td>
-                    <td className={styles.wrongText}>
-                      {exam.wrong_answers ?? 0}
-                    </td>
-                    <td className={styles.skippedText}>
-                      {exam.skipped_answers ?? 0}
-                    </td>
-                    <td>{exam.score ?? 0}</td>
-                    <td>{exam.percentage ?? 0}%</td>
-                    <td>
-                      <button
-                        type="button"
-                        className={styles.detailsButton}
-                        onClick={() => setSelectedExam(exam)}
-                      >
-                        Details
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {history.map((exam) => {
+                  const isSelected = selectedExam?.id === exam.id;
+
+                  return (
+                    <tr
+                      key={exam.id}
+                      className={isSelected ? styles.selectedExamRow : ''}
+                    >
+                      <td data-label="Date">{formatDate(exam.created_at)}</td>
+
+                      <td data-label="Class">
+                        {exam.class_level ? `Class ${exam.class_level}` : '-'}
+                      </td>
+
+                      <td data-label="Subject">{exam.subject || '-'}</td>
+
+                      <td data-label="Total">{exam.total_questions ?? 0}</td>
+
+                      <td data-label="Correct" className={styles.correctText}>
+                        {exam.correct_answers ?? 0}
+                      </td>
+
+                      <td data-label="Wrong" className={styles.wrongText}>
+                        {exam.wrong_answers ?? 0}
+                      </td>
+
+                      <td data-label="Skipped" className={styles.skippedText}>
+                        {exam.skipped_answers ?? 0}
+                      </td>
+
+                      <td data-label="Score">{exam.score ?? 0}</td>
+
+                      <td data-label="Percentage">{exam.percentage ?? 0}%</td>
+
+                      <td data-label="Details">
+                        <button
+                          type="button"
+                          className={
+                            isSelected
+                              ? `${styles.detailsButton} ${styles.activeDetailsButton}`
+                              : styles.detailsButton
+                          }
+                          onClick={() => setSelectedExam(exam)}
+                        >
+                          {isSelected ? 'Viewing' : 'Details'}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -284,105 +350,125 @@ export default function Result({
       </section>
 
       {selectedExam && (
-        <section className={styles.detailsPanel}>
-          <div className={styles.detailsHeader}>
-            <div>
-              <h3>Exam Details</h3>
-              <p>
-                {formatDate(selectedExam.created_at)} · Class{' '}
-                {selectedExam.class_level || '-'} ·{' '}
-                {selectedExam.subject || '-'}
-              </p>
-            </div>
-
-            <button
-              type="button"
-              className={styles.closeButton}
-              onClick={() => setSelectedExam(null)}
-            >
-              Close
-            </button>
-          </div>
-
-          <div className={styles.summaryGrid}>
-            <div className={`${styles.summaryBox} ${styles.correctBox}`}>
-              <span>Correct</span>
-              <strong>{selectedExam.correct_answers ?? 0}</strong>
-            </div>
-
-            <div className={`${styles.summaryBox} ${styles.wrongBox}`}>
-              <span>Wrong</span>
-              <strong>{selectedExam.wrong_answers ?? 0}</strong>
-            </div>
-
-            <div className={`${styles.summaryBox} ${styles.skippedBox}`}>
-              <span>Skipped</span>
-              <strong>{selectedExam.skipped_answers ?? 0}</strong>
-            </div>
-          </div>
-
-          <div className={styles.answerList}>
-            {selectedExamAnswers.length === 0 && (
-              <div className={styles.statusBox}>
-                No question details found for this exam. Old exam results may
-                not have saved full question data.
+        <div
+          className={styles.detailsOverlay}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Exam details"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              setSelectedExam(null);
+            }
+          }}
+        >
+          <aside className={styles.detailsDrawer}>
+            <div className={styles.drawerHeader}>
+              <div>
+                <h3>Exam Details</h3>
+                <p>
+                  {formatDate(selectedExam.created_at)} · Class{' '}
+                  {selectedExam.class_level || '-'} · {selectedExam.subject || '-'}
+                </p>
               </div>
-            )}
 
-            {selectedExamAnswers.map((answer, index) => {
-              const options = normalizeOptions(answer.options);
+              <button
+                type="button"
+                className={styles.closeButton}
+                onClick={() => setSelectedExam(null)}
+              >
+                ✕ Close
+              </button>
+            </div>
 
-              return (
-                <div
-                  key={answer.question_id || answer.id || index}
-                  className={`${styles.answerCard} ${getStatusClass(
-                    answer.status
-                  )}`}
-                >
-                  <div className={styles.answerTopRow}>
-                    <h4>
-                      {index + 1}.{' '}
-                      {answer.question || answer.question_text || 'Question'}
-                    </h4>
-
-                    <span
-                      className={`${styles.statusBadge} ${getStatusClass(
-                        answer.status
-                      )}`}
-                    >
-                      {getStatusLabel(answer.status)}
-                    </span>
-                  </div>
-
-                  {options.length > 0 && (
-                    <div className={styles.optionsList}>
-                      {options.map((option, optionIndex) => (
-                        <div
-                          key={`${option.key}-${optionIndex}`}
-                          className={styles.optionItem}
-                        >
-                          <strong>{option.key}.</strong> {option.text}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className={styles.answerMeta}>
-                    <p>
-                      <strong>Your Answer:</strong>{' '}
-                      {getAnswerDisplay(answer, 'user')}
-                    </p>
-
-                    <p>
-                      <strong>Correct Answer:</strong>{' '}
-                      {getAnswerDisplay(answer, 'correct')}
-                    </p>
-                  </div>
+            <div className={styles.drawerBody}>
+              <div className={styles.summaryGrid}>
+                <div className={`${styles.summaryBox} ${styles.correctBox}`}>
+                  <span>Correct</span>
+                  <strong>{selectedExam.correct_answers ?? 0}</strong>
                 </div>
-              );
-            })}
-          </div>
-        </section>
+
+                <div className={`${styles.summaryBox} ${styles.wrongBox}`}>
+                  <span>Wrong</span>
+                  <strong>{selectedExam.wrong_answers ?? 0}</strong>
+                </div>
+
+                <div className={`${styles.summaryBox} ${styles.skippedBox}`}>
+                  <span>Skipped</span>
+                  <strong>{selectedExam.skipped_answers ?? 0}</strong>
+                </div>
+              </div>
+
+              <div className={styles.answerList}>
+                {selectedExamAnswers.length === 0 && (
+                  <div className={styles.statusBox}>
+                    No question details found for this exam. Old results may not
+                    have saved full question data.
+                  </div>
+                )}
+
+                {selectedExamAnswers.map((answer, index) => {
+                  const options = normalizeOptions(answer.options);
+                  const statusClass = getStatusClass(answer.status);
+                  const isWrong =
+                    String(answer.status || '').toLowerCase() === 'wrong';
+
+                  return (
+                    <article
+                      key={answer.question_id || answer.id || index}
+                      className={`${styles.answerCard} ${statusClass}`}
+                    >
+                      <div className={styles.answerTopRow}>
+                        <h4>
+                          {index + 1}.{' '}
+                          {answer.question || answer.question_text || 'Question'}
+                        </h4>
+
+                        <span className={`${styles.statusBadge} ${statusClass}`}>
+                          {getStatusLabel(answer.status)}
+                        </span>
+                      </div>
+
+                      <div className={styles.optionsList}>
+                        {options.map((option, optionIndex) => (
+                          <div
+                            key={`${option.key}-${optionIndex}`}
+                            className={`${styles.optionItem} ${getOptionClass(
+                              answer,
+                              option.key
+                            )}`}
+                          >
+                            <span className={styles.optionKey}>{option.key}</span>
+                            <span className={styles.optionText}>{option.text}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className={styles.answerMeta}>
+                        <div
+                          className={
+                            isWrong
+                              ? `${styles.answerInfoBox} ${styles.userWrongAnswer}`
+                              : `${styles.answerInfoBox} ${styles.userNormalAnswer}`
+                          }
+                        >
+                          <span>Your Answer</span>
+                          <strong>{getUserAnswerDisplay(answer)}</strong>
+                        </div>
+
+                        <div
+                          className={`${styles.answerInfoBox} ${styles.correctAnswerBox}`}
+                        >
+                          <span>Correct Answer</span>
+                          <strong>{getCorrectAnswerDisplay(answer)}</strong>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
+          </aside>
+        </div>
       )}
     </div>
   );

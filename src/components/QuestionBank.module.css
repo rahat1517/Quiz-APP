@@ -179,3 +179,30 @@
 .filterField select {
   min-width: 170px;
 }
+.filterGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filterField select {
+  min-width: 170px;
+  min-height: 42px;
+  border-radius: 12px;
+  padding: 8px 12px;
+  color: #f8fafc;
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  outline: none;
+}
+
+.filterField select:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+}
+
+.filterField select option {
+  color: #0f172a;
+  background: #ffffff;
+}
