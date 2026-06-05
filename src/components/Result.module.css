@@ -1530,3 +1530,27 @@
     font-size: 14px;
   }
 }
+.explanationBox {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(30, 41, 59, 0.72);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.explanationBox span {
+  display: block;
+  margin-bottom: 7px;
+  color: #7dd3fc;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.explanationBox p {
+  margin: 0;
+  color: #e0f2fe;
+  line-height: 1.6;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}

@@ -53,12 +53,12 @@ export default function useQuiz({
       let status = 'skipped';
 
       if (!userAnswer) {
-        skipped += 1;
+        skipped = skipped + 1;
       } else if (userAnswer === question.correct_answer) {
-        correctAnswers += 1;
+        correctAnswers = correctAnswers + 1;
         status = 'correct';
       } else {
-        wrongAnswers += 1;
+        wrongAnswers = wrongAnswers + 1;
         status = 'wrong';
       }
 
@@ -98,7 +98,7 @@ export default function useQuiz({
         correct_answer_text: correctAnswerKey
           ? question[`option_${correctAnswerKey}`] || null
           : null,
-
+        explanation: question.explanation || question.answer_explanation || '',
         status,
       };
     });

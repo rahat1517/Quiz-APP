@@ -4,6 +4,7 @@ import { normalizeChapter } from '../lib/normalizeChapter';
 // Frontend role checks are useful for UI gating,
 // but Supabase row-level security must be configured
 // server-side so only admins can insert/update/delete.
+
 export async function getQuestions() {
   const { data, error } = await supabase
     .from('questions')
@@ -14,18 +15,95 @@ export async function getQuestions() {
     throw new Error(error.message);
   }
 
+  return data || [];
+}
+
+export async function addQuestion(question) {
+  const payload = {
+    ...question,
+
+    // class_level now supports values like:
+    // "6", "9", "BCS 44", "BCS 45", "Admission", etc.
+    class_level: String(question.class_level || '').trim(),
+
+    subject: String(question.subject || 'General').trim(),
+
+    chapter: normalizeChapter(question.chapter || 'General'),
+
+    question_text: String(question.question_text || '').trim(),
+
+    option_a: String(question.option_a || '').trim(),
+    option_b: String(question.option_b || '').trim(),
+    option_c: String(question.option_c || '').trim(),
+    option_d: String(question.option_d || '').trim(),
+
+    correct_answer: String(question.correct_answer || '').trim().toUpperCase(),
+
+    // explanation must be saved if database has this column
+    explanation: String(question.explanation || '').trim(),
+  };
+
+  const { data, error } = await supabase
+    .from('questions')
+    .insert([payload])
+    .select('*')
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
   return data;
 }
 
 export async function updateQuestion(questionId, updates) {
-  if (updates && typeof updates.chapter !== 'undefined') {
-    updates.chapter = normalizeChapter(updates.chapter);
+  const payload = { ...updates };
+
+  if (typeof payload.class_level !== 'undefined') {
+    payload.class_level = String(payload.class_level || '').trim();
   }
+
+  if (typeof payload.subject !== 'undefined') {
+    payload.subject = String(payload.subject || 'General').trim();
+  }
+
+  if (typeof payload.chapter !== 'undefined') {
+    payload.chapter = normalizeChapter(payload.chapter || 'General');
+  }
+
+  if (typeof payload.question_text !== 'undefined') {
+    payload.question_text = String(payload.question_text || '').trim();
+  }
+
+  if (typeof payload.option_a !== 'undefined') {
+    payload.option_a = String(payload.option_a || '').trim();
+  }
+
+  if (typeof payload.option_b !== 'undefined') {
+    payload.option_b = String(payload.option_b || '').trim();
+  }
+
+  if (typeof payload.option_c !== 'undefined') {
+    payload.option_c = String(payload.option_c || '').trim();
+  }
+
+  if (typeof payload.option_d !== 'undefined') {
+    payload.option_d = String(payload.option_d || '').trim();
+  }
+
+  if (typeof payload.correct_answer !== 'undefined') {
+    payload.correct_answer = String(payload.correct_answer || '').trim().toUpperCase();
+  }
+
+  if (typeof payload.explanation !== 'undefined') {
+    payload.explanation = String(payload.explanation || '').trim();
+  }
+
   const { data, error } = await supabase
     .from('questions')
-    .update(updates)
+    .update(payload)
     .eq('id', questionId)
-    .select()
+    .select('*')
     .single();
 
   if (error) {
@@ -48,36 +126,26 @@ export async function deleteQuestion(questionId) {
   return true;
 }
 
-export async function addQuestion(question) {
-  const payload = {
-    ...question,
-    chapter: normalizeChapter(question.chapter),
-  };
-
-  const { data, error } = await supabase
-    .from('questions')
-    .insert([payload])
-    .select()
-    .single();
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data;
-}
-
 export async function getRandomQuestions(classLevel, subject, chapter, limit) {
+  const safeClassLevel = String(classLevel || '').trim();
+  const safeSubject = subject && subject !== 'All Subjects' ? String(subject).trim() : null;
+  const safeChapter =
+    chapter && chapter !== 'All Chapters'
+      ? normalizeChapter(chapter)
+      : null;
+
+  const safeLimit = Math.max(1, Number(limit) || 1);
+
   const { data, error } = await supabase.rpc('get_random_questions', {
-    p_class_level: classLevel,
-    p_subject: subject || null,
-    p_chapter: chapter || null,
-    p_limit: limit,
+    p_class_level: safeClassLevel,
+    p_subject: safeSubject,
+    p_chapter: safeChapter,
+    p_limit: safeLimit,
   });
 
   if (error) {
     throw new Error(error.message);
   }
 
-  return data;
+  return data || [];
 }

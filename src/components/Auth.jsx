@@ -1,20 +1,46 @@
 import { useState, useEffect } from 'react';
 import styles from './Auth.module.css';
-import { signInWithEmail, signUpWithEmail, getSession, resendSignupVerification } from '../services/authService';
+import { supabase } from '../lib/supabaseClient';
+import {
+  signInWithEmail,
+  signUpWithEmail,
+  getSession,
+  resendSignupVerification,
+} from '../services/authService';
+
+const classOptions = [
+  'Class 6',
+  'Class 7',
+  'Class 8',
+  'Class 9',
+  'Class 10',
+  'Class 11',
+  'Class 12',
+  'BCS 44',
+  'BCS 45',
+  'Other / Custom',
+];
 
 export default function Auth({ onAuthSuccess }) {
   const [view, setView] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const [selectedClassLevel, setSelectedClassLevel] = useState('');
+  const [customClassLevel, setCustomClassLevel] = useState('');
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+
   const COOLDOWN_SECONDS = 60;
+
   const [resendCooldown, setResendCooldown] = useState(() => {
     try {
       const ts = localStorage.getItem('resend_ts');
       if (!ts) return 0;
+
       const remaining = Math.ceil((Number(ts) - Date.now()) / 1000);
       return remaining > 0 ? remaining : 0;
     } catch {
@@ -24,6 +50,7 @@ export default function Auth({ onAuthSuccess }) {
 
   useEffect(() => {
     if (resendCooldown <= 0) return undefined;
+
     const t = setInterval(() => {
       setResendCooldown((s) => {
         if (s <= 1) {
@@ -32,14 +59,40 @@ export default function Auth({ onAuthSuccess }) {
           } catch {
             // ignore localStorage cleanup failures
           }
+
           clearInterval(t);
           return 0;
         }
+
         return s - 1;
       });
     }, 1000);
+
     return () => clearInterval(t);
   }, [resendCooldown]);
+
+  function getFinalClassLevel() {
+    if (selectedClassLevel === 'Other / Custom') {
+      return customClassLevel.trim();
+    }
+
+    return selectedClassLevel.trim();
+  }
+
+  async function saveProfileAfterSignup(user, classLevel) {
+    if (!user?.id) return;
+
+    const { error: profileError } = await supabase.from('profiles').upsert({
+      id: user.id,
+      email: user.email,
+      role: 'user',
+      class_level: classLevel,
+    });
+
+    if (profileError) {
+      console.warn('Profile save failed:', profileError.message);
+    }
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -50,14 +103,34 @@ export default function Auth({ onAuthSuccess }) {
     try {
       if (view === 'login') {
         await signInWithEmail({ email, password });
+
         setMessage('Signed in successfully.');
+
         const session = await getSession();
         onAuthSuccess?.(session?.user ?? null);
       } else {
+        const finalClassLevel = getFinalClassLevel();
+
         if (password !== confirmPassword) {
           throw new Error('Passwords do not match.');
         }
-        const result = await signUpWithEmail({ email, password });
+
+        if (!finalClassLevel) {
+          throw new Error('Please select your class or exam category.');
+        }
+
+        const result = await signUpWithEmail({
+          email,
+          password,
+          metadata: {
+            class_level: finalClassLevel,
+            classLevel: finalClassLevel,
+          },
+        });
+
+        if (result.user) {
+          await saveProfileAfterSignup(result.user, finalClassLevel);
+        }
 
         if (result.user && !result.session) {
           setMessage('Registration successful. Please confirm your email before signing in.');
@@ -78,24 +151,32 @@ export default function Auth({ onAuthSuccess }) {
   async function handleResend() {
     setError('');
     setMessage('');
+
     if (!email) {
       setError('Please enter an email to send the link to.');
       return;
     }
+
     if (resendCooldown > 0) {
       setError(`Please wait ${resendCooldown}s before trying again.`);
       return;
     }
+
     setLoading(true);
+
     try {
       await resendSignupVerification(email);
+
       setMessage('A verification email was resent. Check your inbox.');
+
       const expireAt = Date.now() + COOLDOWN_SECONDS * 1000;
+
       try {
         localStorage.setItem('resend_ts', String(expireAt));
       } catch {
         // ignore localStorage write failures
       }
+
       setResendCooldown(COOLDOWN_SECONDS);
     } catch (err) {
       setError(err.message || 'Unable to send verification link.');
@@ -110,12 +191,14 @@ export default function Auth({ onAuthSuccess }) {
         <div className={styles.authHeader}>
           <div>
             <h1>{view === 'login' ? 'Welcome back' : 'Create your account'}</h1>
+
             <p>
               {view === 'login'
                 ? 'Log in to manage quizzes, save your scores, and continue where you left off.'
                 : 'Sign up to save your quiz progress, track results, and access your personal dashboard.'}
             </p>
           </div>
+
           <button
             type="button"
             className={styles.toggleView}
@@ -123,6 +206,8 @@ export default function Auth({ onAuthSuccess }) {
               setView((current) => (current === 'login' ? 'register' : 'login'));
               setError('');
               setMessage('');
+              setPassword('');
+              setConfirmPassword('');
             }}
           >
             {view === 'login' ? 'New here? Sign up' : 'Already have an account? Log in'}
@@ -133,6 +218,7 @@ export default function Auth({ onAuthSuccess }) {
           <label className={styles.fieldLabel} htmlFor="auth-email">
             Email address
           </label>
+
           <input
             id="auth-email"
             type="email"
@@ -146,6 +232,7 @@ export default function Auth({ onAuthSuccess }) {
           <label className={styles.fieldLabel} htmlFor="auth-password">
             Password
           </label>
+
           <input
             id="auth-password"
             type="password"
@@ -161,6 +248,7 @@ export default function Auth({ onAuthSuccess }) {
               <label className={styles.fieldLabel} htmlFor="auth-password-confirm">
                 Confirm password
               </label>
+
               <input
                 id="auth-password-confirm"
                 type="password"
@@ -170,17 +258,66 @@ export default function Auth({ onAuthSuccess }) {
                 required
                 placeholder="Repeat your password"
               />
+
+              <label className={styles.fieldLabel} htmlFor="auth-class-level">
+                Class / Exam category
+              </label>
+
+              <select
+                id="auth-class-level"
+                className={styles.authSelect}
+                value={selectedClassLevel}
+                onChange={(event) => {
+                  setSelectedClassLevel(event.target.value);
+
+                  if (event.target.value !== 'Other / Custom') {
+                    setCustomClassLevel('');
+                  }
+                }}
+                required
+              >
+                <option value="">Select class or exam</option>
+
+                {classOptions.map((level) => (
+                  <option key={level} value={level}>
+                    {level}
+                  </option>
+                ))}
+              </select>
+
+              {selectedClassLevel === 'Other / Custom' && (
+                <>
+                  <label className={styles.fieldLabel} htmlFor="auth-custom-class">
+                    Custom class / exam name
+                  </label>
+
+                  <input
+                    id="auth-custom-class"
+                    type="text"
+                    value={customClassLevel}
+                    onChange={(event) => setCustomClassLevel(event.target.value)}
+                    required
+                    placeholder="Example: BCS 46, Admission, HSC 2026"
+                  />
+                </>
+              )}
             </>
           )}
 
           <button type="submit" className={styles.authSubmit} disabled={loading}>
-            {loading ? (view === 'login' ? 'Logging in…' : 'Signing up…') : view === 'login' ? 'Log in' : 'Sign up'}
+            {loading
+              ? view === 'login'
+                ? 'Logging in…'
+                : 'Signing up…'
+              : view === 'login'
+                ? 'Log in'
+                : 'Sign up'}
           </button>
 
           {message && (
             <div className={`${styles.authFeedback} ${styles.success}`}>
               {message}
-              {/* Show a resend option after registration prompt */}
+
               {message.toLowerCase().includes('check your email') && (
                 <div className={styles.resendRow}>
                   <button
@@ -189,13 +326,20 @@ export default function Auth({ onAuthSuccess }) {
                     onClick={handleResend}
                     disabled={loading || resendCooldown > 0 || !email}
                   >
-                    {resendCooldown > 0 ? `Resend available in ${resendCooldown}s` : 'Resend verification / send sign-in link'}
+                    {resendCooldown > 0
+                      ? `Resend available in ${resendCooldown}s`
+                      : 'Resend verification / send sign-in link'}
                   </button>
                 </div>
               )}
             </div>
           )}
-          {error && <div className={`${styles.authFeedback} ${styles.error}`}>{error}</div>}
+
+          {error && (
+            <div className={`${styles.authFeedback} ${styles.error}`}>
+              {error}
+            </div>
+          )}
         </form>
       </div>
     </div>

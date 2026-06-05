@@ -24,7 +24,7 @@ export default function App() {
   const [questions, setQuestions] = useState([]);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [selectedSubject, setSelectedSubject] = useState('All Subjects');
-  const [selectedClassLevel, setSelectedClassLevel] = useState('6');
+  const [selectedClassLevel, setSelectedClassLevel] = useState('');
   const [selectedChapter, setSelectedChapter] = useState('All Chapters');
   const [selectedQuestionCount, setSelectedQuestionCount] = useState(5);
   const [selectedTimeLimit, setSelectedTimeLimit] = useState(5);
@@ -54,21 +54,46 @@ export default function App() {
   const isAdmin = profileRole === 'admin';
 
   const assignedClassLevel =
-    profile?.class_level ??
-    user?.user_metadata?.class_level ??
-    user?.user_metadata?.classLevel;
+  profile?.class_level ??
+  user?.user_metadata?.class_level ??
+  user?.user_metadata?.classLevel;
 
-  const assignedClassLabel = assignedClassLevel ? `Class ${assignedClassLevel}` : null;
-  const isClassRestricted = !isAdmin && assignedClassLevel != null;
-  const selectedClass = isClassRestricted ? String(assignedClassLevel) : selectedClassLevel;
+const assignedClassLabel = assignedClassLevel ? String(assignedClassLevel).trim() : null;
 
-  const availableQuestions = useMemo(() => {
-    if (isAdmin) return questions;
-
-    return questions.filter(
-      (question) => String(question.class_level) === String(selectedClass)
+// Admin can select any class/exam.
+// Normal user can only access assigned class/exam.
+const isClassRestricted = !isAdmin && Boolean(assignedClassLabel);
+const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLevel;
+  const classLevels = useMemo(() => {
+    const unique = Array.from(
+      new Set(
+        questions
+          .map((question) => question.class_level)
+          .filter(Boolean)
+          .map((level) => String(level))
+      )
     );
-  }, [questions, isAdmin, selectedClass]);
+
+    return unique.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  }, [questions]);
+
+  useEffect(() => {
+    if (!selectedClassLevel && classLevels.length > 0) {
+      setSelectedClassLevel(classLevels[0]);
+    }
+  }, [classLevels, selectedClassLevel]);
+
+ const availableQuestions = useMemo(() => {
+  const classToUse = isClassRestricted ? assignedClassLabel : selectedClassLevel;
+
+  if (!classToUse) {
+    return isAdmin ? questions : [];
+  }
+
+  return questions.filter(
+    (question) => String(question.class_level).trim() === String(classToUse).trim()
+  );
+  }, [questions, selectedClassLevel, isClassRestricted, assignedClassLabel, isAdmin]);
 
   const subjects = useMemo(() => {
     const unique = Array.from(
@@ -107,7 +132,7 @@ export default function App() {
 
   const totalQuestions = availableQuestions.length;
   const totalSubjects = subjects.length > 1 ? subjects.length - 1 : 0;
-  const totalQuizzes = totalSubjects;
+  const totalQuizzes = classLevels.length;
 
   async function loadQuestions() {
     setLoading(true);
@@ -155,6 +180,7 @@ export default function App() {
       setQuestions([]);
       setSelectedSubject('All Subjects');
       setSelectedChapter('All Chapters');
+      setSelectedClassLevel('');
       setEditingQuestion(null);
       setQuizResult(null);
       setActiveTab('dashboard');
@@ -170,9 +196,7 @@ export default function App() {
     setActiveTab('results');
 
     try {
-      const classLevelToSave = isClassRestricted
-        ? Number(selectedClass)
-        : Number(selectedClassLevel);
+      const classLevelToSave = String(selectedClassLevel);
 
       await saveQuizResult({
         classLevel: classLevelToSave,
@@ -246,9 +270,25 @@ export default function App() {
     try {
       const subjectFilter = selectedSubject === 'All Subjects' ? null : selectedSubject;
       const chapterFilter = selectedChapter === 'All Chapters' ? null : selectedChapter;
-      const classLevelToUse = isClassRestricted
-        ? Number(selectedClass)
-        : Number(selectedClassLevel);
+      const classLevelToUse = String( isClassRestricted ? assignedClassLabel : selectedClassLevel ).trim();
+
+      if (!classLevelToUse) {
+        setQuizError('Please select a class or exam category.');
+        setQuizStarted(false);
+        return;
+      }
+
+      if (Number(selectedQuestionCount) < 1) {
+        setQuizError('Question count must be at least 1.');
+        setQuizStarted(false);
+        return;
+      }
+
+      if (Number(selectedTimeLimit) < 1) {
+        setQuizError('Time limit must be at least 1 minute.');
+        setQuizStarted(false);
+        return;
+      }
 
       const questions = await getRandomQuestions(
         classLevelToUse,
@@ -592,37 +632,14 @@ export default function App() {
               <div className={styles.fieldGroupInline}>
                 <div className={styles.field}>
                   <label htmlFor="quiz-class" className={styles.fieldLabel}>
-                    Class
+                    Class / Exam
                   </label>
 
-                  <select
-                    id="quiz-class"
-                    className={styles.subjectSelect}
-                    value={selectedClass}
-                    onChange={(event) => setSelectedClassLevel(event.target.value)}
-                    disabled={isClassRestricted}
-                  >
-                    {(isClassRestricted
-                      ? [selectedClass]
-                      : ['6', '7', '8', '9', '10', '11', '12']
-                    ).map((level) => (
-                      <option key={level} value={level}>
-                        Class {level}
-                      </option>
-                    ))}
-                  </select>
+                  disabled={isClassRestricted}
 
-                  {assignedClassLabel && (
-                    <small className={styles.assignedClassNote}>
-                      Assigned class: {assignedClassLabel}
-                    </small>
-                  )}
-
-                  {isClassRestricted && (
-                    <small className={styles.fieldHint}>
-                      This class is locked by your account.
-                    </small>
-                  )}
+                  <small className={styles.fieldHint}>
+                    Select the class or exam category.
+                  </small>
                 </div>
 
                 <div className={styles.field}>
@@ -675,41 +692,39 @@ export default function App() {
                     Questions
                   </label>
 
-                  <select
+                  <input
                     id="quiz-count"
                     className={styles.subjectSelect}
+                    type="number"
+                    min="1"
+                    max="100"
                     value={selectedQuestionCount}
-                    onChange={(event) =>
-                      setSelectedQuestionCount(Number(event.target.value))
-                    }
-                  >
-                    {[5, 10, 20, 30].map((count) => (
-                      <option key={count} value={count}>
-                        {count}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(event) => {
+                      const value = Number(event.target.value);
+                      setSelectedQuestionCount(value > 0 ? value : 1);
+                      setQuizStarted(false);
+                    }}
+                  />
                 </div>
 
                 <div className={styles.field}>
                   <label htmlFor="quiz-time" className={styles.fieldLabel}>
-                    Time limit
+                    Time limit/min
                   </label>
 
-                  <select
+                  <input
                     id="quiz-time"
                     className={styles.subjectSelect}
+                    type="number"
+                    min="1"
+                    max="180"
                     value={selectedTimeLimit}
-                    onChange={(event) =>
-                      setSelectedTimeLimit(Number(event.target.value))
-                    }
-                  >
-                    {[5, 10, 15, 30].map((minutes) => (
-                      <option key={minutes} value={minutes}>
-                        {minutes} min
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(event) => {
+                      const value = Number(event.target.value);
+                      setSelectedTimeLimit(value > 0 ? value : 1);
+                      setQuizStarted(false);
+                    }}
+                  />
                 </div>
               </div>
 
@@ -725,7 +740,7 @@ export default function App() {
               {quizError && <p className={styles.statusBanner}>{quizError}</p>}
 
               <p className={styles.statusBanner}>
-                Choose class, subject, chapter, number of questions, and time limit
+                Choose class/exam, subject, chapter, question count, and time limit
                 to start the quiz.
               </p>
             </div>

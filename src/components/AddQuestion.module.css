@@ -405,3 +405,50 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+.field textarea {
+  width: 100%;
+  min-height: 110px;
+  resize: vertical;
+  border-radius: 14px;
+  padding: 12px 14px;
+  color: #f8fafc;
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  outline: none;
+  font: inherit;
+  line-height: 1.5;
+}
+
+.field textarea:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+}
+
+.field textarea::placeholder {
+  color: #64748b;
+}
+
+.previewExplanation {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(30, 41, 59, 0.72);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.previewExplanation span {
+  display: block;
+  margin-bottom: 6px;
+  color: #7dd3fc;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.previewExplanation p {
+  margin: 0;
+  color: #e0f2fe;
+  line-height: 1.5;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}

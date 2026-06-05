@@ -3,7 +3,6 @@ import styles from './Result.module.css';
 
 export default function Result({
   result,
-  questions = [],
   history = [],
   loading = false,
   error = '',
@@ -174,6 +173,15 @@ export default function Result({
     return correctText ? `${correctKey} - ${correctText}` : correctKey;
   }
 
+  function getExplanation(answer) {
+    return (
+      answer.explanation ||
+      answer.answer_explanation ||
+      answer.explanation_text ||
+      ''
+    );
+  }
+
   function getOptionClass(answer, optionKey) {
     const userKey = getUserAnswerKey(answer);
     const correctKey = getCorrectAnswerKey(answer);
@@ -304,7 +312,7 @@ export default function Result({
                       <td data-label="Date">{formatDate(exam.created_at)}</td>
 
                       <td data-label="Class">
-                        {exam.class_level ? `Class ${exam.class_level}` : '-'}
+                        {exam.class_level ? `${exam.class_level}` : '-'}
                       </td>
 
                       <td data-label="Subject">{exam.subject || '-'}</td>
@@ -366,7 +374,7 @@ export default function Result({
               <div>
                 <h3>Exam Details</h3>
                 <p>
-                  {formatDate(selectedExam.created_at)} · Class{' '}
+                  {formatDate(selectedExam.created_at)} ·{' '}
                   {selectedExam.class_level || '-'} · {selectedExam.subject || '-'}
                 </p>
               </div>
@@ -411,6 +419,7 @@ export default function Result({
                   const statusClass = getStatusClass(answer.status);
                   const isWrong =
                     String(answer.status || '').toLowerCase() === 'wrong';
+                  const explanation = getExplanation(answer);
 
                   return (
                     <article
@@ -462,6 +471,13 @@ export default function Result({
                           <strong>{getCorrectAnswerDisplay(answer)}</strong>
                         </div>
                       </div>
+
+                      {explanation && (
+                        <div className={styles.explanationBox}>
+                          <span>Explanation</span>
+                          <p>{explanation}</p>
+                        </div>
+                      )}
                     </article>
                   );
                 })}

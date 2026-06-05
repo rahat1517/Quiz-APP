@@ -24,8 +24,9 @@ export default function QuizFullScreen(props) {
   } = useQuiz(props);
 
   const totalQuestions = questions.length;
-
   const q = questions[currentIndex];
+
+  const currentExplanation = q?.explanation || q?.answer_explanation || '';
 
   if (totalQuestions === 0) {
     return (
@@ -38,14 +39,21 @@ export default function QuizFullScreen(props) {
     );
   }
 
-  // If exam hasn't started, show start screen
   if (!hasStarted) {
     return (
       <section className={styles.wrapper}>
         <div className={styles.centerCard}>
           <h2>Ready to start?</h2>
-          <p>You have {totalQuestions} questions. Time limit: {props.durationMinutes} minutes.</p>
-          <button type="button" className={styles.submitButton} onClick={startExam}>
+          <p>
+            You have {totalQuestions} questions. Time limit:{' '}
+            {props.durationMinutes} minutes.
+          </p>
+
+          <button
+            type="button"
+            className={styles.submitButton}
+            onClick={startExam}
+          >
             Start Exam
           </button>
         </div>
@@ -57,24 +65,33 @@ export default function QuizFullScreen(props) {
     <section className={styles.wrapper}>
       <aside className={styles.leftColumn}>
         <div className={styles.timerBox}>
-          <div className={styles.timerValue}>{minutes}:{String(seconds).padStart(2, '0')}</div>
+          <div className={styles.timerValue}>
+            {minutes}:{String(seconds).padStart(2, '0')}
+          </div>
           <div className={styles.timerLabel}>Time left</div>
         </div>
 
         <div className={styles.progressList}>
           {questions.map((qq, idx) => {
-            // Before submission: only show answered vs skipped
-            // After submission: show correct vs wrong
             let state = 'skipped';
+
             if (answers[qq.id]) {
-              state = submitted ? (answers[qq.id] === qq.correct_answer ? 'correct' : 'wrong') : 'answered';
+              state = submitted
+                ? answers[qq.id] === qq.correct_answer
+                  ? 'correct'
+                  : 'wrong'
+                : 'answered';
             }
+
             const isCurrent = idx === currentIndex;
+
             return (
               <button
                 key={qq.id}
                 type="button"
-                className={`${styles.progressDot} ${styles[state]} ${isCurrent ? styles.currentDot : ''}`}
+                className={`${styles.progressDot} ${styles[state]} ${
+                  isCurrent ? styles.currentDot : ''
+                }`}
                 onClick={() => setCurrentIndex(idx)}
                 aria-label={`Go to question ${idx + 1}`}
               >
@@ -85,7 +102,9 @@ export default function QuizFullScreen(props) {
         </div>
 
         <div className={styles.summaryBox}>
-          <div>Answered: {answeredCount}/{totalQuestions}</div>
+          <div>
+            Answered: {answeredCount}/{totalQuestions}
+          </div>
           <div>Skipped: {totalQuestions - answeredCount}</div>
         </div>
       </aside>
@@ -93,18 +112,29 @@ export default function QuizFullScreen(props) {
       <main className={styles.centerColumn}>
         <div className={styles.questionHeader}>
           <div>
-            <h3 className={styles.questionTitle}>Question {currentIndex + 1} of {totalQuestions}</h3>
+            <h3 className={styles.questionTitle}>
+              Question {currentIndex + 1} of {totalQuestions}
+            </h3>
+
             <div className={styles.questionText}>{q.question_text}</div>
           </div>
+
           <div className={styles.metaSmall}>{q.subject || props.subject}</div>
         </div>
 
-        <div role="radiogroup" aria-label={`Options for question ${currentIndex + 1}`} className={styles.optionsGrid}>
+        <div
+          role="radiogroup"
+          aria-label={`Options for question ${currentIndex + 1}`}
+          className={styles.optionsGrid}
+        >
           {['A', 'B', 'C', 'D'].map((opt) => {
             const text = q[`option_${opt.toLowerCase()}`];
             const selected = answers[q.id] === opt;
-            // After submission, show correct answer highlight
+
             const isCorrect = submitted && q.correct_answer === opt;
+            const isWrongSelected =
+              submitted && selected && q.correct_answer !== opt;
+
             return (
               <button
                 key={opt}
@@ -112,7 +142,11 @@ export default function QuizFullScreen(props) {
                 role="radio"
                 aria-checked={selected}
                 aria-label={`Option ${opt}: ${text}`}
-                className={`${styles.optionCard} ${selected ? styles.selected : ''} ${isCorrect ? styles.correct : ''}`}
+                className={`${styles.optionCard} ${
+                  selected ? styles.selected : ''
+                } ${isCorrect ? styles.correct : ''} ${
+                  isWrongSelected ? styles.wrong : ''
+                }`}
                 onClick={() => selectAnswer(q.id, opt)}
                 disabled={submitted}
               >
@@ -123,29 +157,70 @@ export default function QuizFullScreen(props) {
           })}
         </div>
 
+        {submitted && currentExplanation && (
+          <div className={styles.explanationBox}>
+            <div className={styles.explanationTitle}>Explanation</div>
+            <p>{currentExplanation}</p>
+          </div>
+        )}
+
         <div className={styles.centerActions}>
-          <button type="button" className={styles.navButton} onClick={handlePrevious} disabled={currentIndex === 0}>Previous</button>
+          <button
+            type="button"
+            className={styles.navButton}
+            onClick={handlePrevious}
+            disabled={currentIndex === 0}
+          >
+            Previous
+          </button>
+
           {currentIndex < totalQuestions - 1 ? (
-            <button type="button" className={styles.navButton} onClick={handleNext}>Next</button>
+            <button
+              type="button"
+              className={styles.navButton}
+              onClick={handleNext}
+            >
+              Next
+            </button>
           ) : (
-            <button type="button" className={styles.submitButton} onClick={() => setConfirmOpen(true)}>Submit Exam</button>
+            <button
+              type="button"
+              className={styles.submitButton}
+              onClick={() => setConfirmOpen(true)}
+            >
+              Submit Exam
+            </button>
           )}
         </div>
 
-        <div className="sr-only" aria-live="polite">{timeAnnouncement}</div>
+        <div className="sr-only" aria-live="polite">
+          {timeAnnouncement}
+        </div>
       </main>
 
       <aside className={styles.rightColumn}>
         <div className={styles.tilesGrid}>
           {questions.map((qq, idx) => (
-            <button key={qq.id} type="button" className={styles.tile} onClick={() => setCurrentIndex(idx)} aria-label={`Jump to question ${idx + 1}`}>
+            <button
+              key={qq.id}
+              type="button"
+              className={styles.tile}
+              onClick={() => setCurrentIndex(idx)}
+              aria-label={`Jump to question ${idx + 1}`}
+            >
               {idx + 1}
             </button>
           ))}
         </div>
 
         <div className={styles.submitWrap}>
-          <button type="button" className={styles.submitButton} onClick={() => setConfirmOpen(true)}>Submit Exam</button>
+          <button
+            type="button"
+            className={styles.submitButton}
+            onClick={() => setConfirmOpen(true)}
+          >
+            Submit Exam
+          </button>
         </div>
       </aside>
 
@@ -154,9 +229,17 @@ export default function QuizFullScreen(props) {
           <div className={styles.confirmBox}>
             <h4>Submit exam?</h4>
             <p>Are you sure you want to submit your answers? This will end the exam.</p>
+
             <div className={styles.confirmActions}>
-              <button type="button" className={styles.cancelButton} onClick={() => setConfirmOpen(false)}>Cancel</button>
-             <button
+              <button
+                type="button"
+                className={styles.cancelButton}
+                onClick={() => setConfirmOpen(false)}
+              >
+                Cancel
+              </button>
+
+              <button
                 type="button"
                 className={styles.primaryButton}
                 onClick={() => {
@@ -165,7 +248,7 @@ export default function QuizFullScreen(props) {
                 }}
               >
                 Yes, submit
-            </button>
+              </button>
             </div>
           </div>
         </div>

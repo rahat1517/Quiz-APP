@@ -50,6 +50,12 @@ export default function QuestionList({
     setPage((current) => Math.min(totalPages, Math.max(1, current + direction)));
   }
 
+  function getOptionClass(question, optionKey) {
+    return String(question.correct_answer || '').toUpperCase() === optionKey
+      ? `${styles.optionRow} ${styles.correctOption}`
+      : styles.optionRow;
+  }
+
   return (
     <section className={styles.bankCard}>
       <div className={styles.titles}>
@@ -58,7 +64,7 @@ export default function QuestionList({
           <p>
             {isAdmin
               ? 'Search, filter, and manage your quizzes with a modern card view.'
-              : 'Search and review the question bank in read-only mode.'}
+              : 'Search and review questions from your assigned class or exam category.'}
           </p>
         </div>
 
@@ -144,17 +150,41 @@ export default function QuestionList({
                     {question.subject || 'General'}
                   </span>
 
+                  <span>Class / Exam: {question.class_level || 'N/A'}</span>
                   <span>Chapter: {chapterLabel}</span>
-                  <span>Class: {question.class_level || 'N/A'}</span>
-                  <span>Correct: {question.correct_answer}</span>
+                  <span className={styles.correctAnswerBadge}>
+                    Correct: {question.correct_answer}
+                  </span>
                 </div>
 
                 <div className={styles.optionList}>
-                  <p>A. {question.option_a}</p>
-                  <p>B. {question.option_b}</p>
-                  <p>C. {question.option_c}</p>
-                  <p>D. {question.option_d}</p>
+                  <p className={getOptionClass(question, 'A')}>
+                    <span className={styles.optionKey}>A</span>
+                    <span>{question.option_a}</span>
+                  </p>
+
+                  <p className={getOptionClass(question, 'B')}>
+                    <span className={styles.optionKey}>B</span>
+                    <span>{question.option_b}</span>
+                  </p>
+
+                  <p className={getOptionClass(question, 'C')}>
+                    <span className={styles.optionKey}>C</span>
+                    <span>{question.option_c}</span>
+                  </p>
+
+                  <p className={getOptionClass(question, 'D')}>
+                    <span className={styles.optionKey}>D</span>
+                    <span>{question.option_d}</span>
+                  </p>
                 </div>
+
+                {question.explanation && (
+                  <div className={styles.explanationPreview}>
+                    <strong>Explanation:</strong>
+                    <p>{question.explanation}</p>
+                  </div>
+                )}
 
                 {isAdmin && (
                   <div className={styles.actionRow}>

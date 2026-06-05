@@ -13,14 +13,23 @@ export async function signInWithEmail({ email, password }) {
   return data;
 }
 
-export async function signUpWithEmail({ email, password, emailRedirectTo } = {}) {
+export async function signUpWithEmail({
+  email,
+  password,
+  metadata = {},
+  emailRedirectTo,
+} = {}) {
   const redirectTarget =
-    emailRedirectTo || window.location.origin + '/auth/callback';
+    emailRedirectTo || `${window.location.origin}/auth/callback`;
 
-  const { data, error } = await supabase.auth.signUp(
-    { email, password },
-    { emailRedirectTo: redirectTarget }
-  );
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: redirectTarget,
+      data: metadata,
+    },
+  });
 
   if (error) {
     throw new Error(error.message);
@@ -34,7 +43,7 @@ export async function resendSignupVerification(email) {
     type: 'signup',
     email,
     options: {
-      emailRedirectTo: window.location.origin + '/auth/callback',
+      emailRedirectTo: `${window.location.origin}/auth/callback`,
     },
   });
 
@@ -47,24 +56,30 @@ export async function resendSignupVerification(email) {
 
 export async function getCurrentUser() {
   const { data, error } = await supabase.auth.getUser();
+
   if (error) {
     throw new Error(error.message);
   }
+
   return data.user;
 }
 
 export async function signOut() {
   const { error } = await supabase.auth.signOut();
+
   if (error) {
     throw new Error(error.message);
   }
+
   return true;
 }
 
 export async function getSession() {
   const { data, error } = await supabase.auth.getSession();
+
   if (error) {
     throw new Error(error.message);
   }
+
   return data.session;
 }
