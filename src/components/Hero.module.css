@@ -1,52 +1,203 @@
 .heroSection {
   display: grid;
-  gap: 1.25rem;
-  padding: 1.5rem 0 0;
+  gap: 1.1rem;
 }
 
 .heroPanel {
   position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(250px, 0.55fr);
+  gap: 2rem;
+  align-items: center;
   overflow: hidden;
+  min-height: 390px;
   border-radius: 32px;
-  padding: 2rem;
-  background: linear-gradient(140deg, rgba(109, 60, 255, 0.92), rgba(79, 52, 210, 0.90));
+  padding: clamp(1.6rem, 4vw, 3.5rem);
   color: #f8fafc;
-  box-shadow: inset 0 0 0 1px rgba(196, 181, 253, 0.14),
-              0 24px 70px rgba(13, 11, 26, 0.28);
+  background:
+    radial-gradient(circle at 72% 0%, rgba(196, 181, 253, 0.24), transparent 30%),
+    linear-gradient(140deg, #21134c 0%, #4f34d4 48%, #6d3cf4 100%);
+  box-shadow: inset 0 0 0 1px rgba(196, 181, 253, 0.18),
+    0 28px 70px rgba(13, 11, 26, 0.34);
+}
+
+.heroContent,
+.challengeCard {
+  position: relative;
+  z-index: 1;
 }
 
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.6rem 0.9rem;
-  margin-bottom: 1rem;
-  background: rgba(255, 255, 255, 0.13);
-  border: 1px solid rgba(196, 181, 253, 0.22);
+  gap: 0.5rem;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 999px;
-  font-size: 0.9rem;
-  letter-spacing: 0.02em;
+  color: #ede9fe;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.heroPanel h1 {
-  margin: 0;
-  font-size: clamp(2.4rem, 4vw, 3.4rem);
-  line-height: 1.02;
+.liveDot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: #86efac;
+  box-shadow: 0 0 0 5px rgba(134, 239, 172, 0.12);
 }
 
-.heroPanel p {
-  margin: 1rem 0 0;
-  max-width: 46rem;
-  color: rgba(237, 233, 255, 0.88);
-  font-size: 1rem;
+.welcome {
+  margin: 1.6rem 0 0.35rem;
+  color: #c4b5fd;
+  font-weight: 700;
+}
+
+.heroPanel h1 {
+  max-width: 780px;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(2.35rem, 5vw, 4.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.heroCopy {
+  max-width: 600px;
+  margin: 1.2rem 0 0;
+  color: rgba(237, 233, 254, 0.78);
+  line-height: 1.7;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.7rem;
+}
+
+.primaryAction,
+.secondaryAction {
+  min-height: 50px;
+  border: 0;
+  border-radius: 15px;
+  padding: 0.75rem 1.15rem;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.primaryAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  color: #39217f;
+  background: #fff;
+  box-shadow: 0 15px 30px rgba(30, 15, 80, 0.22);
+}
+
+.secondaryAction {
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.challengeCard {
+  width: 100%;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  padding: 1.3rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 24px;
+  background: rgba(17, 10, 45, 0.34);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(14px);
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.challengeCard:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.34);
+  background: rgba(17, 10, 45, 0.48);
+}
+
+.challengeTop,
+.challengeMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.challengeAction {
+  display: block;
+  margin-top: 1rem;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+.challengeTop {
+  color: #ddd6fe;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.challengeIcon {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  color: #4f34d4;
+  background: #fff;
+  font-weight: 900;
+}
+
+.challengeScore {
+  display: flex;
+  align-items: end;
+  gap: 0.55rem;
+  margin-top: 1.5rem;
+}
+
+.challengeScore strong {
+  color: #fff;
+  font-size: 4.5rem;
+  line-height: 0.85;
+  letter-spacing: -0.08em;
+}
+
+.challengeScore span {
+  color: #c4b5fd;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.challengeCard p {
+  margin: 1.25rem 0;
+  color: rgba(237, 233, 254, 0.72);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.challengeMeta {
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ede9fe;
+  font-size: 0.75rem;
+  font-weight: 700;
 }
 
 .heroAccent {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(circle at top right, rgba(196, 181, 253, 0.18), transparent 35%);
+  background: linear-gradient(115deg, transparent 55%, rgba(255, 255, 255, 0.05));
 }
 
 .statsGrid {
@@ -56,29 +207,382 @@
 }
 
 .statCard {
-  border-radius: 24px;
-  padding: 1.4rem;
-  background: rgba(13, 11, 26, 0.80);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
   border: 1px solid rgba(124, 92, 252, 0.18);
-  box-shadow: 0 20px 50px rgba(13, 11, 26, 0.18);
+  border-radius: 22px;
+  padding: 1.1rem;
   color: #e2e8f0;
+  background: rgba(13, 11, 26, 0.8);
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
 }
+
+.statCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(167, 139, 250, 0.34);
+  background: rgba(19, 16, 38, 0.92);
+}
+
+.statIcon,
+.subjectIcon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: 15px;
+  font-weight: 900;
+}
+
+.statIcon {
+  width: 3.2rem;
+  height: 3.2rem;
+  font-size: 1.15rem;
+}
+
+.purpleIcon { color: #ddd6fe; background: rgba(139, 92, 246, 0.18); }
+.blueIcon { color: #bae6fd; background: rgba(14, 165, 233, 0.16); }
+.greenIcon { color: #bbf7d0; background: rgba(34, 197, 94, 0.14); }
 
 .statCard p {
   margin: 0;
-  font-size: 0.95rem;
-  color: #a78bfa;
+  color: #c4b5fd;
+  font-size: 0.75rem;
+  font-weight: 800;
 }
 
 .statCard strong {
   display: block;
-  margin-top: 0.7rem;
-  font-size: 2rem;
-  color: #ede9ff;
+  margin-top: 0.1rem;
+  color: #f8fafc;
+  font-size: 1.8rem;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
 }
 
-@media (max-width: 850px) {
-  .statsGrid {
+.statContent {
+  min-width: 0;
+}
+
+.statContent small {
+  display: block;
+  margin-top: 0.25rem;
+  color: #777287;
+  font-size: 0.65rem;
+  line-height: 1.35;
+}
+
+.dashboardGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(260px, 0.7fr);
+  gap: 1rem;
+}
+
+.subjectSection,
+.quickPanel {
+  border: 1px solid rgba(124, 92, 252, 0.18);
+  border-radius: 26px;
+  padding: 1.4rem;
+  background: rgba(13, 11, 26, 0.78);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.sectionHeader span,
+.quickEyebrow {
+  color: #8b5cf6;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.sectionHeader h2,
+.quickPanel h2 {
+  margin: 0.25rem 0 0;
+  color: #f8fafc;
+  font-size: 1.25rem;
+}
+
+.sectionHeader button {
+  border: 0;
+  color: #a78bfa;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.subjectGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.subjectCard {
+  position: relative;
+  min-width: 0;
+  display: grid;
+  justify-items: start;
+  gap: 0.4rem;
+  border: 1px solid rgba(196, 181, 253, 0.1);
+  border-radius: 18px;
+  padding: 1rem;
+  color: #f8fafc;
+  background: rgba(255, 255, 255, 0.025);
+  cursor: pointer;
+  text-align: left;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.subjectCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(167, 139, 250, 0.42);
+  background: rgba(124, 92, 252, 0.08);
+}
+
+.subjectIcon {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: 0.55rem;
+  color: #ddd6fe;
+  background: rgba(124, 92, 252, 0.14);
+}
+
+.subjectCard strong {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-size: 0.9rem;
+}
+
+.subjectCard small {
+  color: #777287;
+  font-size: 0.7rem;
+}
+
+.subjectArrow {
+  position: absolute;
+  right: 0.8rem;
+  top: 0.8rem;
+  color: #8b5cf6;
+}
+
+.quickPanel {
+  display: flex;
+  flex-direction: column;
+}
+
+.quickPanel h2 {
+  margin-bottom: 1rem;
+}
+
+.progressSnapshot {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.65rem;
+}
+
+.progressSnapshot div {
+  min-width: 0;
+  padding: 0.75rem 0.5rem;
+  border: 1px solid rgba(196, 181, 253, 0.1);
+  border-radius: 14px;
+  background: rgba(124, 92, 252, 0.06);
+  text-align: center;
+}
+
+.progressSnapshot strong,
+.progressSnapshot span {
+  display: block;
+}
+
+.progressSnapshot strong {
+  color: #f8fafc;
+  font-size: 1.05rem;
+}
+
+.progressSnapshot span {
+  margin-top: 0.2rem;
+  color: #777287;
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+
+.quickPanel button {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 0;
+  border-top: 1px solid rgba(196, 181, 253, 0.1);
+  padding: 1rem 0;
+  color: #c4b5fd;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+:global([data-theme='light']) .heroPanel {
+  color: #fff;
+  background:
+    radial-gradient(circle at 75% 0%, rgba(255, 255, 255, 0.32), transparent 30%),
+    linear-gradient(140deg, #5836bf 0%, #7552de 50%, #8b5cf6 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+    0 28px 65px rgba(91, 57, 165, 0.22);
+}
+
+:global([data-theme='light']) .statCard,
+:global([data-theme='light']) .subjectSection,
+:global([data-theme='light']) .quickPanel {
+  border-color: rgba(109, 74, 204, 0.13);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 14px 35px rgba(82, 51, 151, 0.08);
+}
+
+:global([data-theme='light']) .statCard p,
+:global([data-theme='light']) .subjectCard small,
+:global([data-theme='light']) .progressSnapshot span {
+  color: #746a8c;
+}
+
+:global([data-theme='light']) .statCard strong,
+:global([data-theme='light']) .sectionHeader h2,
+:global([data-theme='light']) .quickPanel h2,
+:global([data-theme='light']) .subjectCard strong,
+:global([data-theme='light']) .progressSnapshot strong {
+  color: #2d1b5d;
+}
+
+:global([data-theme='light']) .subjectCard {
+  color: #2d1b5d;
+  border-color: rgba(109, 74, 204, 0.12);
+  background: linear-gradient(145deg, #fff, #faf8ff);
+  box-shadow: 0 8px 24px rgba(82, 51, 151, 0.05);
+}
+
+:global([data-theme='light']) .subjectCard:hover {
+  border-color: rgba(109, 74, 204, 0.3);
+  background: #f5f0ff;
+  box-shadow: 0 12px 28px rgba(82, 51, 151, 0.1);
+}
+
+:global([data-theme='light']) .subjectIcon,
+:global([data-theme='light']) .progressSnapshot div {
+  color: #6d4acc;
+  border-color: rgba(109, 74, 204, 0.12);
+  background: rgba(124, 92, 252, 0.09);
+}
+
+:global([data-theme='light']) .quickPanel button {
+  color: #5b3eaa;
+  border-top-color: rgba(109, 74, 204, 0.11);
+}
+
+@media (max-width: 980px) {
+  .heroPanel,
+  .dashboardGrid {
     grid-template-columns: 1fr;
+  }
+
+  .challengeCard {
+    display: none;
+  }
+
+  .subjectGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .heroSection {
+    gap: 0.8rem;
+  }
+
+  .heroPanel {
+    min-height: auto;
+    padding: 1.3rem;
+    border-radius: 22px;
+  }
+
+  .heroPanel h1 {
+    font-size: clamp(2.15rem, 12vw, 3.1rem);
+  }
+
+  .heroActions,
+  .heroActions button {
+    width: 100%;
+  }
+
+  .heroActions {
+    display: grid;
+  }
+
+  .primaryAction {
+    justify-content: space-between;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .statCard {
+    display: grid;
+    justify-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 0.35rem;
+    border-radius: 16px;
+    text-align: center;
+  }
+
+  .statIcon {
+    width: 2.35rem;
+    height: 2.35rem;
+    border-radius: 11px;
+  }
+
+  .statCard p {
+    color: #c4b5fd;
+    font-size: 0.62rem;
+  }
+
+  .statCard strong {
+    font-size: 1.25rem;
+  }
+
+  .statContent small {
+    display: none;
+  }
+
+  .subjectSection,
+  .quickPanel {
+    padding: 1rem;
+    border-radius: 20px;
+  }
+
+  .sectionHeader {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .subjectGrid {
+    gap: 0.6rem;
+  }
+
+  .subjectCard {
+    min-height: 132px;
+    padding: 0.85rem;
+  }
+
+  .progressSnapshot {
+    gap: 0.4rem;
   }
 }

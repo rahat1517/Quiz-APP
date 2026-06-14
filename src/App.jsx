@@ -2,6 +2,7 @@
 import { supabase } from './lib/supabaseClient';
 import { getQuestions, deleteQuestion, getRandomQuestions } from './services/questionService';
 import { normalizeChapter } from './lib/normalizeChapter';
+import { formatClassLevel, normalizeClassLevel } from './lib/normalizeClassLevel';
 import { getSession, signOut } from './services/authService';
 import { getCurrentProfile, updateUserProfile } from './services/profileService';
 import { saveQuizResult, getMyQuizResults, getAllQuizResultsForAdmin } from './services/resultService';
@@ -26,15 +27,14 @@ export default function App() {
   const [selectedSubject, setSelectedSubject] = useState('All Subjects');
   const [selectedClassLevel, setSelectedClassLevel] = useState('');
   const [selectedChapter, setSelectedChapter] = useState('All Chapters');
-  const [selectedQuestionCount, setSelectedQuestionCount] = useState(5);
-  const [selectedTimeLimit, setSelectedTimeLimit] = useState(5);
+  const [selectedQuestionCount, setSelectedQuestionCount] = useState('5');
+  const [selectedTimeLimit, setSelectedTimeLimit] = useState('5');
   const [quizQuestions, setQuizQuestions] = useState([]);
   const [quizLoading, setQuizLoading] = useState(false);
   const [quizError, setQuizError] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [toast, setToast] = useState(null);
-  const [darkMode, setDarkMode] = useState(true);
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [quizResult, setQuizResult] = useState(null);
   const [reviewQuestions, setReviewQuestions] = useState([]);
@@ -42,7 +42,6 @@ export default function App() {
   const [quizHistory, setQuizHistory] = useState([]);
   const [resultsLoading, setResultsLoading] = useState(false);
   const [resultsError, setResultsError] = useState('');
-  const [footerActive, setFooterActive] = useState(false);
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -52,25 +51,32 @@ export default function App() {
 
   const profileRole = String(profile?.role || '').trim().toLowerCase();
   const isAdmin = profileRole === 'admin';
+  const displayName =
+    user?.user_metadata?.full_name || user?.email?.split('@')?.[0] || 'Learner';
+  const userInitial = String(displayName).trim().charAt(0).toUpperCase() || 'Q';
 
   const assignedClassLevel =
   profile?.class_level ??
   user?.user_metadata?.class_level ??
   user?.user_metadata?.classLevel;
 
-const assignedClassLabel = assignedClassLevel ? String(assignedClassLevel).trim() : null;
+const assignedClassLabel = assignedClassLevel ? normalizeClassLevel(assignedClassLevel) : null;
 
 // Admin can select any class/exam.
 // Normal user can only access assigned class/exam.
 const isClassRestricted = !isAdmin && Boolean(assignedClassLabel);
 const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLevel;
+  function formatClassLabel(level) {
+    return formatClassLevel(level);
+  }
+
   const classLevels = useMemo(() => {
     const unique = Array.from(
       new Set(
         questions
           .map((question) => question.class_level)
           .filter(Boolean)
-          .map((level) => String(level))
+          .map((level) => normalizeClassLevel(level))
       )
     );
 
@@ -79,8 +85,14 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
 
   useEffect(() => {
     if (!selectedClassLevel && classLevels.length > 0) {
-      setSelectedClassLevel(classLevels[0]);
+      const updateSelectedClass = window.setTimeout(() => {
+        setSelectedClassLevel(classLevels[0]);
+      }, 0);
+
+      return () => window.clearTimeout(updateSelectedClass);
     }
+
+    return undefined;
   }, [classLevels, selectedClassLevel]);
 
  const availableQuestions = useMemo(() => {
@@ -91,7 +103,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
   }
 
   return questions.filter(
-    (question) => String(question.class_level).trim() === String(classToUse).trim()
+    (question) => normalizeClassLevel(question.class_level) === normalizeClassLevel(classToUse)
   );
   }, [questions, selectedClassLevel, isClassRestricted, assignedClassLabel, isAdmin]);
 
@@ -196,12 +208,14 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
     setActiveTab('results');
 
     try {
-      const classLevelToSave = String(selectedClassLevel);
+      const classLevelToSave = String(
+        result.class_level || (isClassRestricted ? assignedClassLabel : selectedClassLevel) || ''
+      ).trim();
 
       await saveQuizResult({
         classLevel: classLevelToSave,
         subject: selectedSubject === 'All Subjects' ? 'All Subjects' : selectedSubject,
-        questionLimit: Number(selectedQuestionCount),
+        questionLimit: quizQuestions.length,
         durationMinutes: Number(selectedTimeLimit),
         totalQuestions: result.total,
         correctAnswers: result.correct,
@@ -234,11 +248,6 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
     setQuizResult(null);
     setReviewQuestions([]);
     setActiveTab('quiz');
-  }
-
-  function handleThemeToggle() {
-    setDarkMode((value) => !value);
-    setFooterActive(true);
   }
 
   function handleTabChange(tab) {
@@ -278,14 +287,26 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
         return;
       }
 
-      if (Number(selectedQuestionCount) < 1) {
-        setQuizError('Question count must be at least 1.');
+      const requestedQuestionCount = Number(selectedQuestionCount);
+
+      if (
+        !Number.isInteger(requestedQuestionCount) ||
+        requestedQuestionCount < 1 ||
+        requestedQuestionCount > 100
+      ) {
+        setQuizError('Enter a whole question count between 1 and 100.');
         setQuizStarted(false);
         return;
       }
 
-      if (Number(selectedTimeLimit) < 1) {
-        setQuizError('Time limit must be at least 1 minute.');
+      const requestedTimeLimit = Number(selectedTimeLimit);
+
+      if (
+        !Number.isInteger(requestedTimeLimit) ||
+        requestedTimeLimit < 1 ||
+        requestedTimeLimit > 180
+      ) {
+        setQuizError('Enter a whole time limit between 1 and 180 minutes.');
         setQuizStarted(false);
         return;
       }
@@ -294,7 +315,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
         classLevelToUse,
         subjectFilter,
         chapterFilter,
-        Number(selectedQuestionCount)
+        requestedQuestionCount
       );
 
       if (!questions || questions.length === 0) {
@@ -305,9 +326,17 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
         return;
       }
 
+      if (questions.length < requestedQuestionCount) {
+        showToast(
+          `Only ${questions.length} matching question${questions.length === 1 ? '' : 's'} available. Starting with all of them.`,
+          'success'
+        );
+      }
+
       setQuizQuestions(questions);
       setQuizStarted(true);
       setActiveTab('quiz');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       setQuizError(err.message || 'Unable to load quiz questions.');
       setQuizStarted(false);
@@ -376,7 +405,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
       return;
     }
 
-    if (activeTab !== 'results' && activeTab !== 'profile') {
+    if (activeTab !== 'dashboard' && activeTab !== 'results' && activeTab !== 'profile') {
       return;
     }
 
@@ -460,47 +489,31 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
 
   return (
     <div
-      className={
-        darkMode
-          ? `${styles.appRoot} ${styles.dark}`
-          : `${styles.appRoot} ${styles.light}`
-      }
+      data-theme="dark"
+      className={`${styles.appRoot} ${styles.dark}`}
     >
       <div className={styles.pageShell}>
         <header className={styles.topBar}>
-          <div className={styles.titleBlock}>
-            <h1>Quiz World</h1>
-            <p>Modern quizzes · Subjects · Scores</p>
-          </div>
+          <button
+            type="button"
+            className={styles.brandButton}
+            onClick={() => handleTabChange('dashboard')}
+            aria-label="Go to dashboard"
+          >
+            <span className={styles.brandMark}>Q</span>
+            <span className={styles.titleBlock}>
+              <strong>Quiz World</strong>
+              <small>Learn, practice, improve</small>
+            </span>
+          </button>
 
           <div className={styles.controlsRow}>
-            <div className={styles.userLabel}>
-              <span className={styles.userIcon}>👤</span>
-              <strong>{user?.email?.split('@')?.[0] ?? user?.email}</strong>
-
-              {assignedClassLabel && !isAdmin && (
-                <small className={styles.userRoleInfo}>{assignedClassLabel}</small>
-              )}
-
-              {profile ? (
-                <small
-                  className={
-                    profile.role === 'admin' ? styles.userRole : styles.userRoleInfo
-                  }
-                >
-                  {profile.role === 'admin' ? '🛡️ Admin' : '👤 User'}
-                </small>
-              ) : (
-                <small className={styles.userRoleWarning}>Profile missing</small>
-              )}
-            </div>
-
             {activeTab !== 'quiz' && (
-              <>
+              <div className={styles.filterControl}>
                 <label htmlFor="top-subject-filter" className="sr-only">
                   Filter subject
                 </label>
-
+                <span className={styles.filterIcon} aria-hidden>⌕</span>
                 <select
                   id="top-subject-filter"
                   className={styles.subjectSelect}
@@ -516,33 +529,37 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
                     </option>
                   ))}
                 </select>
-              </>
+              </div>
             )}
 
             <button
-              className={`${styles.toggleButton} ${
-                darkMode ? styles.themeToggleDark : styles.themeToggleLight
-              } ${footerActive ? styles.pulseActive : ''}`}
               type="button"
-              onClick={handleThemeToggle}
-              title={darkMode ? 'Switch to light theme' : 'Switch to dark theme'}
-              aria-label={darkMode ? 'Switch to light theme' : 'Switch to dark theme'}
-              data-tooltip={darkMode ? 'Switch to light theme' : 'Switch to dark theme'}
+              className={styles.userCard}
+              onClick={() => handleTabChange('profile')}
+              aria-label="Open profile"
             >
-              <span className={styles.toggleIcon} aria-hidden>
-                {darkMode ? '☀️' : '🌙'}
+              <span className={styles.userIcon}>{userInitial}</span>
+              <span className={styles.userDetails}>
+                <strong>{displayName}</strong>
+                <small>
+                  {isAdmin ? 'Admin' : assignedClassLabel || 'Student'}
+                </small>
               </span>
+              <span className={styles.profileArrow} aria-hidden>›</span>
             </button>
 
-            <button
-              className={styles.signOutButton}
-              type="button"
-              onClick={handleSignOut}
-              aria-label="Log out"
-              title="Log out"
-            >
-              🚪 Log out
-            </button>
+            <div className={styles.actionGroup}>
+              <button
+                className={styles.signOutButton}
+                type="button"
+                onClick={handleSignOut}
+                aria-label="Log out"
+                title="Log out"
+              >
+                <span className={styles.signOutIcon} aria-hidden>↪</span>
+                <span className={styles.signOutText}>Log out</span>
+              </button>
+            </div>
           </div>
         </header>
 
@@ -565,6 +582,17 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
               totalQuestions={totalQuestions}
               totalSubjects={totalSubjects}
               totalQuizzes={totalQuizzes}
+              userName={user?.user_metadata?.full_name || user?.email?.split('@')?.[0]}
+              classLabel={assignedClassLabel || selectedClassLevel}
+              subjects={subjects.filter((subject) => subject !== 'All Subjects').slice(0, 4)}
+              history={quizHistory}
+              onNavigate={handleTabChange}
+              onStartSubject={(subject) => {
+                setSelectedSubject(subject);
+                setSelectedChapter('All Chapters');
+                setQuizStarted(false);
+                handleTabChange('quiz');
+              }}
             />
           </section>
         )}
@@ -628,7 +656,8 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
 
         {!loading && !error && activeTab === 'quiz' && (
           <section className={styles.sectionGap}>
-            <div className={styles.quizSelection}>
+            {!quizStarted && (
+              <div className={styles.quizSelection}>
               <div className={styles.fieldGroupInline}>
                 <div className={styles.field}>
                   <label htmlFor="quiz-class" className={styles.fieldLabel}>
@@ -651,12 +680,18 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
 >
   {classLevels.length === 0 ? (
     <option value="">
-      {isClassRestricted ? assignedClassLabel || 'No assigned class' : 'No class found'}
+      {isClassRestricted
+        ? formatClassLabel(assignedClassLabel) || 'No assigned class'
+        : 'No class found'}
     </option>
   ) : (
-    classLevels.map((level) => (
+    Array.from(
+      new Set(isClassRestricted && assignedClassLabel
+        ? [assignedClassLabel, ...classLevels]
+        : classLevels)
+    ).map((level) => (
       <option key={level} value={level}>
-        {level}
+        {formatClassLabel(level)}
       </option>
     ))
   )}
@@ -714,48 +749,125 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
 
                 <div className={styles.field}>
                   <label htmlFor="quiz-count" className={styles.fieldLabel}>
-                    Questions
+                    Question count
                   </label>
 
-                  <input
-                    id="quiz-count"
-                    className={styles.subjectSelect}
-                    type="number"
-                    min="1"
-                    max="100"
-                    value={selectedQuestionCount}
-                    onChange={(event) => {
-                      const value = Number(event.target.value);
-                      setSelectedQuestionCount(value > 0 ? value : 1);
-                      setQuizStarted(false);
-                    }}
-                  />
+                  <div className={styles.numberControl}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedQuestionCount((current) =>
+                          String(Math.max(1, (Number(current) || 1) - 1))
+                        );
+                        setQuizStarted(false);
+                      }}
+                      aria-label="Decrease question count"
+                    >
+                      −
+                    </button>
+                    <input
+                      id="quiz-count"
+                      className={styles.numberInput}
+                      type="number"
+                      inputMode="numeric"
+                      min="1"
+                      max="100"
+                      step="1"
+                      value={selectedQuestionCount}
+                      onChange={(event) => {
+                        setSelectedQuestionCount(event.target.value);
+                        setQuizStarted(false);
+                      }}
+                      onBlur={() => {
+                        const value = Number(selectedQuestionCount);
+                        setSelectedQuestionCount(
+                          String(Number.isInteger(value) && value > 0 ? Math.min(value, 100) : 1)
+                        );
+                      }}
+                      aria-describedby="quiz-count-hint"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedQuestionCount((current) =>
+                          String(Math.min(100, (Number(current) || 0) + 1))
+                        );
+                        setQuizStarted(false);
+                      }}
+                      aria-label="Increase question count"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <small id="quiz-count-hint" className={styles.fieldHint}>
+                    Type any number from 1 to 100.
+                  </small>
                 </div>
 
                 <div className={styles.field}>
                   <label htmlFor="quiz-time" className={styles.fieldLabel}>
-                    Time limit/min
+                    Time limit
                   </label>
 
-                  <input
-                    id="quiz-time"
-                    className={styles.subjectSelect}
-                    type="number"
-                    min="1"
-                    max="180"
-                    value={selectedTimeLimit}
-                    onChange={(event) => {
-                      const value = Number(event.target.value);
-                      setSelectedTimeLimit(value > 0 ? value : 1);
-                      setQuizStarted(false);
-                    }}
-                  />
+                  <div className={styles.numberControl}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedTimeLimit((current) =>
+                          String(Math.max(1, (Number(current) || 1) - 1))
+                        );
+                        setQuizStarted(false);
+                      }}
+                      aria-label="Decrease time limit"
+                    >
+                      −
+                    </button>
+                    <div className={styles.timeInputWrap}>
+                      <input
+                        id="quiz-time"
+                        className={styles.numberInput}
+                        type="number"
+                        inputMode="numeric"
+                        min="1"
+                        max="180"
+                        step="1"
+                        value={selectedTimeLimit}
+                        onChange={(event) => {
+                          setSelectedTimeLimit(event.target.value);
+                          setQuizStarted(false);
+                        }}
+                        onBlur={() => {
+                          const value = Number(selectedTimeLimit);
+                          setSelectedTimeLimit(
+                            String(Number.isInteger(value) && value > 0 ? Math.min(value, 180) : 1)
+                          );
+                        }}
+                        aria-describedby="quiz-time-hint"
+                      />
+                      <span>min</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedTimeLimit((current) =>
+                          String(Math.min(180, (Number(current) || 0) + 1))
+                        );
+                        setQuizStarted(false);
+                      }}
+                      aria-label="Increase time limit"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <small id="quiz-time-hint" className={styles.fieldHint}>
+                    Type any time from 1 to 180 minutes.
+                  </small>
                 </div>
               </div>
 
               <button
                 type="button"
-                className={styles.toggleButton}
+                className={`${styles.toggleButton} ${styles.startQuizButton}`}
                 disabled={quizLoading}
                 onClick={handleStartQuiz}
               >
@@ -768,17 +880,25 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
                 Choose class/exam, subject, chapter, question count, and time limit
                 to start the quiz.
               </p>
-            </div>
+              </div>
+            )}
 
             {quizStarted && quizQuestions.length > 0 && (
               <QuizFullScreen
-                key={`quiz-${selectedClassLevel}-${selectedSubject}-${selectedChapter}-${selectedQuestionCount}-${selectedTimeLimit}-${quizQuestions.length}`}
+                key={`quiz-${selectedClass}-${selectedSubject}-${selectedChapter}-${selectedQuestionCount}-${selectedTimeLimit}-${quizQuestions.map((question) => question.id).join('-')}`}
                 questions={quizQuestions}
                 subject={selectedSubject}
-                classLevel={selectedClassLevel}
-                questionLimit={selectedQuestionCount}
+                classLevel={selectedClass}
+                questionLimit={quizQuestions.length}
                 durationMinutes={selectedTimeLimit}
+                storageKey={`quiz-answers-${quizQuestions.map((question) => question.id).join('-')}`}
                 onComplete={handleQuizComplete}
+                onBackToSetup={() => {
+                  setQuizStarted(false);
+                  setQuizQuestions([]);
+                  setQuizError('');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
               />
             )}
           </section>
@@ -797,7 +917,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
           </section>
         )}
 
-        <Footer honorActive={footerActive} />
+        <Footer />
       </div>
 
       <TabNav

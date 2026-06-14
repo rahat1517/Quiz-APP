@@ -206,13 +206,21 @@ export default function Result({
   }
 
   const selectedExamAnswers = getAnswerList(selectedExam);
+  const resultPercentage = Number(latestResult?.percentage) || 0;
+  const performance =
+    resultPercentage >= 85
+      ? { label: 'Excellent work', message: 'You have a strong grasp of this quiz.', tone: styles.excellent }
+      : resultPercentage >= 60
+        ? { label: 'Good progress', message: 'A little review will make this even stronger.', tone: styles.good }
+        : { label: 'Keep practicing', message: 'Review the answers and try again with confidence.', tone: styles.practice };
 
   return (
     <div className={styles.resultPage}>
       <div className={styles.headerRow}>
         <div>
-          <h2>Quiz Results</h2>
-          <p>See current result and previous exam history.</p>
+          <span className={styles.pageEyebrow}>Performance center</span>
+          <h2>Your quiz results</h2>
+          <p>Understand your score, review answers, and keep improving.</p>
         </div>
 
         {onRestart && (
@@ -221,44 +229,52 @@ export default function Result({
             className={styles.primaryButton}
             onClick={onRestart}
           >
-            Restart Quiz
+            Try another quiz <span aria-hidden>→</span>
           </button>
         )}
       </div>
 
       {latestResult && (
         <section className={styles.currentResultCard}>
-          <h3>Current Exam Result</h3>
+          <div className={styles.resultHero}>
+            <div
+              className={`${styles.scoreRing} ${performance.tone}`}
+              style={{ '--score': `${Math.min(100, Math.max(0, resultPercentage)) * 3.6}deg` }}
+            >
+              <div>
+                <strong>{resultPercentage}%</strong>
+                <span>Score</span>
+              </div>
+            </div>
+
+            <div className={styles.resultMessage}>
+              <span className={`${styles.performanceBadge} ${performance.tone}`}>
+                {performance.label}
+              </span>
+              <h3>You scored {latestResult.score} out of {latestResult.total_questions}</h3>
+              <p>{performance.message}</p>
+              <button
+                type="button"
+                className={styles.reviewButton}
+                onClick={() => setSelectedExam(latestResult)}
+              >
+                Review your answers <span aria-hidden>→</span>
+              </button>
+            </div>
+          </div>
 
           <div className={styles.summaryGrid}>
-            <div className={styles.summaryBox}>
-              <span>Total</span>
-              <strong>{latestResult.total_questions}</strong>
-            </div>
-
             <div className={`${styles.summaryBox} ${styles.correctBox}`}>
-              <span>Correct</span>
-              <strong>{latestResult.correct_answers}</strong>
+              <span className={styles.summaryIcon}>✓</span>
+              <div><span>Correct</span><strong>{latestResult.correct_answers}</strong></div>
             </div>
-
             <div className={`${styles.summaryBox} ${styles.wrongBox}`}>
-              <span>Wrong</span>
-              <strong>{latestResult.wrong_answers}</strong>
+              <span className={styles.summaryIcon}>×</span>
+              <div><span>Wrong</span><strong>{latestResult.wrong_answers}</strong></div>
             </div>
-
             <div className={`${styles.summaryBox} ${styles.skippedBox}`}>
-              <span>Skipped</span>
-              <strong>{latestResult.skipped_answers}</strong>
-            </div>
-
-            <div className={styles.summaryBox}>
-              <span>Score</span>
-              <strong>{latestResult.score}</strong>
-            </div>
-
-            <div className={styles.summaryBox}>
-              <span>Percentage</span>
-              <strong>{latestResult.percentage}%</strong>
+              <span className={styles.summaryIcon}>−</span>
+              <div><span>Skipped</span><strong>{latestResult.skipped_answers}</strong></div>
             </div>
           </div>
         </section>
@@ -267,9 +283,11 @@ export default function Result({
       <section className={styles.historySection}>
         <div className={styles.sectionTitleRow}>
           <div>
+            <span className={styles.pageEyebrow}>Your journey</span>
             <h3>Past Exams</h3>
-            <p>Click Details to open a question-wise review.</p>
+            <p>Open any attempt to review each question and explanation.</p>
           </div>
+          <span className={styles.historyCount}>{history.length} attempts</span>
         </div>
 
         {loading && (

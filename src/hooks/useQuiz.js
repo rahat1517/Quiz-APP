@@ -43,24 +43,13 @@ export default function useQuiz({
   }, [answers, storageKey]);
 
   const result = useMemo(() => {
-    let correctAnswers = 0;
-    let wrongAnswers = 0;
-    let skipped = 0;
-
     const answerDetails = questions.map((question) => {
       const userAnswer = answers[question.id];
-
-      let status = 'skipped';
-
-      if (!userAnswer) {
-        skipped = skipped + 1;
-      } else if (userAnswer === question.correct_answer) {
-        correctAnswers = correctAnswers + 1;
-        status = 'correct';
-      } else {
-        wrongAnswers = wrongAnswers + 1;
-        status = 'wrong';
-      }
+      const status = !userAnswer
+        ? 'skipped'
+        : userAnswer === question.correct_answer
+          ? 'correct'
+          : 'wrong';
 
       const userAnswerKey = String(userAnswer || '').toLowerCase();
       const correctAnswerKey = String(question.correct_answer || '').toLowerCase();
@@ -103,13 +92,9 @@ export default function useQuiz({
       };
     });
 
-    const calculatedTotal = correctAnswers + wrongAnswers + skipped;
-
-    if (calculatedTotal !== totalQuestions && totalQuestions > 0) {
-      console.warn(
-        `Quiz math error: ${correctAnswers} (correct) + ${wrongAnswers} (wrong) + ${skipped} (skipped) = ${calculatedTotal}, expected ${totalQuestions}`
-      );
-    }
+    const correctAnswers = answerDetails.filter((answer) => answer.status === 'correct').length;
+    const wrongAnswers = answerDetails.filter((answer) => answer.status === 'wrong').length;
+    const skipped = answerDetails.filter((answer) => answer.status === 'skipped').length;
 
     const percentage =
       totalQuestions > 0 ? Math.round((correctAnswers / totalQuestions) * 100) : 0;
@@ -163,7 +148,7 @@ export default function useQuiz({
     clearPersistence,
   ]);
 
-  const answeredCount = Object.keys(answers).length;
+  const answeredCount = questions.filter((question) => Boolean(answers[question.id])).length;
 
   const selectAnswer = useCallback(
     (qid, key) => {

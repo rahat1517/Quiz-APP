@@ -258,3 +258,47 @@
   background: rgba(168, 85, 247, 0.3);
   transform: translateY(-1px);
 }
+
+@media (max-width: 760px) {
+  .profileCard {
+    padding: 1rem;
+    border-radius: 22px;
+  }
+
+  .headerRow,
+  .historyHeader,
+  .historyMetaRight {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .summaryGrid,
+  .historyGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .profileActions,
+  .profileActions button {
+    width: 100%;
+  }
+
+  .profileInfo,
+  .performanceBox {
+    padding: 1rem;
+    border-radius: 18px;
+  }
+
+  .profileInfo dd {
+    overflow-wrap: anywhere;
+  }
+
+  .classAssignField {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .classAssignField select,
+  .classAssignField button {
+    width: 100%;
+  }
+}

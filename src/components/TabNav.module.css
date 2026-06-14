@@ -37,6 +37,31 @@
   display: none;
 }
 
+.shortLabel {
+  display: none;
+}
+
+:global([data-theme='light']) .tabNav {
+  border-color: rgba(109, 74, 204, 0.13);
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 16px 40px rgba(82, 51, 151, 0.09);
+}
+
+:global([data-theme='light']) .tabItem {
+  color: #65577f;
+}
+
+:global([data-theme='light']) .tabItem:hover {
+  color: #3b227c;
+  background: rgba(124, 92, 252, 0.07);
+}
+
+:global([data-theme='light']) .active {
+  color: #fff;
+  background: linear-gradient(135deg, #7c5cfc, #5b3fd0);
+  box-shadow: 0 12px 24px rgba(91, 63, 208, 0.22);
+}
+
 @media (max-width: 720px) {
   .tabNav {
     display: none;
@@ -44,13 +69,15 @@
 
   .bottomNav {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 0.55rem;
+    grid-template-columns: repeat(var(--tab-count), minmax(0, 1fr));
+    gap: 0.25rem;
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
-    padding: 0.7rem 0.9rem;
+    padding: 0.55rem max(0.35rem, env(safe-area-inset-right))
+      max(0.55rem, env(safe-area-inset-bottom))
+      max(0.35rem, env(safe-area-inset-left));
     margin: 0;
     background: rgba(15, 23, 42, 0.96);
     border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -59,10 +86,25 @@
     z-index: 20;
   }
 
+  :global([data-theme='light']) .bottomNav {
+    border-top-color: rgba(109, 74, 204, 0.14);
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 -14px 35px rgba(82, 51, 151, 0.12);
+  }
+
   .bottomNav .tabItem {
-    padding: 0.85rem 0.55rem;
-    font-size: 0.78rem;
-    min-height: 3.3rem;
+    padding: 0.7rem 0.2rem;
+    font-size: 0.72rem;
+    min-height: 3rem;
     white-space: normal;
+  }
+
+  .fullLabel {
+    display: none;
+  }
+
+  .shortLabel {
+    display: inline;
+    font-size: inherit;
   }
 }

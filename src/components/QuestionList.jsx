@@ -16,8 +16,6 @@ export default function QuestionList({
   isAdmin,
 }) {
   const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const itemsPerPage = 5;
 
   const filtered = useMemo(() => {
     return questions.filter((question) => {
@@ -36,18 +34,10 @@ export default function QuestionList({
     });
   }, [questions, selectedSubject, selectedChapter, search]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
-  const pageData = filtered.slice((page - 1) * itemsPerPage, page * itemsPerPage);
-  const startIndex = (page - 1) * itemsPerPage;
-
   function handleDelete(id) {
     if (window.confirm('Delete this question permanently?')) {
       if (onDelete) onDelete(id);
     }
-  }
-
-  function updatePage(direction) {
-    setPage((current) => Math.min(totalPages, Math.max(1, current + direction)));
   }
 
   function getOptionClass(question, optionKey) {
@@ -79,7 +69,6 @@ export default function QuestionList({
               value={selectedSubject}
               onChange={(event) => {
                 onSubjectChange?.(event.target.value);
-                setPage(1);
               }}
             >
               {subjects.map((subject) => (
@@ -100,7 +89,6 @@ export default function QuestionList({
               value={selectedChapter}
               onChange={(event) => {
                 onChapterChange?.(event.target.value);
-                setPage(1);
               }}
             >
               {chapters.map((chapter) => (
@@ -122,18 +110,20 @@ export default function QuestionList({
             value={search}
             onChange={(event) => {
               setSearch(event.target.value);
-              setPage(1);
             }}
           />
         </div>
+        <span className={styles.resultCount}>
+          {filtered.length} question{filtered.length === 1 ? '' : 's'}
+        </span>
       </div>
 
-      {pageData.length === 0 ? (
+      {filtered.length === 0 ? (
         <p className={styles.emptyState}>No questions match this filter.</p>
       ) : (
         <div className={styles.questionList}>
-          {pageData.map((question, idx) => {
-            const number = startIndex + idx + 1;
+          {filtered.map((question, idx) => {
+            const number = idx + 1;
             const chapterLabel = normalizeChapter(question.chapter || 'General');
 
             return (
@@ -211,29 +201,6 @@ export default function QuestionList({
         </div>
       )}
 
-      <div className={styles.pagination}>
-        <button
-          type="button"
-          className={styles.pagerButton}
-          onClick={() => updatePage(-1)}
-          disabled={page === 1}
-        >
-          Previous
-        </button>
-
-        <span>
-          {page} / {totalPages}
-        </span>
-
-        <button
-          type="button"
-          className={styles.pagerButton}
-          onClick={() => updatePage(1)}
-          disabled={page === totalPages}
-        >
-          Next
-        </button>
-      </div>
     </section>
   );
 }

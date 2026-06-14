@@ -1,5 +1,6 @@
 ﻿import { supabase } from '../lib/supabaseClient';
 import { normalizeChapter } from '../lib/normalizeChapter';
+import { normalizeClassLevel } from '../lib/normalizeClassLevel';
 
 // Frontend role checks are useful for UI gating,
 // but Supabase row-level security must be configured
@@ -24,7 +25,7 @@ export async function addQuestion(question) {
 
     // class_level now supports values like:
     // "6", "9", "BCS 44", "BCS 45", "Admission", etc.
-    class_level: String(question.class_level || '').trim(),
+    class_level: normalizeClassLevel(question.class_level),
 
     subject: String(question.subject || 'General').trim(),
 
@@ -60,7 +61,7 @@ export async function updateQuestion(questionId, updates) {
   const payload = { ...updates };
 
   if (typeof payload.class_level !== 'undefined') {
-    payload.class_level = String(payload.class_level || '').trim();
+    payload.class_level = normalizeClassLevel(payload.class_level);
   }
 
   if (typeof payload.subject !== 'undefined') {
@@ -127,7 +128,7 @@ export async function deleteQuestion(questionId) {
 }
 
 export async function getRandomQuestions(classLevel, subject, chapter, limit) {
-  const safeClassLevel = String(classLevel || '').trim();
+  const safeClassLevel = normalizeClassLevel(classLevel);
   const safeSubject = subject && subject !== 'All Subjects' ? String(subject).trim() : null;
   const safeChapter =
     chapter && chapter !== 'All Chapters'
@@ -147,5 +148,31 @@ export async function getRandomQuestions(classLevel, subject, chapter, limit) {
     throw new Error(error.message);
   }
 
-  return data || [];
+  if (data?.length) {
+    return data;
+  }
+
+  // Supports older rows/accounts where one side stores "Class 9" and the other stores "9".
+  let fallbackQuery = supabase.from('questions').select('*');
+
+  if (safeSubject) {
+    fallbackQuery = fallbackQuery.eq('subject', safeSubject);
+  }
+
+  if (safeChapter) {
+    fallbackQuery = fallbackQuery.eq('chapter', safeChapter);
+  }
+
+  const { data: fallbackData, error: fallbackError } = await fallbackQuery;
+
+  if (fallbackError) {
+    throw new Error(fallbackError.message);
+  }
+
+  return (fallbackData || [])
+    .filter(
+      (question) => normalizeClassLevel(question.class_level) === safeClassLevel
+    )
+    .sort(() => Math.random() - 0.5)
+    .slice(0, safeLimit);
 }

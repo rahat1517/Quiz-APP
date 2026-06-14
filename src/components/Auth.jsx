@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import styles from './Auth.module.css';
 import { supabase } from '../lib/supabaseClient';
+import { normalizeClassLevel } from '../lib/normalizeClassLevel';
 import {
   signInWithEmail,
   signUpWithEmail,
@@ -26,6 +27,7 @@ export default function Auth({ onAuthSuccess }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const [selectedClassLevel, setSelectedClassLevel] = useState('');
   const [customClassLevel, setCustomClassLevel] = useState('');
@@ -76,7 +78,7 @@ export default function Auth({ onAuthSuccess }) {
       return customClassLevel.trim();
     }
 
-    return selectedClassLevel.trim();
+    return normalizeClassLevel(selectedClassLevel);
   }
 
   async function saveProfileAfterSignup(user, classLevel) {
@@ -187,160 +189,231 @@ export default function Auth({ onAuthSuccess }) {
 
   return (
     <div className={styles.authShell}>
-      <div className={styles.authCard}>
-        <div className={styles.authHeader}>
-          <div>
-            <h1>{view === 'login' ? 'Welcome back' : 'Create your account'}</h1>
+      <div className={styles.backgroundGlowOne} />
+      <div className={styles.backgroundGlowTwo} />
 
+      <div className={styles.authCard}>
+        <aside className={styles.brandPanel}>
+          <div>
+            <div className={styles.brand}>
+              <span className={styles.brandMark}>Q</span>
+              <span>Quiz World</span>
+            </div>
+
+            <div className={styles.brandContent}>
+              <span className={styles.eyebrow}>Learn. Challenge. Grow.</span>
+              <h1>Turn your knowledge into progress.</h1>
+              <p>
+                Take focused quizzes, track every result, and build confidence
+                one answer at a time.
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.benefits}>
+            <div><span>01</span><p>Curated quizzes for your class and exams</p></div>
+            <div><span>02</span><p>Instant scores with detailed answer review</p></div>
+            <div><span>03</span><p>Personal progress that follows you</p></div>
+          </div>
+
+          <p className={styles.brandFooter}>A smarter way to practice every day.</p>
+        </aside>
+
+        <main className={styles.formPanel}>
+          <div className={styles.mobileBrand}>
+            <span className={styles.brandMark}>Q</span>
+            <span>Quiz World</span>
+          </div>
+
+          <div className={styles.viewTabs} aria-label="Authentication options">
+            <button
+              type="button"
+              className={view === 'login' ? styles.activeTab : ''}
+              onClick={() => {
+                setView('login');
+                setError('');
+                setMessage('');
+              }}
+            >
+              Log in
+            </button>
+            <button
+              type="button"
+              className={view === 'register' ? styles.activeTab : ''}
+              onClick={() => {
+                setView('register');
+                setError('');
+                setMessage('');
+              }}
+            >
+              Sign up
+            </button>
+          </div>
+
+          <div className={styles.authHeader}>
+            <span className={styles.welcomeIcon}>{view === 'login' ? 'Welcome' : 'Join us'}</span>
+            <h2>{view === 'login' ? 'Welcome back' : 'Create your account'}</h2>
             <p>
               {view === 'login'
-                ? 'Log in to manage quizzes, save your scores, and continue where you left off.'
-                : 'Sign up to save your quiz progress, track results, and access your personal dashboard.'}
+                ? 'Enter your details to continue your learning journey.'
+                : 'Start tracking your quizzes and progress in a few steps.'}
             </p>
           </div>
 
-          <button
-            type="button"
-            className={styles.toggleView}
-            onClick={() => {
-              setView((current) => (current === 'login' ? 'register' : 'login'));
-              setError('');
-              setMessage('');
-              setPassword('');
-              setConfirmPassword('');
-            }}
-          >
-            {view === 'login' ? 'New here? Sign up' : 'Already have an account? Log in'}
-          </button>
-        </div>
-
-        <form className={styles.authForm} onSubmit={handleSubmit}>
-          <label className={styles.fieldLabel} htmlFor="auth-email">
-            Email address
-          </label>
-
-          <input
-            id="auth-email"
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-            placeholder="rahat123@gmail.com"
-          />
-
-          <label className={styles.fieldLabel} htmlFor="auth-password">
-            Password
-          </label>
-
-          <input
-            id="auth-password"
-            type="password"
-            autoComplete={view === 'login' ? 'current-password' : 'new-password'}
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-            placeholder="At least 8 characters"
-          />
-
-          {view === 'register' && (
-            <>
-              <label className={styles.fieldLabel} htmlFor="auth-password-confirm">
-                Confirm password
+          <form className={styles.authForm} onSubmit={handleSubmit}>
+            <div className={styles.fieldGroup}>
+              <label className={styles.fieldLabel} htmlFor="auth-email">
+                Email address
               </label>
+              <div className={styles.inputWrap}>
+                <span className={styles.inputIcon}>@</span>
+                <input
+                  id="auth-email"
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  required
+                  placeholder="you@example.com"
+                />
+              </div>
+            </div>
 
-              <input
-                id="auth-password-confirm"
-                type="password"
-                autoComplete="new-password"
-                value={confirmPassword}
-                onChange={(event) => setConfirmPassword(event.target.value)}
-                required
-                placeholder="Repeat your password"
-              />
-
-              <label className={styles.fieldLabel} htmlFor="auth-class-level">
-                Class / Exam category
+            <div className={styles.fieldGroup}>
+              <label className={styles.fieldLabel} htmlFor="auth-password">
+                Password
               </label>
+              <div className={styles.inputWrap}>
+                <span className={styles.inputIcon}>*</span>
+                <input
+                  id="auth-password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete={view === 'login' ? 'current-password' : 'new-password'}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  required
+                  placeholder="At least 8 characters"
+                />
+                <button
+                  type="button"
+                  className={styles.passwordToggle}
+                  onClick={() => setShowPassword((current) => !current)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
+            </div>
 
-              <select
-                id="auth-class-level"
-                className={styles.authSelect}
-                value={selectedClassLevel}
-                onChange={(event) => {
-                  setSelectedClassLevel(event.target.value);
-
-                  if (event.target.value !== 'Other / Custom') {
-                    setCustomClassLevel('');
-                  }
-                }}
-                required
-              >
-                <option value="">Select class or exam</option>
-
-                {classOptions.map((level) => (
-                  <option key={level} value={level}>
-                    {level}
-                  </option>
-                ))}
-              </select>
-
-              {selectedClassLevel === 'Other / Custom' && (
-                <>
-                  <label className={styles.fieldLabel} htmlFor="auth-custom-class">
-                    Custom class / exam name
+            {view === 'register' && (
+              <>
+                <div className={styles.fieldGroup}>
+                  <label className={styles.fieldLabel} htmlFor="auth-password-confirm">
+                    Confirm password
                   </label>
-
-                  <input
-                    id="auth-custom-class"
-                    type="text"
-                    value={customClassLevel}
-                    onChange={(event) => setCustomClassLevel(event.target.value)}
-                    required
-                    placeholder="Example: BCS 46, Admission, HSC 2026"
-                  />
-                </>
-              )}
-            </>
-          )}
-
-          <button type="submit" className={styles.authSubmit} disabled={loading}>
-            {loading
-              ? view === 'login'
-                ? 'Logging in…'
-                : 'Signing up…'
-              : view === 'login'
-                ? 'Log in'
-                : 'Sign up'}
-          </button>
-
-          {message && (
-            <div className={`${styles.authFeedback} ${styles.success}`}>
-              {message}
-
-              {message.toLowerCase().includes('check your email') && (
-                <div className={styles.resendRow}>
-                  <button
-                    type="button"
-                    className={styles.resendButton}
-                    onClick={handleResend}
-                    disabled={loading || resendCooldown > 0 || !email}
-                  >
-                    {resendCooldown > 0
-                      ? `Resend available in ${resendCooldown}s`
-                      : 'Resend verification / send sign-in link'}
-                  </button>
+                  <div className={styles.inputWrap}>
+                    <span className={styles.inputIcon}>*</span>
+                    <input
+                      id="auth-password-confirm"
+                      type={showPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      value={confirmPassword}
+                      onChange={(event) => setConfirmPassword(event.target.value)}
+                      required
+                      placeholder="Repeat your password"
+                    />
+                  </div>
                 </div>
-              )}
-            </div>
-          )}
 
-          {error && (
-            <div className={`${styles.authFeedback} ${styles.error}`}>
-              {error}
-            </div>
-          )}
-        </form>
+                <div className={styles.fieldGroup}>
+                  <label className={styles.fieldLabel} htmlFor="auth-class-level">
+                    Class / Exam category
+                  </label>
+                  <select
+                    id="auth-class-level"
+                    className={styles.authSelect}
+                    value={selectedClassLevel}
+                    onChange={(event) => {
+                      setSelectedClassLevel(event.target.value);
+                      if (event.target.value !== 'Other / Custom') setCustomClassLevel('');
+                    }}
+                    required
+                  >
+                    <option value="">Select class or exam</option>
+                    {classOptions.map((level) => (
+                      <option key={level} value={level}>{level}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {selectedClassLevel === 'Other / Custom' && (
+                  <div className={styles.fieldGroup}>
+                    <label className={styles.fieldLabel} htmlFor="auth-custom-class">
+                      Custom class / exam name
+                    </label>
+                    <input
+                      id="auth-custom-class"
+                      type="text"
+                      value={customClassLevel}
+                      onChange={(event) => setCustomClassLevel(event.target.value)}
+                      required
+                      placeholder="Example: BCS 46, Admission, HSC 2026"
+                    />
+                  </div>
+                )}
+              </>
+            )}
+
+            <button type="submit" className={styles.authSubmit} disabled={loading}>
+              <span>
+                {loading
+                  ? view === 'login' ? 'Logging in...' : 'Creating account...'
+                  : view === 'login' ? 'Log in to Quiz World' : 'Create my account'}
+              </span>
+              <span aria-hidden>→</span>
+            </button>
+
+            {message && (
+              <div className={`${styles.authFeedback} ${styles.success}`}>
+                {message}
+                {message.toLowerCase().includes('check your email') && (
+                  <div className={styles.resendRow}>
+                    <button
+                      type="button"
+                      className={styles.resendButton}
+                      onClick={handleResend}
+                      disabled={loading || resendCooldown > 0 || !email}
+                    >
+                      {resendCooldown > 0
+                        ? `Resend available in ${resendCooldown}s`
+                        : 'Resend verification email'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {error && (
+              <div className={`${styles.authFeedback} ${styles.error}`}>
+                {error}
+              </div>
+            )}
+
+            <p className={styles.switchPrompt}>
+              {view === 'login' ? 'New to Quiz World?' : 'Already have an account?'}
+              <button
+                type="button"
+                onClick={() => {
+                  setView((current) => (current === 'login' ? 'register' : 'login'));
+                  setError('');
+                  setMessage('');
+                }}
+              >
+                {view === 'login' ? 'Create an account' : 'Log in instead'}
+              </button>
+            </p>
+          </form>
+        </main>
       </div>
     </div>
   );

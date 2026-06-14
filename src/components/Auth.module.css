@@ -1,47 +1,247 @@
 .authShell {
+  position: relative;
   min-height: 100vh;
   display: grid;
   place-items: center;
-  padding: 2rem 1rem;
-  background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+  overflow: hidden;
+  padding: 2rem;
+  color: #f8fafc;
+  background: #070611;
+}
+
+.backgroundGlowOne,
+.backgroundGlowTwo {
+  position: absolute;
+  width: 34rem;
+  height: 34rem;
+  border-radius: 999px;
+  filter: blur(90px);
+  pointer-events: none;
+  opacity: 0.32;
+}
+
+.backgroundGlowOne {
+  top: -16rem;
+  left: -10rem;
+  background: #7c3aed;
+}
+
+.backgroundGlowTwo {
+  right: -15rem;
+  bottom: -18rem;
+  background: #2563eb;
 }
 
 .authCard {
-  width: min(540px, 100%);
-  background: rgba(15, 23, 42, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  z-index: 1;
+  width: min(1100px, 100%);
+  min-height: min(720px, calc(100vh - 4rem));
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(420px, 0.95fr);
+  overflow: hidden;
+  border: 1px solid rgba(196, 181, 253, 0.18);
   border-radius: 32px;
-  padding: 2rem;
-  box-shadow: 0 30px 90px rgba(15, 23, 42, 0.3);
+  background: rgba(11, 10, 24, 0.88);
+  box-shadow: 0 35px 100px rgba(0, 0, 0, 0.48);
+  backdrop-filter: blur(24px);
+}
+
+.brandPanel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(2rem, 5vw, 4.5rem);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 85% 15%, rgba(196, 181, 253, 0.2), transparent 26%),
+    linear-gradient(145deg, #6d3df5 0%, #4f34d4 50%, #251463 100%);
+}
+
+.brandPanel::before,
+.brandPanel::after {
+  content: '';
+  position: absolute;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.brandPanel::before {
+  width: 26rem;
+  height: 26rem;
+  right: -14rem;
+  top: -8rem;
+}
+
+.brandPanel::after {
+  width: 18rem;
+  height: 18rem;
+  left: -10rem;
+  bottom: -9rem;
+}
+
+.brand,
+.mobileBrand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+.brandMark {
+  width: 2.65rem;
+  height: 2.65rem;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 14px;
+  color: #4f34d4;
+  background: #fff;
+  box-shadow: 0 12px 25px rgba(30, 15, 80, 0.25);
+}
+
+.brandContent {
+  position: relative;
+  z-index: 1;
+  margin-top: clamp(4rem, 11vh, 8rem);
+  max-width: 31rem;
+}
+
+.eyebrow,
+.welcomeIcon {
+  display: inline-flex;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.eyebrow {
+  color: #ede9fe;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.brandContent h1 {
+  margin: 1.25rem 0 1rem;
+  color: #fff;
+  font-size: clamp(2.75rem, 5vw, 4.75rem);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.brandContent p {
+  margin: 0;
+  max-width: 28rem;
+  color: rgba(237, 233, 254, 0.82);
+  line-height: 1.75;
+}
+
+.benefits {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0.85rem;
+  margin-top: 3rem;
+}
+
+.benefits div {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.benefits span {
+  color: #ddd6fe;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.benefits p,
+.brandFooter {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.87rem;
+}
+
+.brandFooter {
+  position: relative;
+  z-index: 1;
+  margin-top: 2rem;
+  color: rgba(255, 255, 255, 0.56);
+}
+
+.formPanel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(2rem, 5vw, 4.5rem);
+  background:
+    radial-gradient(circle at top right, rgba(124, 92, 252, 0.1), transparent 30%),
+    rgba(10, 9, 22, 0.92);
+}
+
+.mobileBrand {
+  display: none;
+}
+
+.viewTabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+  margin-bottom: 2.2rem;
+  padding: 0.3rem;
+  border: 1px solid rgba(196, 181, 253, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.viewTabs button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 10px;
+  color: #8f8aa6;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.viewTabs button.activeTab {
+  color: #fff;
+  background: rgba(124, 92, 252, 0.22);
+  box-shadow: inset 0 0 0 1px rgba(167, 139, 250, 0.22);
 }
 
 .authHeader {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1.75rem;
+  margin-bottom: 1.8rem;
 }
 
-.authHeader h1 {
-  margin: 0 0 0.5rem;
-  font-size: clamp(2rem, 2.8vw, 2.4rem);
+.welcomeIcon {
+  padding-left: 0;
+  color: #a78bfa;
+}
+
+.authHeader h2 {
+  margin: 0.65rem 0 0.45rem;
+  color: #f8fafc;
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
 }
 
 .authHeader p {
   margin: 0;
-  color: #94a3b8;
-  line-height: 1.75;
-}
-
-.toggleView {
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.04);
-  color: #e2e8f0;
-  border-radius: 999px;
-  padding: 0.95rem 1.2rem;
-  cursor: pointer;
-  font-weight: 700;
+  color: #8f8aa6;
+  line-height: 1.65;
 }
 
 .authForm {
@@ -49,68 +249,216 @@
   gap: 1rem;
 }
 
+.fieldGroup {
+  display: grid;
+  gap: 0.5rem;
+}
+
 .fieldLabel {
-  color: #94a3b8;
-  font-size: 0.95rem;
-  font-weight: 700;
+  color: #c4b5fd;
+  font-size: 0.82rem;
+  font-weight: 800;
 }
 
-.authForm input {
+.inputWrap {
+  position: relative;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #7c5cfc;
+  font-weight: 900;
+  pointer-events: none;
+}
+
+.authForm input,
+.authSelect {
   width: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.05);
-  color: #e2e8f0;
-  border-radius: 18px;
-  padding: 1rem 1.1rem;
-  font-size: 1rem;
+  min-height: 54px;
+  border: 1px solid rgba(196, 181, 253, 0.14);
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  color: #f8fafc;
+  background: rgba(255, 255, 255, 0.035);
+  transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
 }
 
-.authForm input:focus {
+.inputWrap input {
+  padding-left: 2.75rem;
+  padding-right: 4.5rem;
+}
+
+.authForm input::placeholder {
+  color: #625d75;
+}
+
+.authForm input:focus,
+.authSelect:focus {
   outline: none;
-  border-color: rgba(59, 130, 246, 0.65);
-  background: rgba(255, 255, 255, 0.1);
+  border-color: #8b5cf6;
+  background: rgba(124, 92, 252, 0.07);
+  box-shadow: 0 0 0 4px rgba(124, 92, 252, 0.12);
+}
+
+.authSelect {
+  color-scheme: dark;
+  cursor: pointer;
+}
+
+.passwordToggle {
+  position: absolute;
+  right: 0.65rem;
+  top: 50%;
+  transform: translateY(-50%);
+  min-height: 36px;
+  border: 0;
+  padding: 0.35rem 0.55rem;
+  color: #a78bfa;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 800;
 }
 
 .authSubmit {
-  border: none;
-  border-radius: 20px;
-  padding: 1rem 1.4rem;
-  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.35rem;
+  border: 0;
+  border-radius: 14px;
+  padding: 0.9rem 1.2rem;
   color: #fff;
-  font-weight: 700;
+  background: linear-gradient(135deg, #8b5cf6, #5b3fd0);
+  box-shadow: 0 16px 32px rgba(91, 63, 208, 0.28);
   cursor: pointer;
-  margin-top: 0.5rem;
+  font-weight: 900;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.authSubmit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 38px rgba(91, 63, 208, 0.38);
 }
 
 .authSubmit:disabled {
-  opacity: 0.7;
+  opacity: 0.65;
   cursor: not-allowed;
 }
 
 .authFeedback {
-  padding: 1rem 1rem;
-  border-radius: 18px;
-  font-size: 0.95rem;
+  padding: 0.85rem 1rem;
+  border-radius: 13px;
+  font-size: 0.85rem;
 }
 
 .success {
-  background: rgba(34, 197, 94, 0.12);
-  border: 1px solid rgba(34, 197, 94, 0.22);
   color: #a7f3d0;
+  border: 1px solid rgba(34, 197, 94, 0.22);
+  background: rgba(34, 197, 94, 0.1);
 }
 
 .error {
-  background: rgba(248, 113, 113, 0.12);
-  border: 1px solid rgba(248, 113, 113, 0.22);
   color: #fecaca;
+  border: 1px solid rgba(248, 113, 113, 0.22);
+  background: rgba(248, 113, 113, 0.1);
 }
 
-@media (max-width: 640px) {
-  .authHeader {
-    flex-direction: column;
+.resendRow {
+  margin-top: 0.75rem;
+}
+
+.resendButton {
+  border: 0;
+  padding: 0;
+  color: #c4b5fd;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.switchPrompt {
+  display: flex;
+  justify-content: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin: 0.4rem 0 0;
+  color: #777287;
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+.switchPrompt button {
+  min-height: auto;
+  border: 0;
+  padding: 0;
+  color: #a78bfa;
+  background: transparent;
+  cursor: pointer;
+  font-size: inherit;
+  font-weight: 800;
+}
+
+@media (max-width: 900px) {
+  .authShell {
+    padding: 1rem;
+    overflow: auto;
   }
 
-  .toggleView {
-    width: 100%;
+  .authCard {
+    width: min(560px, 100%);
+    min-height: auto;
+    grid-template-columns: 1fr;
+  }
+
+  .brandPanel {
+    display: none;
+  }
+
+  .formPanel {
+    padding: clamp(1.4rem, 6vw, 2.5rem);
+  }
+
+  .mobileBrand {
+    display: flex;
+    margin-bottom: 1.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .authShell {
+    place-items: start center;
+    padding: 0;
+    background: #090814;
+  }
+
+  .authCard {
+    min-height: 100dvh;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .formPanel {
+    justify-content: flex-start;
+    padding: 1.25rem;
+  }
+
+  .mobileBrand,
+  .viewTabs {
+    margin-bottom: 1.5rem;
+  }
+
+  .authHeader {
+    margin-bottom: 1.4rem;
+  }
+
+  .authHeader h2 {
+    font-size: 2rem;
   }
 }

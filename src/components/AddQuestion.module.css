@@ -386,9 +386,29 @@
 }
 
 @media (max-width: 700px) {
-  .panelBlock,
+  .card {
+    padding: 1rem;
+    border-radius: 22px;
+  }
+
+  .headerRow,
+  .subjectCaption {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .statusBadge {
+    width: fit-content;
+    white-space: normal;
+  }
+
+  .panelBlock {
+    padding: 1rem;
+    border-radius: 20px;
+  }
+
   .form {
-    padding: 1.1rem;
+    padding: 0;
   }
 
   .field input,
@@ -403,6 +423,21 @@
 
   .answerGrid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .subjectChips,
+  .subjectCardGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .submitRow {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .cancelButton,
+  .submitButton {
+    width: 100%;
   }
 }
 .field textarea {

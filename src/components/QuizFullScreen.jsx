@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import styles from './QuizFullScreen.module.css';
 import useQuiz from '../hooks/useQuiz';
+import { formatClassLevel } from '../lib/normalizeClassLevel';
 
 export default function QuizFullScreen(props) {
   const { questions = [] } = props;
@@ -25,6 +26,9 @@ export default function QuizFullScreen(props) {
 
   const totalQuestions = questions.length;
   const q = questions[currentIndex];
+  const progress = totalQuestions > 0 ? ((currentIndex + 1) / totalQuestions) * 100 : 0;
+  const completion = totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0;
+  const classLabel = formatClassLevel(props.classLevel) || 'Your class';
 
   const currentExplanation = q?.explanation || q?.answer_explanation || '';
 
@@ -41,21 +45,34 @@ export default function QuizFullScreen(props) {
 
   if (!hasStarted) {
     return (
-      <section className={styles.wrapper}>
-        <div className={styles.centerCard}>
-          <h2>Ready to start?</h2>
-          <p>
-            You have {totalQuestions} questions. Time limit:{' '}
-            {props.durationMinutes} minutes.
-          </p>
-
-          <button
-            type="button"
-            className={styles.submitButton}
-            onClick={startExam}
-          >
-            Start Exam
-          </button>
+      <section className={styles.startScreen}>
+        <div className={styles.startCard}>
+          <span className={styles.startBadge}>Quiz ready</span>
+          <div className={styles.startIcon}>Q</div>
+          <h2>Ready to challenge yourself?</h2>
+          <p>Stay focused, choose your best answer, and learn from the result.</p>
+          <div className={styles.startStats}>
+            <div><strong>{totalQuestions}</strong><span>Questions</span></div>
+            <div><strong>{props.durationMinutes}</strong><span>Minutes</span></div>
+            <div><strong>{props.subject || 'Mixed'}</strong><span>Subject</span></div>
+          </div>
+          <p className={styles.startClass}>{classLabel}</p>
+          <div className={styles.startActions}>
+            <button
+              type="button"
+              className={styles.backButton}
+              onClick={props.onBackToSetup}
+            >
+              ← Back to setup
+            </button>
+            <button
+              type="button"
+              className={styles.startButton}
+              onClick={startExam}
+            >
+              Start Exam <span aria-hidden>→</span>
+            </button>
+          </div>
         </div>
       </section>
     );
@@ -65,10 +82,16 @@ export default function QuizFullScreen(props) {
     <section className={styles.wrapper}>
       <aside className={styles.leftColumn}>
         <div className={styles.timerBox}>
+          <span className={styles.timerIcon}>◷</span>
           <div className={styles.timerValue}>
             {minutes}:{String(seconds).padStart(2, '0')}
           </div>
           <div className={styles.timerLabel}>Time left</div>
+        </div>
+
+        <div className={styles.sideHeading}>
+          <span>Questions</span>
+          <strong>{answeredCount}/{totalQuestions}</strong>
         </div>
 
         <div className={styles.progressList}>
@@ -102,25 +125,39 @@ export default function QuizFullScreen(props) {
         </div>
 
         <div className={styles.summaryBox}>
-          <div>
-            Answered: {answeredCount}/{totalQuestions}
-          </div>
-          <div>Skipped: {totalQuestions - answeredCount}</div>
+          <div><span>Answered</span><strong>{answeredCount}</strong></div>
+          <div><span>Remaining</span><strong>{totalQuestions - answeredCount}</strong></div>
         </div>
       </aside>
 
       <main className={styles.centerColumn}>
+        <div className={styles.mobileStatus}>
+          <div>
+            <span>Question {currentIndex + 1}/{totalQuestions}</span>
+            <strong>{minutes}:{String(seconds).padStart(2, '0')}</strong>
+          </div>
+          <div className={styles.mobileProgress}>
+            <span style={{ width: `${completion}%` }} />
+          </div>
+        </div>
+
+        <div className={styles.topProgress}>
+          <span style={{ width: `${progress}%` }} />
+        </div>
+
         <div className={styles.questionHeader}>
           <div>
-            <h3 className={styles.questionTitle}>
-              Question {currentIndex + 1} of {totalQuestions}
-            </h3>
+            <div className={styles.questionMeta}>
+              <span className={styles.questionNumber}>Question {currentIndex + 1}</span>
+              <span className={styles.metaSmall}>{q.subject || props.subject}</span>
+              {q.chapter && <span className={styles.metaSmall}>{q.chapter}</span>}
+            </div>
 
-            <div className={styles.questionText}>{q.question_text}</div>
+            <h3 className={styles.questionText}>{q.question_text}</h3>
           </div>
-
-          <div className={styles.metaSmall}>{q.subject || props.subject}</div>
         </div>
+
+        <p className={styles.answerHint}>Choose one answer</p>
 
         <div
           role="radiogroup"
@@ -171,7 +208,7 @@ export default function QuizFullScreen(props) {
             onClick={handlePrevious}
             disabled={currentIndex === 0}
           >
-            Previous
+            <span aria-hidden>←</span> Previous
           </button>
 
           {currentIndex < totalQuestions - 1 ? (
@@ -180,7 +217,7 @@ export default function QuizFullScreen(props) {
               className={styles.navButton}
               onClick={handleNext}
             >
-              Next
+              Next <span aria-hidden>→</span>
             </button>
           ) : (
             <button
@@ -198,37 +235,15 @@ export default function QuizFullScreen(props) {
         </div>
       </main>
 
-      <aside className={styles.rightColumn}>
-        <div className={styles.tilesGrid}>
-          {questions.map((qq, idx) => (
-            <button
-              key={qq.id}
-              type="button"
-              className={styles.tile}
-              onClick={() => setCurrentIndex(idx)}
-              aria-label={`Jump to question ${idx + 1}`}
-            >
-              {idx + 1}
-            </button>
-          ))}
-        </div>
-
-        <div className={styles.submitWrap}>
-          <button
-            type="button"
-            className={styles.submitButton}
-            onClick={() => setConfirmOpen(true)}
-          >
-            Submit Exam
-          </button>
-        </div>
-      </aside>
-
       {confirmOpen && (
         <div className={styles.confirmOverlay} role="dialog" aria-modal="true">
           <div className={styles.confirmBox}>
+            <span className={styles.confirmIcon}>✓</span>
             <h4>Submit exam?</h4>
-            <p>Are you sure you want to submit your answers? This will end the exam.</p>
+            <p>
+              You answered {answeredCount} of {totalQuestions} questions.
+              Submitting will end this attempt.
+            </p>
 
             <div className={styles.confirmActions}>
               <button

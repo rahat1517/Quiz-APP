@@ -53,22 +53,22 @@
 }
 
 /* Light mode adjustments */
-.light .footer {
-  background: rgba(255, 255, 255, 0.3);
-  border-top: 1px solid rgba(15, 23, 42, 0.08);
-  color: #64748b;
+:global([data-theme='light']) .footer {
+  background: rgba(255, 255, 255, 0.4);
+  border-top-color: rgba(109, 74, 204, 0.1);
+  color: #6b6380;
 }
 
-.light .copyright {
-  color: #0f172a;
+:global([data-theme='light']) .copyright {
+  color: #35245f;
 }
 
-.light .copyright strong {
+:global([data-theme='light']) .copyright strong {
   color: #7c3aed;
 }
 
-.light .honorName {
-  color: #0f172a;
+:global([data-theme='light']) .honorName {
+  color: #35245f;
   background: rgba(124, 92, 252, 0.1);
 }
 

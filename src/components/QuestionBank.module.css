@@ -16,6 +16,17 @@
   grid-template-columns: 1fr auto;
   gap: 1rem;
   margin: 1.5rem 0;
+  align-items: center;
+}
+
+.resultCount {
+  padding: 0.55rem 0.8rem;
+  border-radius: 999px;
+  color: #c4b5fd;
+  background: rgba(124, 92, 252, 0.12);
+  font-size: 0.75rem;
+  font-weight: 800;
+  white-space: nowrap;
 }
 
 .searchField,
@@ -318,6 +329,20 @@
 }
 
 @media (max-width: 760px) {
+  .bankCard {
+    padding: 1rem;
+    border-radius: 22px;
+  }
+
+  .questionItem {
+    padding: 1rem;
+    border-radius: 18px;
+  }
+
+  .questionItem h3 {
+    overflow-wrap: anywhere;
+  }
+
   .filterGroup {
     width: 100%;
     display: grid;
@@ -336,5 +361,10 @@
   .optionKey {
     width: 24px;
     height: 24px;
+  }
+
+  .actionButton {
+    width: 100%;
+    min-height: 44px;
   }
 }
