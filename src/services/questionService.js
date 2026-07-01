@@ -1,6 +1,10 @@
 ﻿import { supabase } from '../lib/supabaseClient';
 import { normalizeChapter } from '../lib/normalizeChapter';
-import { normalizeClassLevel } from '../lib/normalizeClassLevel';
+import {
+  normalizeClassLevel,
+  getClassGroupLevels,
+  isClassInGroup,
+} from '../lib/normalizeClassLevel';
 
 // Frontend role checks are useful for UI gating,
 // but Supabase row-level security must be configured
@@ -170,9 +174,7 @@ export async function getRandomQuestions(classLevel, subject, chapter, limit) {
   }
 
   return (fallbackData || [])
-    .filter(
-      (question) => normalizeClassLevel(question.class_level) === safeClassLevel
-    )
+    .filter((question) => isClassInGroup(question.class_level, safeClassLevel))
     .sort(() => Math.random() - 0.5)
     .slice(0, safeLimit);
 }

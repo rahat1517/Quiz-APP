@@ -2,7 +2,12 @@
 import { supabase } from './lib/supabaseClient';
 import { getQuestions, deleteQuestion, getRandomQuestions } from './services/questionService';
 import { normalizeChapter } from './lib/normalizeChapter';
-import { formatClassLevel, normalizeClassLevel } from './lib/normalizeClassLevel';
+import {
+  formatClassLevel,
+  normalizeClassLevel,
+  getClassGroupLevels,
+  isClassInGroup,
+} from './lib/normalizeClassLevel';
 import { getSession, signOut } from './services/authService';
 import { getCurrentProfile, updateUserProfile } from './services/profileService';
 import { saveQuizResult, getMyQuizResults, getAllQuizResultsForAdmin } from './services/resultService';
@@ -71,16 +76,26 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
   }
 
   const classLevels = useMemo(() => {
-    const unique = Array.from(
-      new Set(
-        questions
-          .map((question) => question.class_level)
-          .filter(Boolean)
-          .map((level) => normalizeClassLevel(level))
-      )
+    const unique = new Set(
+      questions
+        .map((question) => question.class_level)
+        .filter(Boolean)
+        .map((level) => normalizeClassLevel(level))
     );
 
-    return unique.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+    if (unique.has('9') || unique.has('10')) {
+      unique.add('9');
+      unique.add('10');
+    }
+
+    if (unique.has('11') || unique.has('12')) {
+      unique.add('11');
+      unique.add('12');
+    }
+
+    return Array.from(unique).sort((a, b) =>
+      a.localeCompare(b, undefined, { numeric: true })
+    );
   }, [questions]);
 
   useEffect(() => {
@@ -95,16 +110,16 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
     return undefined;
   }, [classLevels, selectedClassLevel]);
 
- const availableQuestions = useMemo(() => {
-  const classToUse = isClassRestricted ? assignedClassLabel : selectedClassLevel;
+  const availableQuestions = useMemo(() => {
+    const classToUse = isClassRestricted ? assignedClassLabel : selectedClassLevel;
 
-  if (!classToUse) {
-    return isAdmin ? questions : [];
-  }
+    if (!classToUse) {
+      return isAdmin ? questions : [];
+    }
 
-  return questions.filter(
-    (question) => normalizeClassLevel(question.class_level) === normalizeClassLevel(classToUse)
-  );
+    return questions.filter((question) =>
+      isClassInGroup(question.class_level, classToUse)
+    );
   }, [questions, selectedClassLevel, isClassRestricted, assignedClassLabel, isAdmin]);
 
   const subjects = useMemo(() => {
