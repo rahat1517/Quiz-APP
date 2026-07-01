@@ -227,7 +227,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
         result.class_level || (isClassRestricted ? assignedClassLabel : selectedClassLevel) || ''
       ).trim();
 
-      await saveQuizResult({
+      const savedResult = await saveQuizResult({
         classLevel: classLevelToSave,
         subject: selectedSubject === 'All Subjects' ? 'All Subjects' : selectedSubject,
         questionLimit: quizQuestions.length,
@@ -239,6 +239,11 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
         score: result.score,
         percentage: result.percentage,
         answers: result.answers,
+      });
+
+      setQuizResult({
+        ...savedResult,
+        ...result,
       });
 
       showToast('Quiz complete! Your score was saved.', 'success');

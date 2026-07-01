@@ -10,21 +10,34 @@ export default function Result({
 }) {
   const [selectedExam, setSelectedExam] = useState(null);
 
+  const displayedHistory = useMemo(() => {
+    if (!result?.id) {
+      return history;
+    }
+
+    return history.filter((exam) => exam.id !== result.id);
+  }, [history, result?.id]);
+
   const latestResult = useMemo(() => {
     if (!result) return null;
 
+    const totalQuestions = result.total ?? result.total_questions ?? 0;
+    const correctAnswers = result.correct ?? result.correct_answers ?? 0;
+    const wrongAnswers = result.wrong ?? result.wrong_answers ?? 0;
+    const skippedAnswers =
+      result.skipped ??
+      result.skippedAnswers ??
+      result.skipped_answers ??
+      Number(totalQuestions) - Number(correctAnswers) - Number(wrongAnswers);
+
     return {
-      total_questions: result.total,
-      correct_answers: result.correct,
-      wrong_answers: result.wrong,
-      skipped_answers:
-        result.skipped ??
-        result.skippedAnswers ??
-        Number(result.total || 0) -
-          Number(result.correct || 0) -
-          Number(result.wrong || 0),
-      score: result.score,
-      percentage: result.percentage,
+      ...result,
+      total_questions: totalQuestions,
+      correct_answers: correctAnswers,
+      wrong_answers: wrongAnswers,
+      skipped_answers: skippedAnswers,
+      score: result.score ?? 0,
+      percentage: result.percentage ?? 0,
       answers: result.answers,
     };
   }, [result]);
@@ -287,7 +300,7 @@ export default function Result({
             <h3>Past Exams</h3>
             <p>Open any attempt to review each question and explanation.</p>
           </div>
-          <span className={styles.historyCount}>{history.length} attempts</span>
+          <span className={styles.historyCount}>{displayedHistory.length} attempts</span>
         </div>
 
         {loading && (
@@ -296,11 +309,11 @@ export default function Result({
 
         {error && <div className={styles.errorBox}>{error}</div>}
 
-        {!loading && !error && history.length === 0 && (
+        {!loading && !error && displayedHistory.length === 0 && (
           <div className={styles.statusBox}>No past exam result found.</div>
         )}
 
-        {!loading && !error && history.length > 0 && (
+        {!loading && !error && displayedHistory.length > 0 && (
           <div className={styles.tableWrapper}>
             <table className={styles.resultTable}>
               <thead>
@@ -319,7 +332,7 @@ export default function Result({
               </thead>
 
               <tbody>
-                {history.map((exam) => {
+                {displayedHistory.map((exam) => {
                   const isSelected = selectedExam?.id === exam.id;
 
                   return (
