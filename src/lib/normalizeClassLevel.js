@@ -7,7 +7,12 @@ const CLASS_GROUPS = {
 
 export function normalizeClassLevel(value) {
   const label = String(value || '').trim();
+  const bcsMatch = label.match(/^BCS[-\s]*(\d+)$/i);
   const classMatch = label.match(/^class\s+(\d+)$/i);
+
+  if (bcsMatch) {
+    return `BCS ${bcsMatch[1]}`;
+  }
 
   return classMatch ? classMatch[1] : label;
 }
@@ -20,6 +25,17 @@ export function getClassGroupLevels(value) {
 
 export function isClassInGroup(questionClassLevel, selectedClassLevel) {
   const normalizedQuestion = normalizeClassLevel(questionClassLevel);
+  const normalizedSelected = normalizeClassLevel(selectedClassLevel);
+
+  if (/^BCS$/i.test(normalizedSelected)) {
+    return /^BCS\s*\d+/i.test(normalizedQuestion);
+  }
+
+  if (/^BCS\s*\d+/i.test(normalizedSelected)) {
+    return /^BCS\s*\d+/i.test(normalizedQuestion) &&
+      normalizedQuestion.toLowerCase().startsWith(normalizedSelected.toLowerCase());
+  }
+
   const groupLevels = getClassGroupLevels(selectedClassLevel);
 
   return groupLevels.includes(normalizedQuestion);
