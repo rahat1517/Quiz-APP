@@ -644,6 +644,34 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
 
         {!loading && !error && activeTab === 'bank' && (
           <section className={styles.sectionGap}>
+            <div className={styles.fieldGroupInline}>
+              <div className={styles.field}>
+                <label htmlFor="bank-class" className={styles.fieldLabel}>
+                  Select class/exam
+                </label>
+                <select
+                  id="bank-class"
+                  className={styles.subjectSelect}
+                  value={isClassRestricted ? assignedClassLabel : selectedClassLevel}
+                  onChange={(event) => {
+                    if (isClassRestricted) return;
+                    setSelectedClassLevel(event.target.value);
+                  }}
+                  disabled={isClassRestricted}
+                >
+                  {classLevels.length === 0 ? (
+                    <option value="">No class found</option>
+                  ) : (
+                    classLevels.map((level) => (
+                      <option key={level} value={level}>
+                        {formatClassLabel(level)}
+                      </option>
+                    ))
+                  )}
+                </select>
+              </div>
+            </div>
+
             <QuestionList
               questions={filteredQuestions}
               subjects={subjects}
