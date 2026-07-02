@@ -628,6 +628,8 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
                 setActiveTab('bank');
               }}
               subjects={subjects.filter((subject) => subject !== 'All Subjects')}
+              classLevels={classLevels}
+              selectedClass={selectedClass}
             />
           </section>
         )}

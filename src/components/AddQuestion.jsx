@@ -26,12 +26,16 @@ const subjectOptions = [
 export default function AddQuestion({
   onQuestionAdded,
   subjects = [],
+  classLevels = [],
+  selectedClass = '',
   questionToEdit,
   onCancel,
 }) {
   const [form, setForm] = useState(() => ({
     class_level: questionToEdit?.class_level
       ? String(questionToEdit.class_level)
+      : selectedClass
+      ? String(selectedClass)
       : '',
     chapter: questionToEdit?.chapter || '',
     subject: questionToEdit?.subject || '',
@@ -134,6 +138,14 @@ export default function AddQuestion({
       .map((label) => ({ label, icon: '📚' })),
   ];
 
+  const availableClassLevels = Array.from(
+    new Set([
+      ...(classLevels || []),
+      form.class_level,
+      ...(questionToEdit?.class_level ? [String(questionToEdit.class_level)] : []),
+    ].filter(Boolean))
+  ).slice(0, 12);
+
   return (
     <section className={styles.card}>
       <div className={styles.headerRow}>
@@ -224,6 +236,30 @@ export default function AddQuestion({
                 />
                 <label>Class / Exam</label>
               </div>
+
+              {availableClassLevels.length > 0 && (
+                <div className={styles.subjectChips}>
+                  {availableClassLevels.map((level) => (
+                    <button
+                      key={level}
+                      type="button"
+                      className={
+                        form.class_level === level
+                          ? `${styles.subjectChoice} ${styles.active}`
+                          : styles.subjectChoice
+                      }
+                      onClick={() =>
+                        setForm((prev) => ({
+                          ...prev,
+                          class_level: level,
+                        }))
+                      }
+                    >
+                      {level}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               <div className={styles.subjectCaption}>
                 <span className={styles.fieldLabel}>Subject</span>
