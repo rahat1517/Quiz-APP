@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabase } from './lib/supabaseClient';
 import { getQuestions, deleteQuestion, getRandomQuestions } from './services/questionService';
 import { normalizeChapter } from './lib/normalizeChapter';
@@ -23,6 +23,7 @@ import Toast from './components/Toast';
 import SkeletonLoader from './components/SkeletonLoader';
 import TabNav from './components/TabNav';
 import Hero from './components/Hero';
+import { Button } from './components/ui/Button';
 import styles from './App.module.css';
 import './index.css';
 
@@ -514,7 +515,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
     >
       <div className={styles.pageShell}>
         <header className={styles.topBar}>
-          <button
+          <Button
             type="button"
             className={styles.brandButton}
             onClick={() => handleTabChange('dashboard')}
@@ -525,7 +526,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
               <strong>Quiz World</strong>
               <small>Learn, practice, improve</small>
             </span>
-          </button>
+          </Button>
 
           <div className={styles.controlsRow}>
             {activeTab !== 'quiz' && (
@@ -552,7 +553,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
               </div>
             )}
 
-            <button
+            <Button
               type="button"
               className={styles.userCard}
               onClick={() => handleTabChange('profile')}
@@ -566,10 +567,10 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
                 </small>
               </span>
               <span className={styles.profileArrow} aria-hidden>›</span>
-            </button>
+            </Button>
 
             <div className={styles.actionGroup}>
-              <button
+              <Button
                 className={styles.signOutButton}
                 type="button"
                 onClick={handleSignOut}
@@ -578,7 +579,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
               >
                 <span className={styles.signOutIcon} aria-hidden>↪</span>
                 <span className={styles.signOutText}>Log out</span>
-              </button>
+              </Button>
             </div>
           </div>
         </header>
@@ -803,7 +804,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
                   </label>
 
                   <div className={styles.numberControl}>
-                    <button
+                    <Button
                       type="button"
                       onClick={() => {
                         setSelectedQuestionCount((current) =>
@@ -814,7 +815,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
                       aria-label="Decrease question count"
                     >
                       −
-                    </button>
+                    </Button>
                     <input
                       id="quiz-count"
                       className={styles.numberInput}
@@ -836,7 +837,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
                       }}
                       aria-describedby="quiz-count-hint"
                     />
-                    <button
+                    <Button
                       type="button"
                       onClick={() => {
                         setSelectedQuestionCount((current) =>
@@ -847,7 +848,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
                       aria-label="Increase question count"
                     >
                       +
-                    </button>
+                    </Button>
                   </div>
                   <small id="quiz-count-hint" className={styles.fieldHint}>
                     Type any number from 1 to 100.
@@ -860,7 +861,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
                   </label>
 
                   <div className={styles.numberControl}>
-                    <button
+                    <Button
                       type="button"
                       onClick={() => {
                         setSelectedTimeLimit((current) =>
@@ -871,7 +872,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
                       aria-label="Decrease time limit"
                     >
                       −
-                    </button>
+                    </Button>
                     <div className={styles.timeInputWrap}>
                       <input
                         id="quiz-time"
@@ -896,7 +897,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
                       />
                       <span>min</span>
                     </div>
-                    <button
+                    <Button
                       type="button"
                       onClick={() => {
                         setSelectedTimeLimit((current) =>
@@ -907,7 +908,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
                       aria-label="Increase time limit"
                     >
                       +
-                    </button>
+                    </Button>
                   </div>
                   <small id="quiz-time-hint" className={styles.fieldHint}>
                     Type any time from 1 to 180 minutes.
@@ -915,14 +916,14 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
                 </div>
               </div>
 
-              <button
+              <Button
                 type="button"
                 className={`${styles.toggleButton} ${styles.startQuizButton}`}
                 disabled={quizLoading}
                 onClick={handleStartQuiz}
               >
                 {quizLoading ? 'Loading exam…' : 'Start quiz'}
-              </button>
+              </Button>
 
               {quizError && <p className={styles.statusBanner}>{quizError}</p>}
 
@@ -973,7 +974,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
       <TabNav
         activeTab={activeTab}
         onChange={handleTabChange}
-        variant="bottom"
+        variant="left"
         isAdmin={isAdmin}
       />
 

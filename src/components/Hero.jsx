@@ -1,4 +1,5 @@
 import styles from './Hero.module.css';
+import { Button } from './ui/Button';
 import { formatClassLevel } from '../lib/normalizeClassLevel';
 
 const subjectIcons = ['∑', '⚗', 'A', '⌘'];
@@ -39,24 +40,24 @@ export default function Hero({
           </p>
 
           <div className={styles.heroActions}>
-            <button
+            <Button
               type="button"
               className={styles.primaryAction}
               onClick={() => onNavigate?.('quiz')}
             >
               Start a quiz <span aria-hidden>→</span>
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               className={styles.secondaryAction}
               onClick={() => onNavigate?.('bank')}
             >
               Explore questions
-            </button>
+            </Button>
           </div>
         </div>
 
-        <button
+        <Button
           type="button"
           className={styles.challengeCard}
           onClick={() => onNavigate?.('quiz')}
@@ -75,7 +76,7 @@ export default function Hero({
             <span>5 min</span>
           </div>
           <span className={styles.challengeAction}>Start challenge →</span>
-        </button>
+        </Button>
 
         <div className={styles.heroAccent} />
       </div>
@@ -124,14 +125,14 @@ export default function Hero({
               <span>Pick a direction</span>
               <h2>Explore subjects</h2>
             </div>
-            <button type="button" onClick={() => onNavigate?.('bank')}>
+            <Button type="button" onClick={() => onNavigate?.('bank')}>
               View question bank →
-            </button>
+            </Button>
           </div>
 
           <div className={styles.subjectGrid}>
             {displaySubjects.slice(0, 4).map((subject, index) => (
-              <button
+              <Button
                 key={subject}
                 type="button"
                 className={styles.subjectCard}
@@ -141,7 +142,7 @@ export default function Hero({
                 <strong>{subject}</strong>
                 <small>Practice now</small>
                 <span className={styles.subjectArrow} aria-hidden>→</span>
-              </button>
+              </Button>
             ))}
           </div>
         </section>
@@ -163,15 +164,15 @@ export default function Hero({
               <span>Latest score</span>
             </div>
           </div>
-          <button type="button" onClick={() => onNavigate?.('results')}>
+          <Button type="button" onClick={() => onNavigate?.('results')}>
             <span>Review your results</span><span aria-hidden>→</span>
-          </button>
-          <button type="button" onClick={() => onNavigate?.('profile')}>
+          </Button>
+          <Button type="button" onClick={() => onNavigate?.('profile')}>
             <span>View your progress</span><span aria-hidden>→</span>
-          </button>
-          <button type="button" onClick={() => onNavigate?.('bank')}>
+          </Button>
+          <Button type="button" onClick={() => onNavigate?.('bank')}>
             <span>Browse all questions</span><span aria-hidden>→</span>
-          </button>
+          </Button>
         </aside>
       </div>
     </section>

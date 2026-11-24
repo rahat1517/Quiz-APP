@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Button } from './ui/Button';
 import styles from './QuizFullScreen.module.css';
 import useQuiz from '../hooks/useQuiz';
 import { formatClassLevel } from '../lib/normalizeClassLevel';
@@ -58,20 +59,20 @@ export default function QuizFullScreen(props) {
           </div>
           <p className={styles.startClass}>{classLabel}</p>
           <div className={styles.startActions}>
-            <button
+            <Button
               type="button"
               className={styles.backButton}
               onClick={props.onBackToSetup}
             >
               ← Back to setup
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               className={styles.startButton}
               onClick={startExam}
             >
               Start Exam <span aria-hidden>→</span>
-            </button>
+            </Button>
           </div>
         </div>
       </section>
@@ -109,7 +110,7 @@ export default function QuizFullScreen(props) {
             const isCurrent = idx === currentIndex;
 
             return (
-              <button
+              <Button
                 key={qq.id}
                 type="button"
                 className={`${styles.progressDot} ${styles[state]} ${
@@ -119,7 +120,7 @@ export default function QuizFullScreen(props) {
                 aria-label={`Go to question ${idx + 1}`}
               >
                 {idx + 1}
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -173,7 +174,7 @@ export default function QuizFullScreen(props) {
               submitted && selected && q.correct_answer !== opt;
 
             return (
-              <button
+              <Button
                 key={opt}
                 type="button"
                 role="radio"
@@ -189,7 +190,7 @@ export default function QuizFullScreen(props) {
               >
                 <div className={styles.optionKey}>{opt}</div>
                 <div className={styles.optionText}>{text}</div>
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -202,31 +203,31 @@ export default function QuizFullScreen(props) {
         )}
 
         <div className={styles.centerActions}>
-          <button
+          <Button
             type="button"
             className={styles.navButton}
             onClick={handlePrevious}
             disabled={currentIndex === 0}
           >
             <span aria-hidden>←</span> Previous
-          </button>
+          </Button>
 
           {currentIndex < totalQuestions - 1 ? (
-            <button
+            <Button
               type="button"
               className={styles.navButton}
               onClick={handleNext}
             >
               Next <span aria-hidden>→</span>
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
               type="button"
               className={styles.submitButton}
               onClick={() => setConfirmOpen(true)}
             >
               Submit Exam
-            </button>
+            </Button>
           )}
         </div>
 
@@ -246,15 +247,15 @@ export default function QuizFullScreen(props) {
             </p>
 
             <div className={styles.confirmActions}>
-              <button
+              <Button
                 type="button"
                 className={styles.cancelButton}
                 onClick={() => setConfirmOpen(false)}
               >
                 Cancel
-              </button>
+              </Button>
 
-              <button
+              <Button
                 type="button"
                 className={styles.primaryButton}
                 onClick={() => {
@@ -263,7 +264,7 @@ export default function QuizFullScreen(props) {
                 }}
               >
                 Yes, submit
-              </button>
+              </Button>
             </div>
           </div>
         </div>

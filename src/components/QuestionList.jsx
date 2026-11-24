@@ -178,21 +178,21 @@ export default function QuestionList({
 
                 {isAdmin && (
                   <div className={styles.actionRow}>
-                    <button
+                    <Button
                       type="button"
                       className={`${styles.actionButton} ${styles.edit}`}
                       onClick={() => onEdit && onEdit(question)}
                     >
                       Edit
-                    </button>
+                    </Button>
 
-                    <button
+                    <Button
                       type="button"
                       className={`${styles.actionButton} ${styles.delete}`}
                       onClick={() => handleDelete(question.id)}
                     >
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 )}
               </article>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import styles from './Auth.module.css';
+import { Button } from './ui/Button';
 import { supabase } from '../lib/supabaseClient';
 import { normalizeClassLevel } from '../lib/normalizeClassLevel';
 import {
@@ -226,7 +227,7 @@ export default function Auth({ onAuthSuccess }) {
           </div>
 
           <div className={styles.viewTabs} aria-label="Authentication options">
-            <button
+            <Button
               type="button"
               className={view === 'login' ? styles.activeTab : ''}
               onClick={() => {
@@ -236,8 +237,8 @@ export default function Auth({ onAuthSuccess }) {
               }}
             >
               Log in
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               className={view === 'register' ? styles.activeTab : ''}
               onClick={() => {
@@ -247,7 +248,7 @@ export default function Auth({ onAuthSuccess }) {
               }}
             >
               Sign up
-            </button>
+            </Button>
           </div>
 
           <div className={styles.authHeader}>
@@ -294,14 +295,14 @@ export default function Auth({ onAuthSuccess }) {
                   required
                   placeholder="At least 8 characters"
                 />
-                <button
+                <Button
                   type="button"
                   className={styles.passwordToggle}
                   onClick={() => setShowPassword((current) => !current)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? 'Hide' : 'Show'}
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -364,21 +365,21 @@ export default function Auth({ onAuthSuccess }) {
               </>
             )}
 
-            <button type="submit" className={styles.authSubmit} disabled={loading}>
+            <Button type="submit" className={styles.authSubmit} disabled={loading}>
               <span>
                 {loading
                   ? view === 'login' ? 'Logging in...' : 'Creating account...'
                   : view === 'login' ? 'Log in to Quiz World' : 'Create my account'}
               </span>
               <span aria-hidden>→</span>
-            </button>
+            </Button>
 
             {message && (
               <div className={`${styles.authFeedback} ${styles.success}`}>
                 {message}
                 {message.toLowerCase().includes('check your email') && (
                   <div className={styles.resendRow}>
-                    <button
+                    <Button
                       type="button"
                       className={styles.resendButton}
                       onClick={handleResend}
@@ -387,7 +388,7 @@ export default function Auth({ onAuthSuccess }) {
                       {resendCooldown > 0
                         ? `Resend available in ${resendCooldown}s`
                         : 'Resend verification email'}
-                    </button>
+                    </Button>
                   </div>
                 )}
               </div>
@@ -401,7 +402,7 @@ export default function Auth({ onAuthSuccess }) {
 
             <p className={styles.switchPrompt}>
               {view === 'login' ? 'New to Quiz World?' : 'Already have an account?'}
-              <button
+              <Button
                 type="button"
                 onClick={() => {
                   setView((current) => (current === 'login' ? 'register' : 'login'));
@@ -410,7 +411,7 @@ export default function Auth({ onAuthSuccess }) {
                 }}
               >
                 {view === 'login' ? 'Create an account' : 'Log in instead'}
-              </button>
+              </Button>
             </p>
           </form>
         </main>

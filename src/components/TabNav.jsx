@@ -1,4 +1,5 @@
 import styles from './TabNav.module.css';
+import { Button } from './ui/Button';
 
 const tabs = [
   { id: 'dashboard', label: 'Dashboard', shortLabel: 'Home' },
@@ -10,7 +11,12 @@ const tabs = [
 ];
 
 export default function TabNav({ activeTab, onChange, variant, isAdmin }) {
-  const navClass = variant === 'bottom' ? `${styles.tabNav} ${styles.bottomNav}` : styles.tabNav;
+  const navClass =
+    variant === 'bottom'
+      ? `${styles.tabNav} ${styles.bottomNav}`
+      : variant === 'left'
+      ? `${styles.tabNav} ${styles.leftNav}`
+      : styles.tabNav;
   const availableTabs = isAdmin ? tabs : tabs.filter((tab) => tab.id !== 'add');
 
   return (
@@ -20,7 +26,7 @@ export default function TabNav({ activeTab, onChange, variant, isAdmin }) {
       style={{ '--tab-count': availableTabs.length }}
     >
       {availableTabs.map((tab) => (
-        <button
+        <Button
           key={tab.id}
           type="button"
           className={activeTab === tab.id ? `${styles.tabItem} ${styles.active}` : styles.tabItem}
@@ -28,7 +34,7 @@ export default function TabNav({ activeTab, onChange, variant, isAdmin }) {
         >
           <span className={styles.fullLabel}>{tab.label}</span>
           <span className={styles.shortLabel}>{tab.shortLabel}</span>
-        </button>
+        </Button>
       ))}
     </nav>
   );

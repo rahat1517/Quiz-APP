@@ -1,4 +1,5 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { Button } from './ui/Button';
 import styles from './Result.module.css';
 
 export default function Result({
@@ -237,13 +238,13 @@ export default function Result({
         </div>
 
         {onRestart && (
-          <button
+          <Button
             type="button"
             className={styles.primaryButton}
             onClick={onRestart}
           >
             Try another quiz <span aria-hidden>→</span>
-          </button>
+          </Button>
         )}
       </div>
 
@@ -266,13 +267,13 @@ export default function Result({
               </span>
               <h3>You scored {latestResult.score} out of {latestResult.total_questions}</h3>
               <p>{performance.message}</p>
-              <button
+              <Button
                 type="button"
                 className={styles.reviewButton}
                 onClick={() => setSelectedExam(latestResult)}
               >
                 Review your answers <span aria-hidden>→</span>
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -367,7 +368,7 @@ export default function Result({
                       <td data-label="Percentage">{exam.percentage ?? 0}%</td>
 
                       <td data-label="Details">
-                        <button
+                        <Button
                           type="button"
                           className={
                             isSelected
@@ -377,7 +378,7 @@ export default function Result({
                           onClick={() => setSelectedExam(exam)}
                         >
                           {isSelected ? 'Viewing' : 'Details'}
-                        </button>
+                        </Button>
                       </td>
                     </tr>
                   );
@@ -410,13 +411,13 @@ export default function Result({
                 </p>
               </div>
 
-              <button
+              <Button
                 type="button"
                 className={styles.closeButton}
                 onClick={() => setSelectedExam(null)}
               >
                 ✕ Close
-              </button>
+              </Button>
             </div>
 
             <div className={styles.drawerBody}>

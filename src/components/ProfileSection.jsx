@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Button } from './ui/Button';
 import styles from './ProfileSection.module.css';
 
 export default function ProfileSection({ user, profile, history = [], loading, error, onSave, isAdmin = false }) {
@@ -42,7 +43,7 @@ export default function ProfileSection({ user, profile, history = [], loading, e
           <div className={styles.profileActions}>
             {editMode ? (
               <>
-                <button
+                <Button
                   type="button"
                   className={styles.saveButton}
                   onClick={async () => {
@@ -62,8 +63,8 @@ export default function ProfileSection({ user, profile, history = [], loading, e
                   disabled={saveLoading}
                 >
                   {saveLoading ? 'Saving…' : 'Save'}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   className={styles.cancelButton}
                   onClick={() => {
@@ -73,15 +74,15 @@ export default function ProfileSection({ user, profile, history = [], loading, e
                   }}
                 >
                   Cancel
-                </button>
+                </Button>
               </>
             ) : (
-              <button type="button" className={styles.editButton} onClick={() => {
+              <Button type="button" className={styles.editButton} onClick={() => {
                 setName(displayName);
                 setEditMode(true);
               }}>
                 Edit profile
-              </button>
+              </Button>
             )}
           </div>
         )}
@@ -130,15 +131,15 @@ export default function ProfileSection({ user, profile, history = [], loading, e
                         </option>
                       ))}
                     </select>
-                    <button
+                    <Button
                       type="button"
                       className={styles.saveButton}
                       onClick={handleAssignClass}
                       disabled={saveLoading}
                     >
                       {saveLoading ? 'Assigning…' : 'Assign'}
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
                       className={styles.cancelButton}
                       onClick={() => {
@@ -147,20 +148,20 @@ export default function ProfileSection({ user, profile, history = [], loading, e
                       }}
                     >
                       Cancel
-                    </button>
+                    </Button>
                   </div>
                 ) : (
                   <>
                     {assignedClass ? `Class ${assignedClass}` : 'Not assigned'}
                     {isAdmin && (
-                      <button
+                      <Button
                         type="button"
                         className={styles.assignButton}
                         onClick={() => setAssignClassMode(true)}
                         title="Assign a class to this user"
                       >
                         {assignedClass ? '✏️ Change' : '➕ Assign'}
-                      </button>
+                      </Button>
                     )}
                   </>
                 )}

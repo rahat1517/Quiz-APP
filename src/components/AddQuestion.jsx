@@ -1,4 +1,5 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
+import { Button } from './ui/Button';
 import { addQuestion, updateQuestion } from '../services/questionService';
 import styles from './AddQuestion.module.css';
 
@@ -240,7 +241,7 @@ export default function AddQuestion({
               {availableClassLevels.length > 0 && (
                 <div className={styles.subjectChips}>
                   {availableClassLevels.map((level) => (
-                    <button
+                    <Button
                       key={level}
                       type="button"
                       className={
@@ -256,7 +257,7 @@ export default function AddQuestion({
                       }
                     >
                       {level}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               )}
@@ -268,7 +269,7 @@ export default function AddQuestion({
 
               <div className={styles.subjectCardGrid}>
                 {availableSubjects.map((option) => (
-                  <button
+                  <Button
                     key={option.label}
                     type="button"
                     className={
@@ -280,7 +281,7 @@ export default function AddQuestion({
                   >
                     <span>{option.icon}</span>
                     {option.label}
-                  </button>
+                  </Button>
                 ))}
               </div>
 
@@ -384,17 +385,17 @@ export default function AddQuestion({
 
           <div className={styles.submitRow}>
             {questionToEdit && (
-              <button
+              <Button
                 type="button"
                 className={styles.cancelButton}
                 onClick={onCancel}
                 disabled={loading}
               >
                 Cancel edit
-              </button>
+              </Button>
             )}
 
-            <button type="submit" className={styles.submitButton} disabled={loading}>
+            <Button type="submit" className={styles.submitButton} disabled={loading}>
               {loading
                 ? questionToEdit
                   ? 'Saving question…'
@@ -402,7 +403,7 @@ export default function AddQuestion({
                 : questionToEdit
                   ? 'Save question'
                   : 'Add question'}
-            </button>
+            </Button>
           </div>
 
           {success && (

@@ -1,4 +1,5 @@
 import styles from './Quiz.module.css';
+import { Button } from './ui/Button';
 import useQuiz from '../hooks/useQuiz';
 
 export default function Quiz(props) {
@@ -37,9 +38,9 @@ export default function Quiz(props) {
         <div style={{ textAlign: 'center', padding: '2rem' }}>
           <h2>Ready to start?</h2>
           <p>You have {questions.length} questions. Time limit: {durationMinutes} minutes.</p>
-          <button type="button" style={{ padding: '0.8rem 1.5rem', fontSize: '1rem', marginTop: '1rem' }} onClick={startExam}>
+          <Button type="button" style={{ padding: '0.8rem 1.5rem', fontSize: '1rem', marginTop: '1rem' }} onClick={startExam}>
             Start Quiz
-          </button>
+          </Button>
         </div>
       </section>
     );
@@ -102,17 +103,17 @@ export default function Quiz(props) {
         </div>
 
         <div className={styles.navigation}>
-          <button type="button" className={styles.navButton} onClick={handlePrevious} disabled={currentIndex === 0}>
+          <Button type="button" className={styles.navButton} onClick={handlePrevious} disabled={currentIndex === 0}>
             Previous
-          </button>
+          </Button>
           {currentIndex < questions.length - 1 ? (
-            <button type="button" className={styles.navButton} onClick={handleNext}>
+            <Button type="button" className={styles.navButton} onClick={handleNext}>
               Next
-            </button>
+            </Button>
           ) : (
-            <button type="button" className={styles.submitButton} onClick={handleSubmit} disabled={submitted}>
+            <Button type="button" className={styles.submitButton} onClick={handleSubmit} disabled={submitted}>
               {submitted ? 'Submitted' : 'Submit Quiz'}
-            </button>
+            </Button>
           )}
         </div>
       </div>

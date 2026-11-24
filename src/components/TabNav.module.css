@@ -108,3 +108,71 @@
     font-size: inherit;
   }
 }
+
+/* ── Left sidebar (desktop) ────────────────────────────────── */
+.leftNav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.5rem 1rem 2rem;
+  background: rgba(15, 23, 42, 0.82);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px);
+  z-index: 50;
+}
+
+.leftNav .tabItem {
+  width: 100%;
+  padding: 0.95rem 1rem;
+  border-radius: 12px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.leftNav .tabItem:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.06);
+  color: #f8fafc;
+}
+
+.leftNav .active {
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  color: #f8fafc;
+  box-shadow: 0 14px 30px rgba(37, 99, 235, 0.2);
+}
+
+.leftNav .fullLabel {
+  display: inline;
+}
+
+.leftNav .shortLabel {
+  display: none;
+}
+
+:global([data-theme='light']) .leftNav {
+  background: rgba(255, 255, 255, 0.82);
+  border-right-color: rgba(109, 74, 204, 0.13);
+}
+
+:global([data-theme='light']) .leftNav .tabItem {
+  color: #65577f;
+}
+
+:global([data-theme='light']) .leftNav .tabItem:hover {
+  background: rgba(124, 92, 252, 0.07);
+  color: #3b227c;
+}
+
+@media (max-width: 720px) {
+  .leftNav {
+    display: none;
+  }
+}
