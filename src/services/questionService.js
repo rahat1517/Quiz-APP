@@ -147,11 +147,11 @@ export async function getRandomQuestions(classLevel, subject, chapter, limit) {
     p_limit: safeLimit,
   });
 
+  // An older deployed RPC takes p_class_level as an integer and rejects
+  // exam labels like "BCS 45". Don't fail the quiz: use the fallback query below.
   if (error) {
-    throw new Error(error.message);
-  }
-
-  if (data?.length) {
+    console.warn(`get_random_questions failed, using fallback query: ${error.message}`);
+  } else if (data?.length) {
     return data;
   }
 
