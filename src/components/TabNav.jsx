@@ -16,7 +16,7 @@ export default function TabNav({ activeTab, onChange, variant, isAdmin }) {
       ? `${styles.tabNav} ${styles.bottomNav}`
       : variant === 'left'
       ? `${styles.tabNav} ${styles.leftNav}`
-      : styles.tabNav;
+      : `${styles.tabNav} ${styles.topNav}`;
   const availableTabs = isAdmin ? tabs : tabs.filter((tab) => tab.id !== 'add');
 
   return (

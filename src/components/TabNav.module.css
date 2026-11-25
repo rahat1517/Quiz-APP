@@ -185,3 +185,11 @@
     display: none;
   }
 }
+
+/* Above 1100px the left sidebar is the menu, so hide the top tab bar
+   instead of showing the same links twice. */
+@media (min-width: 1101px) {
+  .topNav {
+    display: none;
+  }
+}
