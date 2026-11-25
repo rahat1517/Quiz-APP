@@ -2,7 +2,6 @@ import { supabase } from '../lib/supabaseClient';
 import { normalizeChapter } from '../lib/normalizeChapter';
 import {
   normalizeClassLevel,
-  getClassGroupLevels,
   isClassInGroup,
 } from '../lib/normalizeClassLevel';
 

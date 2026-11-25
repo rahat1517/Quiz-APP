@@ -446,14 +446,13 @@
 @media (max-width: 1050px) {
   .wrapper { grid-template-columns: 1fr; }
   .leftColumn { display: none; }
+  /* The sidebar timer is gone at this width, so show the compact status bar. */
+  .mobileStatus { display: grid; gap: 0.55rem; margin-bottom: 0.3rem; }
 }
 
 @media (max-width: 780px) {
   .wrapper { display: block; margin-top: 0.8rem; }
   .centerColumn { min-height: 560px; padding: 1rem; border-radius: 20px; }
-  .mobileStatus { display: grid; gap: 0.55rem; margin-bottom: 0.3rem; }
-  .mobileStatus div:first-child { display: flex; justify-content: space-between; color: #8f8aa6; font-size: 0.75rem; font-weight: 800; }
-  .mobileStatus strong { color: #a78bfa; }
   .topProgress { display: none; }
   .optionsGrid { grid-template-columns: 1fr; }
   .optionCard { min-height: 68px; padding-right: 2.5rem; }
@@ -473,4 +472,63 @@
   .startStats { gap: 0.35rem; }
   .startStats div { padding: 0.65rem 0.35rem; }
   .startCard { padding: 1.2rem; border-radius: 20px; }
+}
+
+/* ── Compact status bar (tablet + phone) ───────────────────── */
+.mobileStatusRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  color: #a8a3bf;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.mobileStatusRow strong {
+  color: #c4b5fd;
+  font-variant-numeric: tabular-nums;
+}
+
+.mobileJump {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.mobileDots {
+  flex: 1;
+  display: flex;
+  gap: 0.4rem;
+  min-width: 0;
+  overflow-x: auto;
+  padding: 0.2rem 0.1rem 0.35rem;
+  scrollbar-width: thin;
+}
+
+.mobileDots .progressDot {
+  flex: 0 0 2.4rem;
+  min-height: 2.4rem;
+}
+
+.mobileJump .submitButton {
+  flex-shrink: 0;
+  min-height: 2.6rem;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.8rem;
+}
+
+.leftColumn .submitButton {
+  width: 100%;
+  margin-top: auto;
+}
+
+/* ── Low-time warning (last minute) ────────────────────────── */
+.timerBox.timeLow {
+  border-color: rgba(244, 63, 94, 0.45);
+  background: linear-gradient(160deg, rgba(244, 63, 94, 0.2), rgba(16, 13, 32, 0.9));
+}
+
+.timeLow .timerValue,
+.mobileStatusRow .timeLowText {
+  color: #fda4af;
 }

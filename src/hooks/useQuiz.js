@@ -184,9 +184,15 @@ export default function useQuiz({
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
 
-  const timeAnnouncement = `${minutes} minute${
-    minutes !== 1 ? 's' : ''
-  } ${seconds} second${seconds !== 1 ? 's' : ''} remaining`;
+  // Announce only at milestones. The live region re-reads whenever its text
+  // changes, so a per-second string made screen readers talk non-stop.
+  const passedMilestone = [300, 60, 30, 10].filter((mark) => timeLeft <= mark).pop();
+  const timeAnnouncement =
+    hasStarted && !submitted && passedMilestone
+      ? passedMilestone >= 60
+        ? `${passedMilestone / 60} minute${passedMilestone === 60 ? '' : 's'} remaining`
+        : `${passedMilestone} seconds remaining`
+      : '';
 
   return {
     currentIndex,

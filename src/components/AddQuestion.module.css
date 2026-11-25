@@ -230,8 +230,42 @@
 }
 
 .optionBox {
-  display: grid;
+  display: flex;
+  align-items: center;
   gap: 0.65rem;
+  padding: 0.35rem 0.35rem 0.35rem 0.6rem;
+  border: 1px solid rgba(124, 92, 252, 0.18);
+  border-radius: 18px;
+  background: rgba(124, 92, 252, 0.06);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.optionBox:focus-within {
+  border-color: rgba(124, 92, 252, 0.65);
+  box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.12);
+}
+
+.optionBadge {
+  flex-shrink: 0;
+}
+
+.optionInput {
+  flex: 1;
+  min-width: 0;
+  padding: 0.75rem 0.5rem;
+  border: 0;
+  outline: none;
+  color: #ede9ff;
+  background: transparent;
+}
+
+.optionInput::placeholder {
+  color: #7d7898;
+}
+
+.fieldHint {
+  color: #8f8aa6;
+  font-size: 0.8rem;
 }
 
 .optionBadge {

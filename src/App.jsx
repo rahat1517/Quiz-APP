@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from './lib/supabaseClient';
 import { getQuestions, deleteQuestion, getRandomQuestions } from './services/questionService';
 import { normalizeChapter } from './lib/normalizeChapter';
 import {
   formatClassLevel,
   normalizeClassLevel,
-  getClassGroupLevels,
   isClassInGroup,
 } from './lib/normalizeClassLevel';
 import { getSession, signOut } from './services/authService';
@@ -42,6 +41,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [toast, setToast] = useState(null);
+  const toastTimer = useRef(null);
   const [editingQuestion, setEditingQuestion] = useState(null);
   const [quizResult, setQuizResult] = useState(null);
   const [reviewQuestions, setReviewQuestions] = useState([]);
@@ -195,8 +195,10 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
   }
 
   function showToast(message, type = 'success') {
+    // Restart the timer so an earlier toast's timeout can't hide a newer one.
+    window.clearTimeout(toastTimer.current);
     setToast({ message, type });
-    window.setTimeout(() => setToast(null), 3200);
+    toastTimer.current = window.setTimeout(() => setToast(null), 3200);
   }
 
   function handleQuestionSaved(message = 'Question saved successfully.') {
@@ -547,6 +549,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
     return (
       <div className={`${styles.appRoot} ${styles.dark}`}>
         <Auth onAuthSuccess={setUser} />
+        <Toast toast={toast} />
       </div>
     );
   }
@@ -606,7 +609,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
               <span className={styles.userDetails}>
                 <strong>{displayName}</strong>
                 <small>
-                  {isAdmin ? 'Admin' : assignedClassLabel || 'Student'}
+                  {isAdmin ? 'Admin' : formatClassLabel(assignedClassLabel) || 'Student'}
                 </small>
               </span>
               <span className={styles.profileArrow} aria-hidden>›</span>
@@ -791,9 +794,9 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
   )}
 </select>
 
-                  <small className={styles.fieldHint}>
-                    Select the class or exam category.
-                  </small>
+                  {isClassRestricted && (
+                    <small className={styles.fieldHint}>Set by your account.</small>
+                  )}
                 </div>
 
                 <div className={styles.field}>
@@ -894,7 +897,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
                     </Button>
                   </div>
                   <small id="quiz-count-hint" className={styles.fieldHint}>
-                    Type any number from 1 to 100.
+                    Between 1 and 100.
                   </small>
                 </div>
 
@@ -954,7 +957,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
                     </Button>
                   </div>
                   <small id="quiz-time-hint" className={styles.fieldHint}>
-                    Type any time from 1 to 180 minutes.
+                    Between 1 and 180 minutes.
                   </small>
                 </div>
               </div>
@@ -968,12 +971,11 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
                 {quizLoading ? 'Loading exam…' : 'Start quiz'}
               </Button>
 
-              {quizError && <p className={styles.statusBanner}>{quizError}</p>}
-
-              <p className={styles.statusBanner}>
-                Choose class/exam, subject, chapter, question count, and time limit
-                to start the quiz.
-              </p>
+              {quizError && (
+                <p className={styles.statusBanner} role="alert">
+                  {quizError}
+                </p>
+              )}
               </div>
             )}
 

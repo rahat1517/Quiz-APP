@@ -1,6 +1,9 @@
 ﻿import { useMemo, useState } from 'react';
 import styles from './QuestionBank.module.css';
 import { Button } from './ui/Button';
+import ConfirmDialog from './ConfirmDialog';
+
+const PAGE_SIZE = 10;
 import { getSubjectBadgeStyle } from '../lib/subjectColors';
 import { normalizeChapter } from '../lib/normalizeChapter';
 
@@ -35,10 +38,17 @@ export default function QuestionList({
     });
   }, [questions, selectedSubject, selectedChapter, search]);
 
+  // Render the bank a page at a time; the count resets whenever the filters change.
+  const filterKey = `${selectedSubject}|${selectedChapter}|${search}`;
+  const [limit, setLimit] = useState({ key: filterKey, count: PAGE_SIZE });
+  const visibleCount = limit.key === filterKey ? limit.count : PAGE_SIZE;
+  const visible = filtered.slice(0, visibleCount);
+  const remaining = filtered.length - visible.length;
+
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
+
   function handleDelete(id) {
-    if (window.confirm('Delete this question permanently?')) {
-      if (onDelete) onDelete(id);
-    }
+    setPendingDeleteId(id);
   }
 
   function getOptionClass(question, optionKey) {
@@ -124,7 +134,7 @@ export default function QuestionList({
         <p className={styles.emptyState}>No questions match this filter.</p>
       ) : (
         <div className={styles.questionList}>
-          {filtered.map((question, idx) => {
+          {visible.map((question, idx) => {
             const number = idx + 1;
             const chapterLabel = normalizeChapter(question.chapter || 'General');
 
@@ -205,6 +215,37 @@ export default function QuestionList({
         </div>
       )}
 
+      {remaining > 0 && (
+        <div className={styles.showMoreRow}>
+          <span>
+            Showing {visible.length} of {filtered.length}
+          </span>
+          <Button
+            type="button"
+            className={styles.showMoreButton}
+            onClick={() => setLimit({ key: filterKey, count: visibleCount + PAGE_SIZE })}
+          >
+            Show {Math.min(PAGE_SIZE, remaining)} more
+          </Button>
+        </div>
+      )}
+
+      <ConfirmDialog
+        open={pendingDeleteId !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingDeleteId(null);
+        }}
+        title="Delete this question?"
+        description="It will be removed from the bank and from future quizzes. This can't be undone."
+        confirmLabel="Delete question"
+        tone="danger"
+        icon="!"
+        onConfirm={() => {
+          const id = pendingDeleteId;
+          setPendingDeleteId(null);
+          onDelete?.(id);
+        }}
+      />
     </section>
   );
 }

@@ -120,8 +120,15 @@
   flex-direction: column;
   gap: 0.5rem;
   padding: 1.5rem 1rem 2rem;
-  background: rgba(15, 23, 42, 0.82);
+  /* Undo the pill styling inherited from .tabNav: straight edges, items from the top. */
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  padding-top: 7.5rem;
+  border: 0;
   border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0;
+  box-shadow: none;
+  background: rgba(15, 23, 42, 0.82);
   backdrop-filter: blur(18px);
   z-index: 50;
 }

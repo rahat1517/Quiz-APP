@@ -6,12 +6,16 @@ import { cn } from '../../lib/utils';
 const DatePicker = React.forwardRef(
   ({ className, value, onValueChange, placeholder, minDate, maxDate, open, onOpenChange, ...props }, ref) => {
     const [isOpen, setIsOpen] = React.useState(!!open);
+    const setOpen = (next) => {
+      setIsOpen(next);
+      onOpenChange?.(next);
+    };
     const [displayValue, setDisplayValue] = React.useState(value ? formatDate(value) : '');
-    const [focusedDate, setFocusedDate] = React.useState(value ? new Date(value) : new Date());
+    const [focusedDate] = React.useState(value ? new Date(value) : new Date());
 
     const handleValueChange = (date) => {
       setDisplayValue(formatDate(date));
-      setIsOpen(false);
+      setOpen(false);
       onValueChange?.(date);
     };
 
@@ -41,7 +45,7 @@ const DatePicker = React.forwardRef(
           />
           <button
             type="button"
-            onClick={() => setIsOpen((prev) => !prev)}
+            onClick={() => setOpen(!isOpen)}
             className="inline-flex items-center justify-center rounded-md p-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             aria-label="Open calendar picker"
           >
