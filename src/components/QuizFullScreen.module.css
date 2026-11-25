@@ -8,9 +8,9 @@
 .leftColumn,
 .centerColumn,
 .startCard {
-  border: 1px solid rgba(124, 92, 252, 0.16);
-  background: rgba(13, 11, 26, 0.86);
-  box-shadow: 0 22px 55px rgba(8, 6, 20, 0.18);
+  border: 1px solid var(--rule);
+  background: var(--sheet);
+  box-shadow: var(--shadow-md);
 }
 
 .leftColumn,
@@ -28,13 +28,13 @@
   justify-items: center;
   padding: 1.2rem 0.75rem;
   border-radius: 18px;
-  color: #ede9fe;
-  background: linear-gradient(145deg, rgba(124, 92, 252, 0.22), rgba(79, 52, 210, 0.12));
-  border: 1px solid rgba(167, 139, 250, 0.18);
+  color: var(--ink);
+  background: var(--accent-soft);
+  border: 1px solid var(--rule);
 }
 
 .timerIcon {
-  color: #a78bfa;
+  color: var(--accent);
   font-size: 1.15rem;
 }
 
@@ -46,7 +46,7 @@
 }
 
 .timerLabel {
-  color: #8f8aa6;
+  color: var(--muted);
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -56,14 +56,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: #8f8aa6;
+  color: var(--muted);
   font-size: 0.75rem;
   font-weight: 800;
   text-transform: uppercase;
 }
 
 .sideHeading strong {
-  color: #c4b5fd;
+  color: var(--ink);
 }
 
 .progressList {
@@ -77,10 +77,10 @@
 .progressDot {
   aspect-ratio: 1;
   min-height: 36px;
-  border: 1px solid rgba(196, 181, 253, 0.1);
+  border: 1px solid var(--rule);
   border-radius: 10px;
-  color: #8f8aa6;
-  background: rgba(255, 255, 255, 0.025);
+  color: var(--muted);
+  background: var(--inset);
   cursor: pointer;
   font-size: 0.75rem;
   font-weight: 800;
@@ -88,20 +88,20 @@
 
 .progressDot.answered,
 .progressDot.answered {
-  color: #ddd6fe;
-  border-color: rgba(139, 92, 246, 0.3);
-  background: rgba(124, 92, 252, 0.17);
+  color: var(--ink);
+  border-color: var(--rule);
+  background: var(--accent-soft);
 }
 
-.progressDot.correct { color: #bbf7d0; background: rgba(34, 197, 94, 0.14); }
-.progressDot.wrong { color: #fecaca; background: rgba(239, 68, 68, 0.13); }
-.progressDot.skipped { color: #8f8aa6; }
+.progressDot.correct { color: var(--correct-ink); background: var(--correct-soft); }
+.progressDot.wrong { color: var(--wrong-ink); background: var(--wrong-soft); }
+.progressDot.skipped { color: var(--muted); }
 
 .progressDot.currentDot {
-  color: #fff;
-  border-color: #8b5cf6;
-  background: #6d4acc;
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.14);
+  color: var(--on-accent);
+  border-color: var(--accent);
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-tint);
 }
 
 .summaryBox {
@@ -113,7 +113,7 @@
 .summaryBox div {
   padding: 0.65rem 0.35rem;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--inset);
   text-align: center;
 }
 
@@ -123,12 +123,12 @@
 }
 
 .summaryBox span {
-  color: #777287;
+  color: var(--muted);
   font-size: 0.75rem;
 }
 
 .summaryBox strong {
-  color: #f8fafc;
+  color: var(--ink);
 }
 
 .centerColumn {
@@ -147,7 +147,7 @@
   height: 5px;
   overflow: hidden;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--inset);
 }
 
 .topProgress {
@@ -161,7 +161,7 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #8b5cf6, #38bdf8);
+  background: var(--accent);
   transition: width 220ms ease;
 }
 
@@ -171,7 +171,7 @@
 
 .questionHeader {
   padding-bottom: 1.25rem;
-  border-bottom: 1px solid rgba(196, 181, 253, 0.1);
+  border-bottom: 1px solid var(--rule);
 }
 
 .questionMeta {
@@ -191,18 +191,18 @@
 }
 
 .questionNumber {
-  color: #ddd6fe;
-  background: rgba(124, 92, 252, 0.16);
+  color: var(--ink);
+  background: var(--accent-soft);
 }
 
 .metaSmall {
-  color: #94a3b8;
-  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  background: var(--inset);
 }
 
 .questionText {
   margin: 1rem 0 0;
-  color: #f8fafc;
+  color: var(--ink);
   font-size: clamp(1.2rem, 2.2vw, 1.75rem);
   line-height: 1.45;
   overflow-wrap: anywhere;
@@ -210,7 +210,7 @@
 
 .answerHint {
   margin: 0.25rem 0 0;
-  color: #777287;
+  color: var(--muted);
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -230,34 +230,35 @@
   align-items: center;
   gap: 0.9rem;
   overflow: hidden;
-  border: 1px solid rgba(196, 181, 253, 0.1);
-  border-radius: 17px;
+  border: 1px solid var(--rule);
+  border-radius: 14px;
   padding: 1rem;
-  color: #d8d3e5;
-  background: rgba(255, 255, 255, 0.025);
+  color: var(--ink);
+  background: var(--sheet);
   cursor: pointer;
   text-align: left;
-  transition: transform 170ms ease, border-color 170ms ease, background 170ms ease,
-    box-shadow 170ms ease;
+  transition: border-color 150ms ease, background-color 150ms ease, box-shadow 150ms ease;
 }
 
 .optionCard:hover:not(:disabled) {
-  transform: translateY(-2px);
-  border-color: rgba(139, 92, 246, 0.55);
-  background: rgba(124, 92, 252, 0.08);
+  border-color: var(--accent);
 }
 
+/* OMR bubble: an outlined circle that gets shaded in when chosen, like an
+   answer sheet. The inset shadow grows from the edge inward as the "ink". */
 .optionKey {
-  width: 2.35rem;
-  height: 2.35rem;
+  width: 2.25rem;
+  height: 2.25rem;
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  border: 1px solid rgba(196, 181, 253, 0.12);
-  border-radius: 11px;
-  color: #a78bfa;
-  background: rgba(124, 92, 252, 0.09);
-  font-weight: 900;
+  border: 2px solid var(--rule-strong);
+  border-radius: 50%;
+  color: var(--ink-2);
+  background: var(--sheet);
+  box-shadow: inset 0 0 0 0 var(--accent);
+  font-weight: 800;
+  transition: box-shadow 180ms ease-out, border-color 180ms ease-out, color 180ms ease-out;
 }
 
 .optionText {
@@ -268,48 +269,62 @@
 }
 
 .optionCard.selected {
-  color: #f8fafc;
-  border: 2px solid #8b5cf6;
-  background: linear-gradient(135deg, rgba(124, 92, 252, 0.27), rgba(79, 52, 210, 0.2));
-  box-shadow: 0 14px 30px rgba(91, 63, 208, 0.18);
-}
-
-.optionCard.selected::after {
-  content: '✓';
-  position: absolute;
-  right: 0.85rem;
-  top: 0.85rem;
-  color: #fff;
-  font-weight: 900;
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px var(--accent);
 }
 
 .optionCard.selected .optionKey {
-  color: #fff;
-  border-color: #a78bfa;
-  background: #7c5cfc;
+  color: var(--on-accent);
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1.2rem var(--accent);
 }
 
+/* After submitting: green tick for the right answer, margin red for a wrong pick. */
 .optionCard.correct {
-  color: #dcfce7;
-  border: 2px solid #22c55e;
-  background: rgba(22, 163, 74, 0.18);
+  color: var(--correct-ink);
+  border-color: var(--correct);
+  background: var(--correct-soft);
+  box-shadow: inset 0 0 0 1px var(--correct);
 }
 
-.optionCard.correct .optionKey { color: #052e16; background: #86efac; }
-.optionCard.wrong { color: #fee2e2; border: 2px solid #ef4444; background: rgba(220, 38, 38, 0.17); }
-.optionCard.wrong .optionKey { color: #450a0a; background: #fca5a5; }
+.optionCard.correct .optionKey {
+  color: var(--on-accent);
+  border-color: var(--correct-ink);
+  box-shadow: inset 0 0 0 1.2rem var(--correct-ink);
+}
+
+.optionCard.wrong {
+  color: var(--wrong-ink);
+  border-color: var(--wrong);
+  background: var(--wrong-soft);
+  box-shadow: inset 0 0 0 1px var(--wrong);
+}
+
+.optionCard.wrong .optionKey {
+  color: var(--on-accent);
+  border-color: var(--wrong-ink);
+  box-shadow: inset 0 0 0 1.2rem var(--wrong-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .optionCard,
+  .optionKey {
+    transition: none;
+  }
+}
 
 .explanationBox {
   padding: 1rem;
-  border: 1px solid rgba(56, 189, 248, 0.3);
+  border: 1px solid var(--rule);
   border-radius: 16px;
-  color: #e0f2fe;
-  background: rgba(14, 165, 233, 0.08);
+  color: var(--ink);
+  background: var(--accent-soft);
 }
 
 .explanationTitle {
   margin-bottom: 0.45rem;
-  color: #7dd3fc;
+  color: var(--accent);
   font-size: 0.7rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -341,13 +356,13 @@
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  color: #c4b5fd;
-  background: rgba(124, 92, 252, 0.1);
+  color: var(--ink);
+  background: var(--accent-soft);
 }
 
 .navButton:disabled { opacity: 0.35; cursor: not-allowed; }
-.submitButton, .startButton { color: #fff; background: linear-gradient(135deg, #8b5cf6, #5b3fd0); }
-.backButton { color: #c4b5fd; background: rgba(124, 92, 252, 0.1); }
+.submitButton, .startButton { color: var(--on-accent); background: var(--accent); }
+.backButton { color: var(--ink); background: var(--accent-soft); }
 
 .startScreen {
   display: grid;
@@ -356,9 +371,7 @@
   margin-top: 1.2rem;
   padding: 1rem;
   border-radius: 28px;
-  background:
-    radial-gradient(circle at 50% 0%, rgba(124, 92, 252, 0.2), transparent 40%),
-    rgba(13, 11, 26, 0.5);
+  background: var(--paper);
 }
 
 .startCard {
@@ -373,8 +386,8 @@
 .startBadge {
   padding: 0.4rem 0.7rem;
   border-radius: 999px;
-  color: #c4b5fd;
-  background: rgba(124, 92, 252, 0.13);
+  color: var(--ink);
+  background: var(--accent-soft);
   font-size: 0.7rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -384,14 +397,14 @@
   display: grid;
   place-items: center;
   border-radius: 20px;
-  color: #fff;
-  background: linear-gradient(135deg, #8b5cf6, #5b3fd0);
+  color: var(--on-accent);
+  background: var(--accent);
   font-weight: 900;
 }
 
 .startIcon { width: 4.5rem; height: 4.5rem; margin-top: 1.4rem; font-size: 1.8rem; }
-.startCard h2 { margin: 1.2rem 0 0.5rem; color: #f8fafc; font-size: clamp(1.8rem, 4vw, 2.6rem); }
-.startCard > p { max-width: 430px; margin: 0; color: #8f8aa6; }
+.startCard h2 { margin: 1.2rem 0 0.5rem; color: var(--ink); font-size: clamp(1.8rem, 4vw, 2.6rem); }
+.startCard > p { max-width: 430px; margin: 0; color: var(--muted); }
 
 .startStats {
   width: 100%;
@@ -401,16 +414,16 @@
   margin: 1.7rem 0;
 }
 
-.startStats div { min-width: 0; padding: 0.8rem; border-radius: 15px; background: rgba(255,255,255,0.03); }
+.startStats div { min-width: 0; padding: 0.8rem; border-radius: 15px; background: var(--inset); }
 .startStats strong, .startStats span { display: block; overflow-wrap: anywhere; }
-.startStats strong { color: #f8fafc; font-size: 1.1rem; }
-.startStats span { color: #777287; font-size: 0.75rem; }
+.startStats strong { color: var(--ink); font-size: 1.1rem; }
+.startStats span { color: var(--muted); font-size: 0.75rem; }
 .startClass {
   margin: -0.9rem 0 1.4rem;
   padding: 0.4rem 0.75rem;
   border-radius: 999px;
-  color: #c4b5fd;
-  background: rgba(124, 92, 252, 0.1);
+  color: var(--ink);
+  background: var(--accent-soft);
   font-size: 0.75rem;
   font-weight: 800;
 }
@@ -422,26 +435,6 @@
 }
 
 .startButton { display: flex; justify-content: space-between; gap: 3rem; min-width: 210px; }
-
-
-:global([data-theme='light']) .leftColumn,
-:global([data-theme='light']) .centerColumn,
-:global([data-theme='light']) .startCard {
-  border-color: rgba(109, 74, 204, 0.13);
-  background: rgba(255,255,255,0.88);
-  box-shadow: 0 20px 50px rgba(82, 51, 151, 0.09);
-}
-
-:global([data-theme='light']) .startScreen { background: rgba(124, 92, 252, 0.05); }
-:global([data-theme='light']) .questionText,
-:global([data-theme='light']) .summaryBox strong,
-:global([data-theme='light']) .startCard h2,
-:global([data-theme='light']) .startStats strong { color: #2d1b5d; }
-:global([data-theme='light']) .optionCard { color: #4b3d68; border-color: rgba(109,74,204,0.13); background: #fbfaff; }
-:global([data-theme='light']) .optionCard:hover:not(:disabled) { background: #f5f0ff; }
-:global([data-theme='light']) .progressDot,
-:global([data-theme='light']) .summaryBox div,
-:global([data-theme='light']) .startStats div { border-color: rgba(109,74,204,0.1); background: rgba(124,92,252,0.06); }
 
 @media (max-width: 1050px) {
   .wrapper { grid-template-columns: 1fr; }
@@ -458,10 +451,9 @@
   .centerColumn { min-height: 0; padding: 1rem; border-radius: 20px; overflow: visible; }
   .topProgress { display: none; }
   .optionsGrid { grid-template-columns: 1fr; }
-  .optionCard { min-height: 68px; padding-right: 2.5rem; }
+  .optionCard { min-height: 68px; }
   /* Sit just above the fixed bottom tab bar; at bottom: 0 the bar hid these buttons. */
-  .centerActions { position: sticky; bottom: var(--bottom-nav-space); z-index: 5; margin: auto -1rem -1rem; padding: 0.7rem 1rem; background: rgba(13,11,26,0.96); border-top: 1px solid rgba(196,181,253,0.08); }
-  :global([data-theme='light']) .centerActions { background: rgba(255,255,255,0.96); }
+  .centerActions { position: sticky; bottom: var(--bottom-nav-space); z-index: 5; margin: auto -1rem -1rem; padding: 0.7rem 1rem; background: var(--sheet); border-top: 1px solid var(--rule); }
   .centerActions button { flex: 1; justify-content: center; }
   .startScreen { min-height: 500px; margin-top: 0.8rem; padding: 0; }
   .startActions { width: 100%; display: grid; }
@@ -483,13 +475,13 @@
   display: flex;
   justify-content: space-between;
   gap: 0.75rem;
-  color: #a8a3bf;
+  color: var(--muted);
   font-size: 0.8rem;
   font-weight: 800;
 }
 
 .mobileStatusRow strong {
-  color: #c4b5fd;
+  color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
 
@@ -533,11 +525,11 @@
 
 /* ── Low-time warning (last minute) ────────────────────────── */
 .timerBox.timeLow {
-  border-color: rgba(244, 63, 94, 0.45);
-  background: linear-gradient(160deg, rgba(244, 63, 94, 0.2), rgba(16, 13, 32, 0.9));
+  border-color: var(--wrong);
+  background: var(--wrong-soft);
 }
 
 .timeLow .timerValue,
 .mobileStatusRow .timeLowText {
-  color: #fda4af;
+  color: var(--wrong-ink);
 }

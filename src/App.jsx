@@ -524,7 +524,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
 
   if (authLoading) {
     return (
-      <div className={`${styles.appRoot} ${styles.dark}`}>
+      <div className={styles.appRoot}>
         <div className={styles.pageShell}>
           <SkeletonLoader />
         </div>
@@ -534,7 +534,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
 
   if (!authLoading && isAuthCallback && !user) {
     return (
-      <div className={`${styles.appRoot} ${styles.dark}`}>
+      <div className={styles.appRoot}>
         <div className={styles.pageShell}>
           <div className={styles.statusBanner}>
             Email verification callback received. Checking your session...
@@ -547,7 +547,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
 
   if (!user) {
     return (
-      <div className={`${styles.appRoot} ${styles.dark}`}>
+      <div className={styles.appRoot}>
         <Auth onAuthSuccess={setUser} />
         <Toast toast={toast} />
       </div>
@@ -556,8 +556,8 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
 
   return (
     <div
-      data-theme="dark"
-      className={`${styles.appRoot} ${styles.dark}`}
+      data-theme="light"
+      className={styles.appRoot}
     >
       <div className={styles.pageShell}>
         <header className={styles.topBar}>

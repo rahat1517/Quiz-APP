@@ -1,23 +1,8 @@
-/* ── Color tokens ──────────────────────────────────────────── */
-:root {
-  --accent:        #7c5cfc;
-  --accent-bg:     #ede9ff;
-  --accent-border: #a78bfa;
-  --border:        rgba(124, 92, 252, 0.18);
-  --text-h:        #3b1fa8;
-  --social-bg:     #f5f0ff;
-  --shadow:        0 4px 24px rgba(124, 92, 252, 0.22),
-                   0 1px  6px rgba(124, 92, 252, 0.12);
-}
-
 /* ── .appRoot ──────────────────────────────────────────────── */
 .appRoot {
   min-height: 100vh;
-  color: #e2e8f0;
-  background:
-    radial-gradient(circle at top left,    rgba(124, 92, 252, 0.22), transparent 26%),
-    radial-gradient(circle at bottom right, rgba(79,  52, 210, 0.15), transparent 30%),
-    #0d0b1a;
+  color: var(--ink);
+  background: var(--paper);
 }
 
 /* ── .pageShell ────────────────────────────────────────────── */
@@ -43,10 +28,9 @@
   align-items: center;
   padding: 0.8rem 0.9rem;
   border-radius: 24px;
-  background: rgba(13, 11, 26, 0.88);
-  border: 1px solid rgba(124, 92, 252, 0.18);
-  box-shadow: 0 24px 70px rgba(13, 11, 26, 0.28),
-              inset 0 0 0 1px rgba(124, 92, 252, 0.07);
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  box-shadow: var(--shadow-md);
 }
 
 .brandButton {
@@ -69,9 +53,9 @@
   place-items: center;
   flex-shrink: 0;
   border-radius: 14px;
-  color: #fff;
-  background: linear-gradient(135deg, #8b5cf6, #5b3fd0);
-  box-shadow: 0 10px 22px rgba(91, 63, 208, 0.28);
+  color: var(--on-accent);
+  background: var(--accent);
+  box-shadow: var(--shadow-md);
   font-weight: 900;
 }
 
@@ -86,14 +70,11 @@
 
 .titleBlock strong {
   font-size: 1rem;
-  background: linear-gradient(135deg, #c4b5fd 0%, #7c5cfc 60%, #a78bfa 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--ink);
 }
 
 .titleBlock small {
-  color: #777287;
+  color: var(--muted);
   font-size: 0.75rem;
   font-weight: 700;
 }
@@ -118,7 +99,7 @@
   top: 50%;
   z-index: 1;
   transform: translateY(-50%);
-  color: #8b5cf6;
+  color: var(--accent);
   pointer-events: none;
 }
 
@@ -133,18 +114,18 @@
   gap: 0.6rem;
   min-width: 150px;
   min-height: 48px;
-  border: 1px solid rgba(124, 92, 252, 0.16);
+  border: 1px solid var(--rule);
   border-radius: 15px;
   padding: 0.35rem 0.55rem;
-  color: #ede9ff;
-  background: rgba(124, 92, 252, 0.06);
+  color: var(--ink);
+  background: var(--accent-soft);
   cursor: pointer;
   text-align: left;
 }
 
 .userCard:hover {
-  border-color: rgba(167, 139, 250, 0.34);
-  background: rgba(124, 92, 252, 0.12);
+  border-color: var(--rule);
+  background: var(--accent-soft);
 }
 
 .userIcon {
@@ -154,8 +135,8 @@
   place-items: center;
   flex-shrink: 0;
   border-radius: 999px;
-  color: #fff;
-  background: linear-gradient(135deg, #8b5cf6, #5b3fd0);
+  color: var(--on-accent);
+  background: var(--accent);
   font-size: 0.8rem;
   font-weight: 900;
 }
@@ -169,7 +150,7 @@
 .userDetails strong {
   max-width: 100px;
   overflow: hidden;
-  color: #ede9ff;
+  color: var(--ink);
   font-size: 0.76rem;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -177,13 +158,13 @@
 
 .userDetails small {
   margin-top: 0.2rem;
-  color: #8f8aa6;
+  color: var(--muted);
   font-size: 0.75rem;
 }
 
 .profileArrow {
   margin-left: auto;
-  color: #8f8aa6;
+  color: var(--muted);
   font-size: 1.1rem;
 }
 
@@ -196,10 +177,10 @@
 /* ── shared button/select base ─────────────────────────────── */
 .subjectSelect,
 .signOutButton {
-  border: 1px solid rgba(124, 92, 252, 0.22);
+  border: 1px solid var(--rule);
   border-radius: 18px;
-  background: rgba(124, 92, 252, 0.08);
-  color: #ede9ff;
+  background: var(--accent-soft);
+  color: var(--ink);
   padding: 0.9rem 1.15rem;
   cursor: pointer;
   transition: background 150ms ease, border-color 150ms ease,
@@ -217,17 +198,17 @@
   padding: 0;
   border-radius: 999px;
   min-width: auto;
-  border: 1px solid rgba(124, 92, 252, 0.22);
-  background: rgba(124, 92, 252, 0.08);
-  color: #ede9ff;
+  border: 1px solid var(--rule);
+  background: var(--accent-soft);
+  color: var(--ink);
   transition: background 150ms ease, border-color 150ms ease,
               color 150ms ease, transform 180ms ease, box-shadow 180ms ease;
 }
 
 .toggleButton:hover {
   transform: translateY(-1px);
-  border-color: var(--accent-border);
-  box-shadow: 0 4px 12px rgba(124, 92, 252, 0.2);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-sm);
 }
 
 .toggleButton:hover .toggleIcon {
@@ -242,9 +223,9 @@
   top: calc(100% + 0.65rem);
   transform: translateX(-50%);
   white-space: nowrap;
-  background: rgba(13, 11, 26, 0.96);
-  color: #ede9ff;
-  border: 1px solid rgba(124, 92, 252, 0.28);
+  background: var(--sheet);
+  color: var(--ink);
+  border: 1px solid var(--rule);
   padding: 0.45rem 0.75rem;
   border-radius: 999px;
   font-size: 0.78rem;
@@ -273,13 +254,14 @@
 /* ── .subjectSelect ────────────────────────────────────────── */
 .subjectSelect {
   min-width: 220px;
-  background: rgba(13, 11, 26, 0.96);
-  box-shadow: inset 0 0 0 1px rgba(124, 92, 252, 0.08);
+  background: var(--sheet);
+  box-shadow: var(--shadow-sm);
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-image: linear-gradient(45deg,  transparent 50%, #c4b5fd 50%),
-                    linear-gradient(135deg, #c4b5fd 50%, transparent 50%);
+  /* chevron drawn with two triangles */
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+                    linear-gradient(135deg, var(--muted) 50%, transparent 50%);
   background-position: calc(100% - 1rem) 50%, calc(100% - 0.7rem) 50%;
   background-repeat: no-repeat;
   background-size: 0.35rem 0.35rem, 0.35rem 0.35rem;
@@ -287,19 +269,19 @@
 
 .subjectSelect:hover,
 .subjectSelect:focus {
-  background-color: rgba(124, 92, 252, 0.12);
-  border-color: var(--accent-border);
+  background-color: var(--accent-soft);
+  border-color: var(--accent);
   outline: none;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-md);
 }
 
 .subjectSelect option {
-  color: #e2e8f0;
-  background: #0d0b1a;
+  color: var(--ink);
+  background: var(--sheet);
 }
 
 .subjectSelect::-ms-expand        { display: none; }
-.subjectSelect:-moz-focusring     { color: transparent; text-shadow: 0 0 0 #ede9ff; }
+.subjectSelect:-moz-focusring     { color: transparent; text-shadow: none; }
 
 /* ── .signOutButton ────────────────────────────────────────── */
 .signOutButton {
@@ -309,17 +291,17 @@
   gap: 0.55rem;
   min-height: 44px;
   white-space: nowrap;
-  background: rgba(248, 113, 113, 0.14);
-  border-color: rgba(248, 113, 113, 0.24);
-  color: #fca5a5;
+  background: var(--wrong-soft);
+  border-color: var(--wrong);
+  color: var(--wrong-ink);
   font-weight: 800;
 }
 
 .signOutButton:hover {
   transform: translateY(-1px);
-  background: rgba(248, 113, 113, 0.22);
-  border-color: rgba(248, 113, 113, 0.44);
-  box-shadow: 0 4px 20px rgba(248, 113, 113, 0.18);
+  background: var(--wrong-soft);
+  border-color: var(--wrong);
+  box-shadow: var(--shadow-sm);
 }
 
 .signOutButton:active {
@@ -332,8 +314,8 @@
   display: grid;
   place-items: center;
   border-radius: 8px;
-  color: #fecaca;
-  background: rgba(248, 113, 113, 0.12);
+  color: var(--wrong-ink);
+  background: var(--wrong-soft);
   font-size: 0.9rem;
   font-weight: 900;
 }
@@ -350,14 +332,14 @@
   margin-bottom: 1.5rem;
   padding: 1.2rem;
   border-radius: 24px;
-  background: rgba(13, 11, 26, 0.88);
-  border: 1px solid rgba(124, 92, 252, 0.18);
-  box-shadow: inset 0 0 0 1px rgba(124, 92, 252, 0.05);
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  box-shadow: var(--shadow-sm);
 }
 
 .quizSelection label {
   font-size: 0.95rem;
-  color: #c4b5fd;
+  color: var(--ink);
 }
 
 .quizSelection button {
@@ -391,35 +373,35 @@
   grid-template-columns: 44px minmax(0, 1fr) 44px;
   overflow: hidden;
   min-height: 52px;
-  border: 1px solid rgba(148, 163, 184, 0.45);
+  border: 1px solid var(--rule-strong);
   border-radius: 18px;
-  background: #0f172a;
+  background: var(--sheet);
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
 .numberControl:focus-within {
-  border-color: #38bdf8;
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-tint);
 }
 
 .numberControl button,
 .numberInput {
   min-width: 0;
   border: 0;
-  color: #f8fafc;
+  color: var(--ink);
   background: transparent;
 }
 
 .numberControl button {
   padding: 0;
-  color: #c4b5fd;
+  color: var(--ink);
   cursor: pointer;
   font-size: 1.2rem;
   font-weight: 900;
 }
 
 .numberControl button:hover {
-  background: rgba(124, 92, 252, 0.14);
+  background: var(--accent-soft);
 }
 
 /* The control clips overflow, so draw the ring inside the button. */
@@ -457,7 +439,7 @@
   right: 0.45rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #8f8aa6;
+  color: var(--muted);
   font-size: 0.75rem;
   font-weight: 800;
   pointer-events: none;
@@ -470,7 +452,9 @@
   min-height: 48px;
   padding: 0.75rem 1.25rem;
   border-radius: 16px;
-  background: linear-gradient(135deg, #7c5cfc, #4f34d4);
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
   font-weight: 800;
 }
 
@@ -478,12 +462,12 @@
 .fieldHint {
   display: block;
   margin-top: 0.4rem;
-  color: #cbd5e1;
+  color: var(--ink);
   font-size: 0.85rem;
 }
 
 .assignedClassNote {
-  color: #86b7ff;
+  color: var(--accent);
 }
 
 /* ── .statusBanner ─────────────────────────────────────────── */
@@ -491,21 +475,12 @@
   margin-top: 1rem;
   padding: 1rem 1.25rem;
   border-radius: 24px;
-  background: rgba(13, 11, 26, 0.80);
-  border: 1px solid rgba(124, 92, 252, 0.18);
-  color: #c4b5fd;
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  color: var(--ink);
 }
 
 /* ── dark mode class ───────────────────────────────────────── */
-.dark {
-  color-scheme: dark;
-  background:
-    radial-gradient(circle at top left,    rgba(124, 92, 252, 0.22), transparent 26%),
-    radial-gradient(circle at bottom right, rgba(79,  52, 210, 0.15), transparent 30%),
-    #0d0b1a;
-  color: #e2e8f0;
-}
-
 /* ── responsive ────────────────────────────────────────────── */
 @media (max-width: 780px) {
   .pageShell {
@@ -623,26 +598,25 @@
   }
 }
 .subjectSelect {
-  color: #f8fafc;
-  background-color: #0f172a;
-  border: 1px solid rgba(148, 163, 184, 0.45);
-  color-scheme: dark;
+  color: var(--ink);
+  background-color: var(--sheet);
+  border: 1px solid var(--rule-strong);
+  color-scheme: light;
 }
 
 .subjectSelect option {
-  color: #f8fafc;
-  background-color: #0f172a;
+  color: var(--ink);
+  background-color: var(--sheet);
 }
 
 .subjectSelect:focus {
-  border-color: #38bdf8;
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-tint);
   outline: none;
 }
 
-
 /* Hover and focus looked identical; give keyboard focus its own ring. */
 .subjectSelect:focus-visible {
-  outline: 2px solid #c4b5fd;
+  outline: 2px solid var(--rule);
   outline-offset: 2px;
 }

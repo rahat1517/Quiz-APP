@@ -1,7 +1,6 @@
 /* ============================================================================
-   COMPREHENSIVE DARK VIOLET ANIMATION SYSTEM
-   Design Tokens: #7c5cfc (accent), #ede9ff (accent-bg), #a78bfa (accent-border)
-   Base Background: #0d0b1a
+   ANIMATION SYSTEM
+   Colours come from the "Exam Paper" tokens in src/index.css.
    ============================================================================ */
 
 /* ============================================================================
@@ -26,16 +25,6 @@
   /* Animation Delays (for staggering) */
   --delay: 0ms;
 
-  /* Color Palette */
-  --accent: #7c5cfc;
-  --accent-light: #a78bfa;
-  --accent-bg: #ede9ff;
-  --accent-border: #a78bfa;
-  --border: rgba(124, 92, 252, 0.18);
-  --text-h: #3b1fa8;
-  --social-bg: #f5f0ff;
-  --shadow: 0 4px 24px rgba(124, 92, 252, 0.22), 0 1px 6px rgba(124, 92, 252, 0.12);
-  --bg-base: #0d0b1a;
 }
 
 /* ============================================================================
@@ -130,7 +119,7 @@
 @keyframes cardHoverLift {
   to {
     transform: translateY(-4px);
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-md);
   }
 }
 
@@ -156,11 +145,11 @@
 @keyframes btnPulse {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(124, 92, 252, 0.7);
+    box-shadow: 0 0 0 0 var(--focus-tint);
   }
   50% {
     transform: scale(1.02);
-    box-shadow: 0 0 0 12px rgba(124, 92, 252, 0);
+    box-shadow: 0 0 0 12px var(--focus-tint);
   }
 }
 
@@ -182,15 +171,15 @@
 
 @keyframes btnSuccess {
   0% {
-    background-color: #7c5cfc;
-    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+    background-color: var(--accent);
+    box-shadow: 0 0 0 0 var(--correct-soft);
   }
   50% {
-    background-color: #22c55e;
-    box-shadow: 0 0 0 12px rgba(34, 197, 94, 0);
+    background-color: var(--correct-ink);
+    box-shadow: 0 0 0 12px var(--correct-soft);
   }
   100% {
-    background-color: #22c55e;
+    background-color: var(--correct-ink);
   }
 }
 
@@ -212,17 +201,17 @@
 
 @keyframes inputFocusGlow {
   from {
-    box-shadow: 0 0 0 0 rgba(124, 92, 252, 0.5);
+    box-shadow: 0 0 0 0 var(--focus-tint);
   }
   to {
-    box-shadow: 0 0 0 8px rgba(124, 92, 252, 0);
+    box-shadow: 0 0 0 8px var(--focus-tint);
   }
 }
 
 @keyframes inputError {
   0%, 100% {
     transform: translateX(0);
-    border-color: #ef4444;
+    border-color: var(--wrong);
   }
   10%, 30%, 50%, 70%, 90% {
     transform: translateX(-4px);
@@ -323,47 +312,47 @@
 @keyframes optionSelect {
   0% {
     transform: scale(1);
-    border-color: rgba(124, 92, 252, 0.3);
+    border-color: var(--rule);
   }
   50% {
     transform: scale(1.02);
-    border-color: #7c5cfc;
-    box-shadow: 0 0 12px rgba(124, 92, 252, 0.5);
+    border-color: var(--accent);
+    box-shadow: var(--shadow-sm);
   }
   100% {
     transform: scale(1);
-    border-color: #7c5cfc;
+    border-color: var(--accent);
   }
 }
 
 @keyframes optionReject {
   0%, 100% {
     transform: translateX(0);
-    border-color: #ef4444;
+    border-color: var(--wrong);
   }
   10%, 30%, 50%, 70%, 90% {
     transform: translateX(-4px);
-    background-color: rgba(239, 68, 68, 0.05);
+    background-color: var(--wrong-soft);
   }
   20%, 40%, 60%, 80% {
     transform: translateX(4px);
-    background-color: rgba(239, 68, 68, 0.05);
+    background-color: var(--wrong-soft);
   }
 }
 
 @keyframes optionCorrect {
   0% {
     transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6);
+    box-shadow: 0 0 0 0 var(--correct-soft);
   }
   50% {
     transform: scale(1.05);
-    box-shadow: 0 0 0 12px rgba(34, 197, 94, 0);
+    box-shadow: 0 0 0 12px var(--correct-soft);
   }
   100% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
-    border-color: #22c55e;
+    box-shadow: 0 0 0 0 var(--correct-soft);
+    border-color: var(--correct);
   }
 }
 
@@ -542,11 +531,11 @@
 @keyframes starFill {
   from {
     fill: transparent;
-    stroke: #fbbf24;
+    stroke: var(--skip-ink);
   }
   to {
-    fill: #fbbf24;
-    stroke: #fbbf24;
+    fill: var(--skip-ink);
+    stroke: var(--skip-ink);
   }
 }
 
@@ -662,12 +651,7 @@
 }
 
 .card-shimmer {
-  background: linear-gradient(
-    90deg,
-    rgba(124, 92, 252, 0.05) 0%,
-    rgba(124, 92, 252, 0.15) 50%,
-    rgba(124, 92, 252, 0.05) 100%
-  );
+  background: var(--accent-soft);
   background-size: 1000px 100%;
   animation: cardShimmer 2s infinite;
 }
@@ -681,19 +665,14 @@
   content: '';
   position: absolute;
   border-radius: 50%;
-  background: rgba(124, 92, 252, 0.6);
+  background: var(--accent);
   width: 20px;
   height: 20px;
   animation: btnRipple 600ms ease-out;
 }
 
 .btn-slide {
-  background: linear-gradient(
-    90deg,
-    #7c5cfc 0%,
-    #a78bfa 50%,
-    #7c5cfc 100%
-  );
+  background: var(--accent);
   background-size: 200% 100%;
   transition: background-position 300ms ease;
 }
@@ -736,12 +715,7 @@
 
 /* Skeleton & loading animations */
 .skeleton-pulse {
-  background: linear-gradient(
-    90deg,
-    rgba(124, 92, 252, 0.05) 0%,
-    rgba(124, 92, 252, 0.2) 50%,
-    rgba(124, 92, 252, 0.05) 100%
-  );
+  background: var(--accent-soft);
   background-size: 1000px 100%;
   animation: skeletonPulse 1.5s infinite;
 }
@@ -920,7 +894,7 @@
 
 .hover-lift:hover {
   transform: translateY(-4px);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-md);
 }
 
 .hover-glow {
@@ -928,8 +902,8 @@
 }
 
 .hover-glow:hover {
-  box-shadow: 0 0 20px rgba(124, 92, 252, 0.4);
-  border-color: #a78bfa;
+  box-shadow: var(--shadow-sm);
+  border-color: var(--accent);
 }
 
 .hover-scale {
@@ -1064,24 +1038,8 @@
 
   /* Reduce shadow complexity */
   .hover-lift:hover {
-    box-shadow: 0 2px 8px rgba(124, 92, 252, 0.2);
+    box-shadow: var(--shadow-sm);
   }
-}
-
-/* ============================================================================
-   17. DARK MODE OPTIMIZATIONS (existing dark mode applications)
-   ============================================================================ */
-
-.dark {
-  --accent: #7c5cfc;
-  --accent-light: #a78bfa;
-  --accent-bg: #ede9ff;
-  --accent-border: #a78bfa;
-  --border: rgba(124, 92, 252, 0.18);
-  --text-h: #3b1fa8;
-  --social-bg: #f5f0ff;
-  --shadow: 0 4px 24px rgba(124, 92, 252, 0.22), 0 1px 6px rgba(124, 92, 252, 0.12);
-  --bg-base: #0d0b1a;
 }
 
 /* ============================================================================
