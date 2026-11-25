@@ -5,7 +5,6 @@ import { normalizeChapter } from './lib/normalizeChapter';
 import {
   formatClassLevel,
   normalizeClassLevel,
-  getClassGroupLevels,
   isClassInGroup,
 } from './lib/normalizeClassLevel';
 import { getSession, signOut } from './services/authService';
