@@ -21,9 +21,10 @@ Built with React 19, Vite and Supabase (auth, database and a random-question RPC
    cp .env.example .env
    ```
 
-3. Run the SQL in `supabase/class_level_and_random_questions.sql` in your Supabase
-   project. It adds the `class_level` and `chapter` columns and the
-   `get_random_questions` function the quiz uses.
+3. Open your Supabase project's SQL Editor, paste `supabase/schema.sql` and run it.
+   It creates the `questions`, `profiles` and `quiz_results` tables, row-level
+   security, the sign-up trigger and the `get_random_questions` function. It's
+   safe to run again.
 
 4. Start the dev server:
 
@@ -44,11 +45,18 @@ Built with React 19, Vite and Supabase (auth, database and a random-question RPC
 
 - **Student** — sees questions for their assigned class only, takes quizzes and
   reviews results. Correct answers are hidden in the Question Bank.
-- **Admin** — set `role = 'admin'` on the user's row in the `profiles` table.
-  Admins can pick any class and add, edit or delete questions.
+- **Admin** — can pick any class and add, edit or delete questions. To make
+  someone an admin, run this in the SQL Editor:
 
-Role checks in the UI only hide controls. Configure Supabase row-level security
-so only admins can write to the `questions` table.
+  ```sql
+  update public.profiles set role = 'admin' where email = 'person@example.com';
+  ```
+
+Role checks in the UI only hide controls; the real rules are row-level security
+in `supabase/schema.sql`. Signed-in users can read questions, and only admins
+can change them. Everyone sees only their own profile and results (admins see
+all). Users can't make themselves admin or change their assigned class, and
+logged-out visitors can't read anything.
 
 ## Deployment
 
