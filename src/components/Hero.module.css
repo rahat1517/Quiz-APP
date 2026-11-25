@@ -13,12 +13,10 @@
   min-height: 390px;
   border-radius: 32px;
   padding: clamp(1.6rem, 4vw, 3.5rem);
-  color: #f8fafc;
-  background:
-    radial-gradient(circle at 72% 0%, rgba(196, 181, 253, 0.24), transparent 30%),
-    linear-gradient(140deg, #21134c 0%, #4f34d4 48%, #6d3cf4 100%);
-  box-shadow: inset 0 0 0 1px rgba(196, 181, 253, 0.18),
-    0 28px 70px rgba(13, 11, 26, 0.34);
+  /* the exam-booklet cover: ink navy with paper-white type */
+  color: var(--on-accent);
+  background: var(--cover);
+  box-shadow: none;
 }
 
 .heroContent,
@@ -32,10 +30,10 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.45rem 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border: 1px solid var(--rule-on-cover);
   border-radius: 999px;
-  color: #ede9fe;
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--on-accent);
+  background: transparent;
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -46,20 +44,19 @@
   width: 0.45rem;
   height: 0.45rem;
   border-radius: 999px;
-  background: #86efac;
-  box-shadow: 0 0 0 5px rgba(134, 239, 172, 0.12);
+  background: var(--correct);
 }
 
 .welcome {
   margin: 1.6rem 0 0.35rem;
-  color: #c4b5fd;
+  color: var(--accent-on-cover);
   font-weight: 700;
 }
 
 .heroPanel h1 {
   max-width: 780px;
   margin: 0;
-  color: #fff;
+  color: var(--on-accent);
   font-size: clamp(2.35rem, 5vw, 4.5rem);
   line-height: 0.98;
   letter-spacing: -0.055em;
@@ -68,7 +65,7 @@
 .heroCopy {
   max-width: 600px;
   margin: 1.2rem 0 0;
-  color: rgba(237, 233, 254, 0.78);
+  color: var(--on-cover-muted);
   line-height: 1.7;
 }
 
@@ -93,35 +90,34 @@
   display: inline-flex;
   align-items: center;
   gap: 1rem;
-  color: #39217f;
-  background: #fff;
-  box-shadow: 0 15px 30px rgba(30, 15, 80, 0.22);
+  color: var(--ink);
+  background: var(--sheet);
 }
 
 .secondaryAction {
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--on-accent);
+  border: 1px solid var(--rule-on-cover);
+  background: transparent;
 }
 
 .challengeCard {
   width: 100%;
-  color: inherit;
+  color: var(--ink);
   cursor: pointer;
   text-align: left;
   padding: 1.3rem;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--rule);
   border-radius: 24px;
-  background: rgba(17, 10, 45, 0.34);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  background: var(--sheet);
+  box-shadow: none;
   backdrop-filter: blur(14px);
   transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
 }
 
 .challengeCard:hover {
   transform: translateY(-3px);
-  border-color: rgba(255, 255, 255, 0.34);
-  background: rgba(17, 10, 45, 0.48);
+  border-color: var(--rule);
+  background: var(--sheet);
 }
 
 .challengeTop,
@@ -135,13 +131,13 @@
 .challengeAction {
   display: block;
   margin-top: 1rem;
-  color: #fff;
+  color: var(--ink);
   font-size: 0.75rem;
   font-weight: 900;
 }
 
 .challengeTop {
-  color: #ddd6fe;
+  color: var(--ink);
   font-size: 0.78rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -153,8 +149,8 @@
   display: grid;
   place-items: center;
   border-radius: 12px;
-  color: #4f34d4;
-  background: #fff;
+  color: var(--accent);
+  background: var(--sheet);
   font-weight: 900;
 }
 
@@ -166,38 +162,31 @@
 }
 
 .challengeScore strong {
-  color: #fff;
+  color: var(--ink);
   font-size: 4.5rem;
   line-height: 0.85;
   letter-spacing: -0.08em;
 }
 
 .challengeScore span {
-  color: #c4b5fd;
+  color: var(--ink);
   font-size: 0.8rem;
   font-weight: 700;
 }
 
 .challengeCard p {
   margin: 1.25rem 0;
-  color: rgba(237, 233, 254, 0.72);
+  color: var(--ink);
   font-size: 0.82rem;
   line-height: 1.55;
 }
 
 .challengeMeta {
   padding-top: 0.9rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  color: #ede9fe;
+  border-top: 1px solid var(--rule);
+  color: var(--ink);
   font-size: 0.75rem;
   font-weight: 700;
-}
-
-.heroAccent {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(115deg, transparent 55%, rgba(255, 255, 255, 0.05));
 }
 
 .statsGrid {
@@ -211,18 +200,18 @@
   align-items: center;
   gap: 1rem;
   min-width: 0;
-  border: 1px solid rgba(124, 92, 252, 0.18);
+  border: 1px solid var(--rule);
   border-radius: 22px;
   padding: 1.1rem;
-  color: #e2e8f0;
-  background: rgba(13, 11, 26, 0.8);
+  color: var(--ink);
+  background: var(--sheet);
   transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
 }
 
 .statCard:hover {
   transform: translateY(-2px);
-  border-color: rgba(167, 139, 250, 0.34);
-  background: rgba(19, 16, 38, 0.92);
+  border-color: var(--rule);
+  background: var(--sheet);
 }
 
 .statIcon,
@@ -240,13 +229,13 @@
   font-size: 1.15rem;
 }
 
-.purpleIcon { color: #ddd6fe; background: rgba(139, 92, 246, 0.18); }
-.blueIcon { color: #bae6fd; background: rgba(14, 165, 233, 0.16); }
-.greenIcon { color: #bbf7d0; background: rgba(34, 197, 94, 0.14); }
+.purpleIcon { color: var(--ink); background: var(--accent-soft); }
+.blueIcon { color: var(--ink); background: var(--accent-soft); }
+.greenIcon { color: var(--correct-ink); background: var(--correct-soft); }
 
 .statCard p {
   margin: 0;
-  color: #c4b5fd;
+  color: var(--ink);
   font-size: 0.75rem;
   font-weight: 800;
 }
@@ -254,7 +243,7 @@
 .statCard strong {
   display: block;
   margin-top: 0.1rem;
-  color: #f8fafc;
+  color: var(--ink);
   font-size: 1.8rem;
   line-height: 1.1;
   overflow-wrap: anywhere;
@@ -267,7 +256,7 @@
 .statContent small {
   display: block;
   margin-top: 0.25rem;
-  color: #777287;
+  color: var(--muted);
   font-size: 0.75rem;
   line-height: 1.35;
 }
@@ -280,10 +269,10 @@
 
 .subjectSection,
 .quickPanel {
-  border: 1px solid rgba(124, 92, 252, 0.18);
+  border: 1px solid var(--rule);
   border-radius: 26px;
   padding: 1.4rem;
-  background: rgba(13, 11, 26, 0.78);
+  background: var(--sheet);
 }
 
 .sectionHeader {
@@ -296,7 +285,7 @@
 
 .sectionHeader span,
 .quickEyebrow {
-  color: #8b5cf6;
+  color: var(--accent);
   font-size: 0.7rem;
   font-weight: 900;
   letter-spacing: 0.09em;
@@ -306,13 +295,13 @@
 .sectionHeader h2,
 .quickPanel h2 {
   margin: 0.25rem 0 0;
-  color: #f8fafc;
+  color: var(--ink);
   font-size: 1.25rem;
 }
 
 .sectionHeader button {
   border: 0;
-  color: #a78bfa;
+  color: var(--accent);
   background: transparent;
   cursor: pointer;
   font-size: 0.78rem;
@@ -331,11 +320,11 @@
   display: grid;
   justify-items: start;
   gap: 0.4rem;
-  border: 1px solid rgba(196, 181, 253, 0.1);
+  border: 1px solid var(--rule);
   border-radius: 18px;
   padding: 1rem;
-  color: #f8fafc;
-  background: rgba(255, 255, 255, 0.025);
+  color: var(--ink);
+  background: var(--inset);
   cursor: pointer;
   text-align: left;
   transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
@@ -343,16 +332,16 @@
 
 .subjectCard:hover {
   transform: translateY(-2px);
-  border-color: rgba(167, 139, 250, 0.42);
-  background: rgba(124, 92, 252, 0.08);
+  border-color: var(--rule);
+  background: var(--accent-soft);
 }
 
 .subjectIcon {
   width: 2.5rem;
   height: 2.5rem;
   margin-bottom: 0.55rem;
-  color: #ddd6fe;
-  background: rgba(124, 92, 252, 0.14);
+  color: var(--ink);
+  background: var(--accent-soft);
 }
 
 .subjectCard strong {
@@ -362,7 +351,7 @@
 }
 
 .subjectCard small {
-  color: #777287;
+  color: var(--muted);
   font-size: 0.7rem;
 }
 
@@ -370,7 +359,7 @@
   position: absolute;
   right: 0.8rem;
   top: 0.8rem;
-  color: #8b5cf6;
+  color: var(--accent);
 }
 
 .quickPanel {
@@ -392,9 +381,9 @@
 .progressSnapshot div {
   min-width: 0;
   padding: 0.75rem 0.5rem;
-  border: 1px solid rgba(196, 181, 253, 0.1);
+  border: 1px solid var(--rule);
   border-radius: 14px;
-  background: rgba(124, 92, 252, 0.06);
+  background: var(--accent-soft);
   text-align: center;
 }
 
@@ -404,13 +393,13 @@
 }
 
 .progressSnapshot strong {
-  color: #f8fafc;
+  color: var(--ink);
   font-size: 1.05rem;
 }
 
 .progressSnapshot span {
   margin-top: 0.2rem;
-  color: #777287;
+  color: var(--muted);
   font-size: 0.75rem;
   font-weight: 700;
 }
@@ -420,70 +409,14 @@
   justify-content: space-between;
   gap: 1rem;
   border: 0;
-  border-top: 1px solid rgba(196, 181, 253, 0.1);
+  border-top: 1px solid var(--rule);
   padding: 1rem 0;
-  color: #c4b5fd;
+  color: var(--ink);
   background: transparent;
   cursor: pointer;
   text-align: left;
   font-size: 0.8rem;
   font-weight: 700;
-}
-
-:global([data-theme='light']) .heroPanel {
-  color: #fff;
-  background:
-    radial-gradient(circle at 75% 0%, rgba(255, 255, 255, 0.32), transparent 30%),
-    linear-gradient(140deg, #5836bf 0%, #7552de 50%, #8b5cf6 100%);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2),
-    0 28px 65px rgba(91, 57, 165, 0.22);
-}
-
-:global([data-theme='light']) .statCard,
-:global([data-theme='light']) .subjectSection,
-:global([data-theme='light']) .quickPanel {
-  border-color: rgba(109, 74, 204, 0.13);
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 14px 35px rgba(82, 51, 151, 0.08);
-}
-
-:global([data-theme='light']) .statCard p,
-:global([data-theme='light']) .subjectCard small,
-:global([data-theme='light']) .progressSnapshot span {
-  color: #746a8c;
-}
-
-:global([data-theme='light']) .statCard strong,
-:global([data-theme='light']) .sectionHeader h2,
-:global([data-theme='light']) .quickPanel h2,
-:global([data-theme='light']) .subjectCard strong,
-:global([data-theme='light']) .progressSnapshot strong {
-  color: #2d1b5d;
-}
-
-:global([data-theme='light']) .subjectCard {
-  color: #2d1b5d;
-  border-color: rgba(109, 74, 204, 0.12);
-  background: linear-gradient(145deg, #fff, #faf8ff);
-  box-shadow: 0 8px 24px rgba(82, 51, 151, 0.05);
-}
-
-:global([data-theme='light']) .subjectCard:hover {
-  border-color: rgba(109, 74, 204, 0.3);
-  background: #f5f0ff;
-  box-shadow: 0 12px 28px rgba(82, 51, 151, 0.1);
-}
-
-:global([data-theme='light']) .subjectIcon,
-:global([data-theme='light']) .progressSnapshot div {
-  color: #6d4acc;
-  border-color: rgba(109, 74, 204, 0.12);
-  background: rgba(124, 92, 252, 0.09);
-}
-
-:global([data-theme='light']) .quickPanel button {
-  color: #5b3eaa;
-  border-top-color: rgba(109, 74, 204, 0.11);
 }
 
 @media (max-width: 980px) {
@@ -550,7 +483,7 @@
   }
 
   .statCard p {
-    color: #c4b5fd;
+    color: var(--ink);
     font-size: 0.75rem;
   }
 

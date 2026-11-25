@@ -4,11 +4,58 @@
   box-sizing: border-box;
 }
 
+/* ── Colour tokens: "Exam Paper" ─────────────────────────────
+   One palette for the whole app, taken from the exam hall: answer-sheet
+   white, ink-navy text, ballpoint-blue actions, a green tick for correct
+   and margin red for wrong. Use these variables, never raw colours.
+   Text pairs meet WCAG AA (4.5:1); --rule-strong meets 3:1 for field edges. */
 :root {
-  color-scheme: dark;
+  color-scheme: light;
+
+  /* surfaces */
+  --paper: #f4f6fa;        /* page background */
+  --sheet: #ffffff;        /* cards, answer sheets */
+  --inset: #eef2f8;        /* wells, hover rows, table headers */
+  --cover: #14213d;        /* exam-booklet cover: auth panel, dashboard hero */
+  --rule-on-cover: rgba(255, 255, 255, 0.2);
+
+  /* lines */
+  --rule: #d8dee9;         /* hairline borders between areas */
+  --rule-strong: #7f8ba5;  /* outlines of inputs and unselected answer bubbles */
+
+  /* text */
+  --ink: #14213d;          /* headings and body */
+  --ink-2: #33405e;        /* secondary text */
+  --muted: #5b6782;        /* hints, labels, timestamps */
+  --on-accent: #ffffff;    /* text on blue, green, red and cover */
+  --on-cover-muted: #b9c4da;
+
+  /* ballpoint blue: actions, selection, focus */
+  --accent: #2b59c3;
+  --accent-strong: #2148a3;
+  --accent-soft: #e8eefb;
+  --accent-on-cover: #9db7f0;
+
+  /* marking */
+  --correct: #1e8e5a;      /* rings and borders */
+  --correct-ink: #17784b;  /* text and filled bubbles */
+  --correct-soft: #e4f4ec;
+  --wrong: #d94848;
+  --wrong-ink: #b83434;
+  --wrong-soft: #fbe8e8;
+  --skip: #c98300;
+  --skip-ink: #9a5b00;
+  --skip-soft: #fdf1dc;
+
+  /* depth: soft ink shadows, no coloured glows */
+  --shadow-sm: 0 1px 2px rgba(20, 33, 61, 0.06), 0 1px 1px rgba(20, 33, 61, 0.04);
+  --shadow-md: 0 6px 20px rgba(20, 33, 61, 0.08), 0 1px 3px rgba(20, 33, 61, 0.05);
+  --focus-tint: rgba(43, 89, 195, 0.22);
+  --scrim: rgba(20, 33, 61, 0.45);
+
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #0d0b1a;
-  color: #e2e8f0;
+  background: var(--paper);
+  color: var(--ink);
 }
 
 html, body, #root {
@@ -17,11 +64,8 @@ html, body, #root {
 
 body {
   margin: 0;
-  background:
-    radial-gradient(circle at top left,     rgba(124, 92, 252, 0.18), transparent 30%),
-    radial-gradient(circle at bottom right, rgba(79,  52, 210, 0.12), transparent 32%),
-    linear-gradient(180deg, #0d0b1a 0%, #060412 100%);
-  color: #e2e8f0;
+  background: var(--paper);
+  color: var(--ink);
 }
 
 button, input, select, textarea {
@@ -37,12 +81,17 @@ button:focus-visible,
 a:focus-visible,
 [role='radio']:focus-visible,
 [tabindex]:not([tabindex='-1']):focus-visible {
-  outline: 2px solid #c4b5fd;
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
 
 input, select, textarea {
-  color: #ede9ff;
+  color: var(--ink);
+}
+
+::placeholder {
+  color: var(--muted);
+  opacity: 1;
 }
 
 html {
@@ -74,7 +123,8 @@ textarea {
 }
 
 ::selection {
-  background: rgba(124, 92, 252, 0.35);
+  background: var(--accent-soft);
+  color: var(--ink);
 }
 
 .sr-only {
@@ -148,12 +198,12 @@ video {
   }
 }
 select {
-  color: #f8fafc;
-  background-color: #0f172a;
-  color-scheme: dark;
+  color: var(--ink);
+  background-color: var(--sheet);
+  color-scheme: light;
 }
 
 select option {
-  color: #f8fafc;
-  background-color: #0f172a;
+  color: var(--ink);
+  background-color: var(--sheet);
 }

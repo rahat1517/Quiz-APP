@@ -1,9 +1,9 @@
 .profileCard {
   padding: 2rem;
   border-radius: 28px;
-  background: rgba(15, 23, 42, 0.88);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #e2e8f0;
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  color: var(--ink);
 }
 
 .headerRow {
@@ -23,17 +23,17 @@
 
 .profileInput {
   width: 100%;
-  border: 1px solid rgba(148, 163, 184, 0.4);
+  border: 1px solid var(--rule-strong);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--sheet);
   padding: 0.85rem 1rem;
-  color: #f8fafc;
+  color: var(--ink);
 }
 
 .profileInput:focus {
   outline: none;
-  border-color: rgba(96, 165, 250, 0.7);
-  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.12);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-tint);
 }
 
 .editButton,
@@ -49,13 +49,13 @@
 
 .editButton,
 .saveButton {
-  background: rgba(59, 130, 246, 0.2);
-  color: #f8fafc;
+  background: var(--accent-soft);
+  color: var(--ink);
 }
 
 .cancelButton {
-  background: rgba(255, 255, 255, 0.08);
-  color: #cbd5e1;
+  background: var(--inset);
+  color: var(--ink);
 }
 
 .editButton:hover,
@@ -70,7 +70,7 @@
 
 .subtitle {
   margin: 0;
-  color: #94a3b8;
+  color: var(--muted);
 }
 
 .summaryGrid {
@@ -84,14 +84,14 @@
 .performanceBox {
   padding: 1.4rem;
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--inset);
+  border: 1px solid var(--rule);
 }
 
 .profileInfo h3,
 .performanceBox h3 {
   margin: 0 0 1rem;
-  color: #f8fafc;
+  color: var(--ink);
 }
 
 .profileInfo dl {
@@ -101,13 +101,13 @@
 
 .profileInfo dt {
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: var(--muted);
 }
 
 .profileInfo dd {
   margin: 0;
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--ink);
 }
 
 .metricRow {
@@ -123,12 +123,12 @@
 }
 
 .metricRow span {
-  color: #94a3b8;
+  color: var(--muted);
 }
 
 .metricRow strong {
   font-size: 1.2rem;
-  color: #f8fafc;
+  color: var(--ink);
 }
 
 .recentSection h3 {
@@ -143,8 +143,8 @@
 .historyItem {
   padding: 1rem;
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--inset);
+  border: 1px solid var(--rule);
 }
 
 .historyHeader {
@@ -152,7 +152,7 @@
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 0.8rem;
-  color: #dbeafe;
+  color: var(--ink);
   align-items: center;
 }
 
@@ -168,9 +168,9 @@
   gap: 0.35rem;
   padding: 0.35rem 0.7rem;
   border-radius: 999px;
-  background: rgba(134, 239, 172, 0.16);
-  color: #dcfce7;
-  border: 1px solid rgba(84, 211, 148, 0.24);
+  background: var(--correct-soft);
+  color: var(--correct-ink);
+  border: 1px solid var(--correct);
   font-size: 0.75rem;
   font-weight: 700;
 }
@@ -182,8 +182,8 @@
   min-width: 3.2rem;
   padding: 0.35rem 0.65rem;
   border-radius: 999px;
-  background: rgba(59, 130, 246, 0.2);
-  color: #f8fafc;
+  background: var(--accent-soft);
+  color: var(--ink);
   font-size: 0.95rem;
   font-weight: 700;
 }
@@ -193,26 +193,26 @@
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.85rem;
-  color: #cbd5e1;
+  color: var(--ink);
 }
 
 .historyGrid span {
   display: block;
-  color: #94a3b8;
+  color: var(--muted);
   font-size: 0.75rem;
 }
 
 .empty {
-  color: #94a3b8;
+  color: var(--muted);
 }
 
 .statusBanner {
   margin: 1rem 0;
   padding: 1rem 1.1rem;
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #cbd5e1;
+  background: var(--inset);
+  border: 1px solid var(--rule);
+  color: var(--ink);
 }
 
 .classAssignField {
@@ -223,11 +223,11 @@
 }
 
 .classAssignField select {
-  border: 1px solid rgba(96, 165, 250, 0.3);
+  border: 1px solid var(--rule-strong);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--sheet);
   padding: 0.6rem 0.85rem;
-  color: #f8fafc;
+  color: var(--ink);
   cursor: pointer;
   font-size: 0.9rem;
   flex: 1;
@@ -236,13 +236,13 @@
 
 .classAssignField select:focus {
   outline: none;
-  border-color: rgba(96, 165, 250, 0.6);
-  background: rgba(96, 165, 250, 0.08);
+  border-color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .classAssignField select option {
-  background: #1e293b;
-  color: #f8fafc;
+  background: var(--sheet);
+  color: var(--ink);
 }
 
 .assignButton {
@@ -250,15 +250,15 @@
   border-radius: 12px;
   padding: 0.6rem 0.85rem;
   font-size: 0.9rem;
-  background: rgba(168, 85, 247, 0.2);
-  color: #ddd6fe;
+  background: var(--accent-soft);
+  color: var(--ink);
   cursor: pointer;
   transition: background 150ms ease, transform 150ms ease;
   min-width: auto;
 }
 
 .assignButton:hover {
-  background: rgba(168, 85, 247, 0.3);
+  background: var(--accent-soft);
   transform: translateY(-1px);
 }
 

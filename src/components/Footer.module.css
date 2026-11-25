@@ -1,10 +1,10 @@
 .footer {
   margin-top: 3rem;
   padding: 1.5rem 1.25rem 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  color: #94a3b8;
+  border-top: 1px solid var(--rule);
+  color: var(--muted);
   font-size: 0.9rem;
-  background: rgba(15, 23, 42, 0.4);
+  background: var(--sheet);
 }
 
 .footerContent {
@@ -33,43 +33,23 @@
 }
 
 .copyright {
-  color: #cbd5e1;
+  color: var(--ink);
   font-size: 0.9rem;
 }
 
 .copyright strong {
-  color: #a78bfa;
+  color: var(--accent);
   font-weight: 600;
 }
 
 .honorName {
-  color: #f1f5f9;
+  color: var(--ink);
   font-weight: 600;
   font-size: 0.9rem;
-  background: rgba(168, 139, 250, 0.08);
+  background: var(--accent-soft);
   padding: 0.4rem 0.75rem;
   border-radius: 8px;
   display: inline-block;
-}
-
-/* Light mode adjustments */
-:global([data-theme='light']) .footer {
-  background: rgba(255, 255, 255, 0.4);
-  border-top-color: rgba(109, 74, 204, 0.1);
-  color: #6b6380;
-}
-
-:global([data-theme='light']) .copyright {
-  color: #35245f;
-}
-
-:global([data-theme='light']) .copyright strong {
-  color: #7c3aed;
-}
-
-:global([data-theme='light']) .honorName {
-  color: #35245f;
-  background: rgba(124, 92, 252, 0.1);
 }
 
 /* Mobile responsive */

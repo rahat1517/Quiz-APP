@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(5, 4, 14, 0.72);
+  background: var(--scrim);
   backdrop-filter: blur(8px);
 }
 
@@ -14,11 +14,11 @@
   width: min(410px, calc(100% - 2rem));
   padding: 1.5rem;
   transform: translate(-50%, -50%);
-  border: 1px solid rgba(196, 181, 253, 0.18);
+  border: 1px solid var(--rule);
   border-radius: 24px;
-  color: #f8fafc;
-  background: #100d20;
-  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
+  color: var(--ink);
+  background: var(--sheet);
+  box-shadow: var(--shadow-md);
   text-align: center;
 }
 
@@ -29,13 +29,13 @@
   height: 3rem;
   margin: 0 auto;
   border-radius: 20px;
-  color: #fff;
-  background: linear-gradient(135deg, #8b5cf6, #5b3fd0);
+  color: var(--on-accent);
+  background: var(--accent);
   font-weight: 900;
 }
 
 .iconDanger {
-  background: linear-gradient(135deg, #f43f5e, #be123c);
+  background: var(--wrong-ink);
 }
 
 .title {
@@ -45,7 +45,7 @@
 
 .description {
   margin: 0;
-  color: #a8a3bf;
+  color: var(--muted);
   line-height: 1.6;
 }
 
@@ -66,21 +66,21 @@
 }
 
 .cancelButton {
-  color: #c4b5fd;
-  background: rgba(124, 92, 252, 0.12);
+  color: var(--ink);
+  background: var(--accent-soft);
 }
 
 .cancelButton:hover {
-  background: rgba(124, 92, 252, 0.2);
+  background: var(--accent-soft);
 }
 
 .confirmButton {
-  color: #fff;
-  background: linear-gradient(135deg, #8b5cf6, #5b3fd0);
+  color: var(--on-accent);
+  background: var(--accent);
 }
 
 .confirmButton.danger {
-  background: linear-gradient(135deg, #f43f5e, #be123c);
+  background: var(--wrong-ink);
 }
 
 @media (max-width: 420px) {

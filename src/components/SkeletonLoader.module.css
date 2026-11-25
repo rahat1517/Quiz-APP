@@ -8,8 +8,8 @@
   min-height: 200px;
   border-radius: 28px;
   padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--inset);
+  border: 1px solid var(--rule);
   overflow: hidden;
   position: relative;
 }
@@ -18,7 +18,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0) 100%);
+  background: var(--inset);
   animation: shimmer 1.4s infinite ease;
 }
 
@@ -27,7 +27,7 @@
 .lineShort,
 .button {
   position: relative;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--inset);
   border-radius: 999px;
 }
 

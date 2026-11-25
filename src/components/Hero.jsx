@@ -78,7 +78,6 @@ export default function Hero({
           <span className={styles.challengeAction}>Start challenge →</span>
         </Button>
 
-        <div className={styles.heroAccent} />
       </div>
 
       <div className={styles.statsGrid}>

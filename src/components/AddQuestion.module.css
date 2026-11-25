@@ -1,11 +1,10 @@
 .card {
-  background: rgba(13, 11, 26, 0.88);
-  border: 1px solid rgba(124, 92, 252, 0.18);
+  background: var(--sheet);
+  border: 1px solid var(--rule);
   border-radius: 32px;
   padding: 2rem;
-  color: #e2e8f0;
-  box-shadow: 0 30px 90px rgba(13, 11, 26, 0.32),
-              inset 0 0 0 1px rgba(124, 92, 252, 0.06);
+  color: var(--ink);
+  box-shadow: var(--shadow-md);
 }
 
 .headerRow {
@@ -19,22 +18,19 @@
 .headerRow h2 {
   margin: 0 0 0.5rem;
   font-size: clamp(1.75rem, 2.8vw, 2.4rem);
-  background: linear-gradient(135deg, #c4b5fd 0%, #7c5cfc 60%, #a78bfa 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--ink);
 }
 
 .headerRow p {
   margin: 0;
-  color: #a78bfa;
+  color: var(--muted);
   max-width: 52ch;
 }
 
 .statusBadge {
-  background: rgba(124, 92, 252, 0.16);
-  color: #ede9ff;
-  border: 1px solid rgba(124, 92, 252, 0.28);
+  background: var(--accent-soft);
+  color: var(--ink);
+  border: 1px solid var(--rule);
   padding: 0.8rem 1rem;
   border-radius: 999px;
   font-weight: 700;
@@ -54,8 +50,8 @@
 }
 
 .panelBlock {
-  background: rgba(13, 11, 26, 0.95);
-  border: 1px solid rgba(124, 92, 252, 0.14);
+  background: var(--sheet);
+  border: 1px solid var(--rule);
   border-radius: 28px;
   padding: 1.35rem 1.5rem;
 }
@@ -63,12 +59,12 @@
 .panelBlock h3 {
   margin: 0 0 0.75rem;
   font-size: 1rem;
-  color: #ede9ff;
+  color: var(--ink);
 }
 
 .panelBlock p {
   margin: 0;
-  color: #c4b5fd;
+  color: var(--ink);
   line-height: 1.7;
 }
 
@@ -85,15 +81,15 @@
   gap: 0.6rem;
   border-radius: 999px;
   padding: 0.65rem 0.9rem;
-  background: rgba(124, 92, 252, 0.10);
-  border: 1px solid rgba(124, 92, 252, 0.18);
-  color: #ede9ff;
+  background: var(--accent-soft);
+  border: 1px solid var(--rule);
+  color: var(--ink);
   font-size: 0.95rem;
 }
 
 .previewCard {
-  background: rgba(124, 92, 252, 0.04);
-  border: 1px solid rgba(124, 92, 252, 0.14);
+  background: var(--accent-soft);
+  border: 1px solid var(--rule);
   border-radius: 24px;
   padding: 1.4rem;
   min-height: 220px;
@@ -104,13 +100,13 @@
   align-items: center;
   gap: 0.55rem;
   margin-bottom: 1rem;
-  color: #c4b5fd;
+  color: var(--ink);
   font-size: 0.95rem;
 }
 
 .previewQuestion {
   margin: 0 0 1rem;
-  color: #ede9ff;
+  color: var(--ink);
   font-size: 1rem;
   line-height: 1.6;
 }
@@ -118,13 +114,13 @@
 .previewCard ol {
   margin: 0;
   padding-left: 1.2rem;
-  color: #c4b5fd;
+  color: var(--ink);
   display: grid;
   gap: 0.55rem;
 }
 
 .previewCorrect {
-  color: #a7f3d0;
+  color: var(--correct-ink);
   font-weight: 700;
 }
 
@@ -156,7 +152,7 @@
 }
 
 .subjectCaption small {
-  color: #a78bfa;
+  color: var(--accent);
 }
 
 .subjectCardGrid {
@@ -166,9 +162,9 @@
 }
 
 .subjectChoice {
-  border: 1px solid rgba(124, 92, 252, 0.18);
-  background: rgba(124, 92, 252, 0.06);
-  color: #ede9ff;
+  border: 1px solid var(--rule);
+  background: var(--accent-soft);
+  color: var(--ink);
   border-radius: 18px;
   padding: 0.95rem 1rem;
   cursor: pointer;
@@ -180,18 +176,18 @@
 }
 
 .subjectChoice:hover {
-  background: rgba(124, 92, 252, 0.18);
-  border-color: rgba(167, 139, 250, 0.45);
+  background: var(--accent-soft);
+  border-color: var(--accent);
 }
 
 .subjectChoice.active {
-  background: linear-gradient(135deg, rgba(124, 92, 252, 0.24), rgba(109, 60, 255, 0.26));
-  border-color: rgba(167, 139, 250, 0.60);
-  color: #ede9ff;
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--ink);
 }
 
 .fieldLabel {
-  color: #a78bfa;
+  color: var(--accent);
   font-size: 0.95rem;
   font-weight: 600;
 }
@@ -200,9 +196,9 @@
 .field textarea,
 .field select {
   width: 100%;
-  background: rgba(124, 92, 252, 0.06);
-  border: 1px solid rgba(124, 92, 252, 0.18);
-  color: #ede9ff;
+  background: var(--sheet);
+  border: 1px solid var(--rule-strong);
+  color: var(--ink);
   border-radius: 20px;
   padding: 1rem 1.15rem;
   font-size: 1rem;
@@ -218,9 +214,9 @@
 .field textarea:focus,
 .field select:focus {
   outline: none;
-  border-color: rgba(124, 92, 252, 0.65);
-  background: rgba(124, 92, 252, 0.10);
-  box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.12);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 3px var(--focus-tint);
 }
 
 .optionsGrid {
@@ -234,15 +230,15 @@
   align-items: center;
   gap: 0.65rem;
   padding: 0.35rem 0.35rem 0.35rem 0.6rem;
-  border: 1px solid rgba(124, 92, 252, 0.18);
+  border: 1px solid var(--rule-strong);
   border-radius: 18px;
-  background: rgba(124, 92, 252, 0.06);
+  background: var(--sheet);
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
 .optionBox:focus-within {
-  border-color: rgba(124, 92, 252, 0.65);
-  box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.12);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-tint);
 }
 
 .optionBadge {
@@ -256,16 +252,16 @@
   padding: 0.75rem 0.5rem;
   border: 0;
   outline: none;
-  color: #ede9ff;
+  color: var(--ink);
   background: transparent;
 }
 
 .optionInput::placeholder {
-  color: #7d7898;
+  color: var(--muted);
 }
 
 .fieldHint {
-  color: #8f8aa6;
+  color: var(--muted);
   font-size: 0.8rem;
 }
 
@@ -276,8 +272,8 @@
   width: 2rem;
   height: 2rem;
   border-radius: 999px;
-  background: rgba(124, 92, 252, 0.16);
-  color: #c4b5fd;
+  background: var(--accent-soft);
+  color: var(--ink);
   font-weight: 700;
 }
 
@@ -291,7 +287,7 @@
 .controlLabel,
 .metaLabel {
   margin: 0 0 0.75rem;
-  color: #a78bfa;
+  color: var(--accent);
   font-weight: 700;
 }
 
@@ -307,21 +303,21 @@
   gap: 0.65rem;
   padding: 0.9rem 1rem;
   border-radius: 18px;
-  border: 1px solid rgba(124, 92, 252, 0.18);
-  background: rgba(124, 92, 252, 0.04);
-  color: #ede9ff;
+  border: 1px solid var(--rule);
+  background: var(--accent-soft);
+  color: var(--ink);
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .answerOption input {
-  accent-color: #7c5cfc;
+  accent-color: var(--accent);
 }
 
 .answerOption:hover {
-  background: rgba(124, 92, 252, 0.16);
-  border-color: rgba(167, 139, 250, 0.40);
-  box-shadow: 0 0 0 3px rgba(124, 92, 252, 0.08);
+  background: var(--accent-soft);
+  border-color: var(--rule);
+  box-shadow: 0 0 0 3px var(--focus-tint);
 }
 
 .answerOption span {
@@ -329,15 +325,15 @@
 }
 
 .metaPanel {
-  background: rgba(124, 92, 252, 0.05);
-  border: 1px solid rgba(124, 92, 252, 0.14);
+  background: var(--accent-soft);
+  border: 1px solid var(--rule);
   border-radius: 22px;
   padding: 1rem 1.1rem;
 }
 
 .metaPanel p {
   margin: 0;
-  color: #c4b5fd;
+  color: var(--ink);
   line-height: 1.7;
 }
 
@@ -360,24 +356,24 @@
 }
 
 .cancelButton {
-  color: #c4b5fd;
-  background: rgba(124, 92, 252, 0.08);
-  border: 1px solid rgba(124, 92, 252, 0.20);
+  color: var(--ink);
+  background: var(--accent-soft);
+  border: 1px solid var(--rule);
 }
 
 .cancelButton:hover {
-  background: rgba(124, 92, 252, 0.14);
-  border-color: rgba(167, 139, 250, 0.36);
+  background: var(--accent-soft);
+  border-color: var(--rule);
 }
 
 .submitButton {
-  color: #fff;
-  background: linear-gradient(135deg, #7c5cfc, #4f34d4);
-  box-shadow: 0 20px 40px rgba(124, 92, 252, 0.28);
+  color: var(--on-accent);
+  background: var(--accent);
+  box-shadow: var(--shadow-md);
 }
 
 .submitButton:hover {
-  box-shadow: 0 24px 50px rgba(124, 92, 252, 0.38);
+  box-shadow: var(--shadow-md);
   transform: translateY(-1px);
 }
 
@@ -392,18 +388,18 @@
   padding: 1rem 1.1rem;
   border-radius: 18px;
   border: 1px solid transparent;
-  background: rgba(124, 92, 252, 0.06);
-  color: #c4b5fd;
+  background: var(--accent-soft);
+  color: var(--ink);
 }
 
 .success {
-  border-color: rgba(34, 197, 94, 0.22);
-  color: #86efac;
+  border-color: var(--correct);
+  color: var(--correct-ink);
 }
 
 .error {
-  border-color: rgba(248, 113, 113, 0.22);
-  color: #fca5a5;
+  border-color: var(--wrong);
+  color: var(--wrong-ink);
 }
 
 @media (max-width: 960px) {
@@ -495,35 +491,35 @@
   resize: vertical;
   border-radius: 14px;
   padding: 12px 14px;
-  color: #f8fafc;
-  background: #0f172a;
-  border: 1px solid rgba(148, 163, 184, 0.45);
+  color: var(--ink);
+  background: var(--sheet);
+  border: 1px solid var(--rule-strong);
   outline: none;
   font: inherit;
   line-height: 1.5;
 }
 
 .field textarea:focus {
-  border-color: #38bdf8;
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-tint);
 }
 
 .field textarea::placeholder {
-  color: #64748b;
+  color: var(--muted);
 }
 
 .previewExplanation {
   margin-top: 12px;
   padding: 12px;
   border-radius: 14px;
-  background: rgba(30, 41, 59, 0.72);
-  border: 1px solid rgba(56, 189, 248, 0.35);
+  background: var(--sheet);
+  border: 1px solid var(--rule);
 }
 
 .previewExplanation span {
   display: block;
   margin-bottom: 6px;
-  color: #7dd3fc;
+  color: var(--accent);
   font-size: 12px;
   font-weight: 900;
   text-transform: uppercase;
@@ -531,7 +527,7 @@
 
 .previewExplanation p {
   margin: 0;
-  color: #e0f2fe;
+  color: var(--ink);
   line-height: 1.5;
   word-break: break-word;
   overflow-wrap: anywhere;

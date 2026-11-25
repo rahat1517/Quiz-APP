@@ -5,8 +5,8 @@
   place-items: center;
   overflow: hidden;
   padding: 2rem;
-  color: #f8fafc;
-  background: #070611;
+  color: var(--ink);
+  background: var(--paper);
 }
 
 .backgroundGlowOne,
@@ -18,18 +18,19 @@
   filter: blur(90px);
   pointer-events: none;
   opacity: 0.32;
+  display: none; /* flat paper page: no decorative glows */
 }
 
 .backgroundGlowOne {
   top: -16rem;
   left: -10rem;
-  background: #7c3aed;
+  background: var(--accent);
 }
 
 .backgroundGlowTwo {
   right: -15rem;
   bottom: -18rem;
-  background: #2563eb;
+  background: var(--accent);
 }
 
 .authCard {
@@ -40,10 +41,10 @@
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(420px, 0.95fr);
   overflow: hidden;
-  border: 1px solid rgba(196, 181, 253, 0.18);
+  border: 1px solid var(--rule);
   border-radius: 32px;
-  background: rgba(11, 10, 24, 0.88);
-  box-shadow: 0 35px 100px rgba(0, 0, 0, 0.48);
+  background: var(--sheet);
+  box-shadow: var(--shadow-md);
   backdrop-filter: blur(24px);
 }
 
@@ -54,16 +55,16 @@
   justify-content: space-between;
   padding: clamp(2rem, 5vw, 4.5rem);
   overflow: hidden;
-  background:
-    radial-gradient(circle at 85% 15%, rgba(196, 181, 253, 0.2), transparent 26%),
-    linear-gradient(145deg, #6d3df5 0%, #4f34d4 50%, #251463 100%);
+  /* the exam-booklet cover */
+  color: var(--on-accent);
+  background: var(--cover);
 }
 
 .brandPanel::before,
 .brandPanel::after {
   content: '';
   position: absolute;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--rule-on-cover);
   border-radius: 999px;
   pointer-events: none;
 }
@@ -87,7 +88,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: #fff;
+  color: var(--on-accent);
   font-size: 1.05rem;
   font-weight: 900;
   letter-spacing: 0.02em;
@@ -99,11 +100,11 @@
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--rule);
   border-radius: 14px;
-  color: #4f34d4;
-  background: #fff;
-  box-shadow: 0 12px 25px rgba(30, 15, 80, 0.25);
+  color: var(--accent);
+  background: var(--sheet);
+  box-shadow: none;
 }
 
 .brandContent {
@@ -125,14 +126,14 @@
 }
 
 .eyebrow {
-  color: #ede9fe;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--on-accent);
+  background: transparent;
+  border: 1px solid var(--rule-on-cover);
 }
 
 .brandContent h1 {
   margin: 1.25rem 0 1rem;
-  color: #fff;
+  color: var(--on-accent);
   font-size: clamp(2.75rem, 5vw, 4.75rem);
   line-height: 0.98;
   letter-spacing: -0.055em;
@@ -141,7 +142,7 @@
 .brandContent p {
   margin: 0;
   max-width: 28rem;
-  color: rgba(237, 233, 254, 0.82);
+  color: var(--on-cover-muted);
   line-height: 1.75;
 }
 
@@ -160,7 +161,7 @@
 }
 
 .benefits span {
-  color: #ddd6fe;
+  color: var(--accent-on-cover);
   font-size: 0.7rem;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -169,7 +170,7 @@
 .benefits p,
 .brandFooter {
   margin: 0;
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--on-accent);
   font-size: 0.87rem;
 }
 
@@ -177,7 +178,7 @@
   position: relative;
   z-index: 1;
   margin-top: 2rem;
-  color: rgba(255, 255, 255, 0.56);
+  color: var(--on-cover-muted);
 }
 
 .formPanel {
@@ -185,13 +186,13 @@
   flex-direction: column;
   justify-content: center;
   padding: clamp(2rem, 5vw, 4.5rem);
-  background:
-    radial-gradient(circle at top right, rgba(124, 92, 252, 0.1), transparent 30%),
-    rgba(10, 9, 22, 0.92);
+  background: var(--sheet);
 }
 
+/* shown on phones, on the white form panel */
 .mobileBrand {
   display: none;
+  color: var(--ink);
 }
 
 .viewTabs {
@@ -200,25 +201,25 @@
   gap: 0.35rem;
   margin-bottom: 2.2rem;
   padding: 0.3rem;
-  border: 1px solid rgba(196, 181, 253, 0.12);
+  border: 1px solid var(--rule);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--inset);
 }
 
 .viewTabs button {
   min-height: 42px;
   border: 0;
   border-radius: 10px;
-  color: #8f8aa6;
+  color: var(--muted);
   background: transparent;
   cursor: pointer;
   font-weight: 800;
 }
 
 .viewTabs button.activeTab {
-  color: #fff;
-  background: rgba(124, 92, 252, 0.22);
-  box-shadow: inset 0 0 0 1px rgba(167, 139, 250, 0.22);
+  color: var(--ink);
+  background: var(--accent-soft);
+  box-shadow: var(--shadow-sm);
 }
 
 .authHeader {
@@ -227,12 +228,12 @@
 
 .welcomeIcon {
   padding-left: 0;
-  color: #a78bfa;
+  color: var(--accent);
 }
 
 .authHeader h2 {
   margin: 0.65rem 0 0.45rem;
-  color: #f8fafc;
+  color: var(--ink);
   font-size: clamp(2rem, 4vw, 2.75rem);
   line-height: 1.05;
   letter-spacing: -0.04em;
@@ -240,7 +241,7 @@
 
 .authHeader p {
   margin: 0;
-  color: #8f8aa6;
+  color: var(--muted);
   line-height: 1.65;
 }
 
@@ -255,7 +256,7 @@
 }
 
 .fieldLabel {
-  color: #c4b5fd;
+  color: var(--ink);
   font-size: 0.82rem;
   font-weight: 800;
 }
@@ -269,7 +270,7 @@
   left: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #7c5cfc;
+  color: var(--accent);
   font-weight: 900;
   pointer-events: none;
 }
@@ -278,11 +279,11 @@
 .authSelect {
   width: 100%;
   min-height: 54px;
-  border: 1px solid rgba(196, 181, 253, 0.14);
+  border: 1px solid var(--rule-strong);
   border-radius: 14px;
   padding: 0.85rem 1rem;
-  color: #f8fafc;
-  background: rgba(255, 255, 255, 0.035);
+  color: var(--ink);
+  background: var(--sheet);
   transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
 }
 
@@ -292,19 +293,19 @@
 }
 
 .authForm input::placeholder {
-  color: #625d75;
+  color: var(--muted);
 }
 
 .authForm input:focus,
 .authSelect:focus {
   outline: none;
-  border-color: #8b5cf6;
-  background: rgba(124, 92, 252, 0.07);
-  box-shadow: 0 0 0 4px rgba(124, 92, 252, 0.12);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 4px var(--focus-tint);
 }
 
 .authSelect {
-  color-scheme: dark;
+  color-scheme: light;
   cursor: pointer;
 }
 
@@ -317,7 +318,7 @@
   min-width: 44px;
   border: 0;
   padding: 0.35rem 0.55rem;
-  color: #a78bfa;
+  color: var(--accent);
   background: transparent;
   cursor: pointer;
   font-size: 0.75rem;
@@ -333,9 +334,9 @@
   border: 0;
   border-radius: 14px;
   padding: 0.9rem 1.2rem;
-  color: #fff;
-  background: linear-gradient(135deg, #8b5cf6, #5b3fd0);
-  box-shadow: 0 16px 32px rgba(91, 63, 208, 0.28);
+  color: var(--on-accent);
+  background: var(--accent);
+  box-shadow: var(--shadow-md);
   cursor: pointer;
   font-weight: 900;
   transition: transform 160ms ease, box-shadow 160ms ease;
@@ -343,7 +344,7 @@
 
 .authSubmit:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 20px 38px rgba(91, 63, 208, 0.38);
+  box-shadow: var(--shadow-md);
 }
 
 .authSubmit:disabled {
@@ -358,15 +359,15 @@
 }
 
 .success {
-  color: #a7f3d0;
-  border: 1px solid rgba(34, 197, 94, 0.22);
-  background: rgba(34, 197, 94, 0.1);
+  color: var(--correct-ink);
+  border: 1px solid var(--correct);
+  background: var(--correct-soft);
 }
 
 .error {
-  color: #fecaca;
-  border: 1px solid rgba(248, 113, 113, 0.22);
-  background: rgba(248, 113, 113, 0.1);
+  color: var(--wrong-ink);
+  border: 1px solid var(--wrong);
+  background: var(--wrong-soft);
 }
 
 .resendRow {
@@ -376,7 +377,7 @@
 .resendButton {
   border: 0;
   padding: 0;
-  color: #c4b5fd;
+  color: var(--ink);
   background: transparent;
   cursor: pointer;
   font-size: 0.8rem;
@@ -390,7 +391,7 @@
   flex-wrap: wrap;
   align-items: center;
   margin: 0.4rem 0 0;
-  color: #9a95ad;
+  color: var(--muted);
   font-size: 0.82rem;
   text-align: center;
 }
@@ -400,7 +401,7 @@
   min-height: 44px;
   border: 0;
   padding: 0 0.35rem;
-  color: #a78bfa;
+  color: var(--accent);
   background: transparent;
   cursor: pointer;
   font-size: inherit;
@@ -437,7 +438,7 @@
   .authShell {
     place-items: start center;
     padding: 0;
-    background: #090814;
+    background: var(--sheet);
   }
 
   .authCard {
