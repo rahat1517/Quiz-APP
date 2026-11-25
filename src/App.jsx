@@ -978,6 +978,13 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
         isAdmin={isAdmin}
       />
 
+      <TabNav
+        activeTab={activeTab}
+        onChange={handleTabChange}
+        variant="bottom"
+        isAdmin={isAdmin}
+      />
+
       <Toast toast={toast} />
     </div>
   );

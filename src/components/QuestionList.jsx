@@ -1,5 +1,6 @@
 ﻿import { useMemo, useState } from 'react';
 import styles from './QuestionBank.module.css';
+import { Button } from './ui/Button';
 import { getSubjectBadgeStyle } from '../lib/subjectColors';
 import { normalizeChapter } from '../lib/normalizeChapter';
 
@@ -41,7 +42,8 @@ export default function QuestionList({
   }
 
   function getOptionClass(question, optionKey) {
-    return String(question.correct_answer || '').toUpperCase() === optionKey
+    // Only admins see the answer key; students would otherwise get every answer in advance.
+    return isAdmin && String(question.correct_answer || '').toUpperCase() === optionKey
       ? `${styles.optionRow} ${styles.correctOption}`
       : styles.optionRow;
   }
@@ -142,9 +144,11 @@ export default function QuestionList({
 
                   <span>Class / Exam: {question.class_level || 'N/A'}</span>
                   <span>Chapter: {chapterLabel}</span>
-                  <span className={styles.correctAnswerBadge}>
-                    Correct: {question.correct_answer}
-                  </span>
+                  {isAdmin && (
+                    <span className={styles.correctAnswerBadge}>
+                      Correct: {question.correct_answer}
+                    </span>
+                  )}
                 </div>
 
                 <div className={styles.optionList}>
@@ -169,7 +173,7 @@ export default function QuestionList({
                   </p>
                 </div>
 
-                {question.explanation && (
+                {isAdmin && question.explanation && (
                   <div className={styles.explanationPreview}>
                     <strong>Explanation:</strong>
                     <p>{question.explanation}</p>

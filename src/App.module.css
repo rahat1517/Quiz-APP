@@ -27,7 +27,7 @@
   padding: 1.25rem 0 2rem 270px;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 780px) {
   .pageShell {
     padding-left: 1rem;
     padding-bottom: 110px;

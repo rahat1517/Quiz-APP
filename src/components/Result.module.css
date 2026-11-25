@@ -5,6 +5,12 @@
   overflow-x: hidden;
 }
 
+/* Grid items default to min-width: auto, so the wide history table pushed the
+   whole page past its column. Let children shrink; .tableWrapper scrolls instead. */
+.resultPage > * {
+  min-width: 0;
+}
+
 .headerRow,
 .sectionTitleRow,
 .drawerHeader,
