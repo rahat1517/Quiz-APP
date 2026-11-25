@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 export default function useQuiz({
   questions = [],
@@ -122,31 +122,35 @@ export default function useQuiz({
     durationMinutes,
   ]);
 
+  // Guards against reporting the same attempt twice (e.g. timer expiry racing a manual submit).
+  const completedRef = useRef(false);
+
+  const handleSubmit = useCallback(() => {
+    if (completedRef.current) return;
+    completedRef.current = true;
+
+    setSubmitted(true);
+    clearPersistence();
+    onComplete?.(result);
+  }, [clearPersistence, onComplete, result]);
+
+  // The interval only counts down; side effects stay out of the state updater,
+  // which React may run more than once.
   useEffect(() => {
     if (submitted || totalQuestions === 0 || !hasStarted) return undefined;
 
     const timer = window.setInterval(() => {
-      setTimeLeft((value) => {
-        if (value <= 1) {
-          setSubmitted(true);
-          clearPersistence();
-          onComplete?.(result);
-          return 0;
-        }
-
-        return value - 1;
-      });
+      setTimeLeft((value) => Math.max(0, value - 1));
     }, 1000);
 
     return () => window.clearInterval(timer);
-  }, [
-    submitted,
-    totalQuestions,
-    onComplete,
-    result,
-    hasStarted,
-    clearPersistence,
-  ]);
+  }, [submitted, totalQuestions, hasStarted]);
+
+  useEffect(() => {
+    if (timeLeft === 0 && hasStarted && !submitted && totalQuestions > 0) {
+      handleSubmit();
+    }
+  }, [timeLeft, hasStarted, submitted, totalQuestions, handleSubmit]);
 
   const answeredCount = questions.filter((question) => Boolean(answers[question.id])).length;
 
@@ -164,12 +168,6 @@ export default function useQuiz({
   const startExam = useCallback(() => {
     setHasStarted(true);
   }, []);
-
-  const handleSubmit = useCallback(() => {
-    setSubmitted(true);
-    clearPersistence();
-    onComplete?.(result);
-  }, [clearPersistence, onComplete, result]);
 
   const handleNext = useCallback(
     () => setCurrentIndex((n) => Math.min(totalQuestions - 1, n + 1)),

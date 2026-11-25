@@ -2,10 +2,10 @@
 import styles from './QuestionBank.module.css';
 import { Button } from './ui/Button';
 import ConfirmDialog from './ConfirmDialog';
-
-const PAGE_SIZE = 10;
 import { getSubjectBadgeStyle } from '../lib/subjectColors';
 import { normalizeChapter } from '../lib/normalizeChapter';
+
+const PAGE_SIZE = 10;
 
 export default function QuestionList({
   questions = [],

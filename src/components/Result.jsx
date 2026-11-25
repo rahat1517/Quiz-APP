@@ -11,15 +11,15 @@ export default function Result({
 }) {
   const [selectedExam, setSelectedExam] = useState(null);
 
-  const resultId = result?.id;
+  const currentResultId = result?.id;
 
   const displayedHistory = useMemo(() => {
-    if (!resultId) {
+    if (!currentResultId) {
       return history;
     }
 
-    return history.filter((exam) => exam.id !== resultId);
-  }, [history, resultId]);
+    return history.filter((exam) => exam.id !== currentResultId);
+  }, [history, currentResultId]);
 
   const latestResult = useMemo(() => {
     if (!result) return null;

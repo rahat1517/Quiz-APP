@@ -6,12 +6,13 @@ import { cn } from '../../lib/utils';
 const DatePicker = React.forwardRef(
   ({ className, value, onValueChange, placeholder, minDate, maxDate, open, onOpenChange, ...props }, ref) => {
     const [isOpen, setIsOpen] = React.useState(!!open);
+    const [displayValue, setDisplayValue] = React.useState(value ? formatDate(value) : '');
+    const [focusedDate] = React.useState(value ? new Date(value) : new Date());
+
     const setOpen = (next) => {
       setIsOpen(next);
       onOpenChange?.(next);
     };
-    const [displayValue, setDisplayValue] = React.useState(value ? formatDate(value) : '');
-    const [focusedDate] = React.useState(value ? new Date(value) : new Date());
 
     const handleValueChange = (date) => {
       setDisplayValue(formatDate(date));
