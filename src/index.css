@@ -31,8 +31,14 @@ button, input, select, textarea {
   letter-spacing: 0.01em;
 }
 
-button {
-  outline: none;
+/* Visible keyboard focus. Mouse clicks don't trigger :focus-visible on buttons,
+   so this only shows for keyboard users. */
+button:focus-visible,
+a:focus-visible,
+[role='radio']:focus-visible,
+[tabindex]:not([tabindex='-1']):focus-visible {
+  outline: 2px solid #c4b5fd;
+  outline-offset: 3px;
 }
 
 input, select, textarea {
@@ -106,6 +112,24 @@ img,
 svg,
 video {
   max-width: 100%;
+}
+
+/* Height of the fixed bottom tab bar on phones, including the home-indicator
+   area. Sticky elements and page padding use it to stay clear of the bar. */
+:root {
+  --bottom-nav-space: 0px;
+}
+
+@media (max-width: 780px) {
+  :root {
+    --bottom-nav-space: calc(68px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* 14px (the old floor) made labels 8-10px on phones; 16px keeps small UI
+     text readable and stops iOS zooming into form fields. */
+  html {
+    font-size: 16px;
+  }
 }
 
 @media (max-width: 760px) {

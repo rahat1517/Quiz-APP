@@ -313,7 +313,8 @@
   right: 0.65rem;
   top: 50%;
   transform: translateY(-50%);
-  min-height: 36px;
+  min-height: 44px;
+  min-width: 44px;
   border: 0;
   padding: 0.35rem 0.55rem;
   color: #a78bfa;
@@ -387,16 +388,18 @@
   justify-content: center;
   gap: 0.35rem;
   flex-wrap: wrap;
+  align-items: center;
   margin: 0.4rem 0 0;
-  color: #777287;
+  color: #9a95ad;
   font-size: 0.82rem;
   text-align: center;
 }
 
 .switchPrompt button {
-  min-height: auto;
+  /* Full-size tap target while still reading as an inline link. */
+  min-height: 44px;
   border: 0;
-  padding: 0;
+  padding: 0 0.35rem;
   color: #a78bfa;
   background: transparent;
   cursor: pointer;

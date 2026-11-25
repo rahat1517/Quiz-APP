@@ -14,7 +14,9 @@ export default function ProfileSection({ user, profile, history = [], loading, e
   const [saveSuccess, setSaveSuccess] = useState('');
 
   const totalQuizzes = history.length;
-  const bestScore = history.reduce((best, item) => Math.max(best, item.score || 0), 0);
+  // Show best score as a percentage so it matches the dashboard and results.
+  const bestScore = history.reduce((best, item) => Math.max(best, Number(item.percentage) || 0), 0);
+  const roleLabel = String(profile?.role || '').toLowerCase() === 'admin' ? 'Admin' : 'Student';
   const lastQuiz = history[0];
 
   async function handleAssignClass() {
@@ -114,7 +116,7 @@ export default function ProfileSection({ user, profile, history = [], loading, e
             </div>
             <div>
               <dt>Role</dt>
-              <dd>{profile?.role || 'Student'}</dd>
+              <dd>{roleLabel}</dd>
             </div>
             <div>
               <dt>Assigned class</dt>
@@ -183,7 +185,7 @@ export default function ProfileSection({ user, profile, history = [], loading, e
             </div>
             <div>
               <span>Best score</span>
-              <strong>{bestScore}</strong>
+              <strong>{totalQuizzes ? `${bestScore}%` : '—'}</strong>
             </div>
           </div>
         </div>
@@ -211,7 +213,12 @@ export default function ProfileSection({ user, profile, history = [], loading, e
                     {Number(item.percentage) >= 85 && (
                       <span className={styles.highScoreBadge} title="High scorer">⭐ Top quiz</span>
                     )}
-                    <time dateTime={item.created_at}>{new Date(item.created_at).toLocaleString()}</time>
+                    <time dateTime={item.created_at}>
+                      {new Date(item.created_at).toLocaleString(undefined, {
+                        dateStyle: 'medium',
+                        timeStyle: 'short',
+                      })}
+                    </time>
                   </div>
                 </div>
                 <div className={styles.historyGrid}>

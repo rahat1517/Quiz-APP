@@ -52,6 +52,18 @@
   color: #94a3b8;
 }
 
+/* The whole box is the tap target: the input fills it at full touch height. */
+.searchField {
+  padding-top: 0;
+  padding-bottom: 0;
+  cursor: text;
+}
+
+.searchField input {
+  min-height: 48px;
+  outline: none;
+}
+
 .titles {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 160px;
@@ -367,4 +379,29 @@
     width: 100%;
     min-height: 44px;
   }
+}
+
+.showMoreRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.25rem;
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+.showMoreButton {
+  min-height: 44px;
+  padding: 0.6rem 1.2rem;
+  border: 1px solid rgba(124, 92, 252, 0.35);
+  border-radius: 14px;
+  color: #ddd6fe;
+  background: rgba(124, 92, 252, 0.12);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.showMoreButton:hover {
+  background: rgba(124, 92, 252, 0.22);
 }

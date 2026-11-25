@@ -6,7 +6,7 @@ const tabs = [
   { id: 'profile', label: 'Profile', shortLabel: 'Profile' },
   { id: 'add', label: 'Add Question', shortLabel: 'Add' },
   { id: 'bank', label: 'Question Bank', shortLabel: 'Bank' },
-  { id: 'quiz', label: 'Start Quiz', shortLabel: 'Quiz' },
+  { id: 'quiz', label: 'Quiz', shortLabel: 'Quiz' },
   { id: 'results', label: 'Results', shortLabel: 'Results' },
 ];
 
@@ -31,6 +31,7 @@ export default function TabNav({ activeTab, onChange, variant, isAdmin }) {
           type="button"
           className={activeTab === tab.id ? `${styles.tabItem} ${styles.active}` : styles.tabItem}
           onClick={() => onChange(tab.id)}
+          aria-current={activeTab === tab.id ? 'page' : undefined}
         >
           <span className={styles.fullLabel}>{tab.label}</span>
           <span className={styles.shortLabel}>{tab.shortLabel}</span>

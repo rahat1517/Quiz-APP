@@ -167,22 +167,6 @@ export default function AddQuestion({
       <div className={styles.innerGrid}>
         <aside className={styles.panel}>
           <div className={styles.panelBlock}>
-            <h3>Subject guidance</h3>
-            <p>
-              Pick a subject that keeps questions grouped and quizzes relevant.
-              Add a custom subject if a category is missing.
-            </p>
-
-            <div className={styles.subjectChips}>
-              {availableSubjects.slice(0, 6).map((option) => (
-                <span key={option.label} className={styles.subjectChip}>
-                  <span>{option.icon}</span> {option.label}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className={styles.panelBlock}>
             <h3>Live preview</h3>
 
             <div className={styles.previewCard}>
@@ -220,22 +204,22 @@ export default function AddQuestion({
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.fieldGroup}>
             <div className={styles.subjectHub}>
-              <div className={styles.subjectCaption}>
-                <span className={styles.fieldLabel}>Class / Exam</span>
-                <small>
-                  Type any exam category like Class 9, BCS 44, BCS 45, Admission.
-                </small>
-              </div>
-
               <div className={styles.field}>
+                <label htmlFor="add-class-level" className={styles.fieldLabel}>
+                  Class / Exam
+                </label>
                 <input
+                  id="add-class-level"
                   name="class_level"
-                  placeholder="Example: Class 9, BCS 44, BCS 45"
+                  placeholder="Example: Class 9, BCS 44, Admission"
                   value={form.class_level}
                   onChange={handleChange}
+                  aria-describedby="add-class-level-hint"
                   required
                 />
-                <label>Class / Exam</label>
+                <small id="add-class-level-hint" className={styles.fieldHint}>
+                  Type a new category or pick an existing one below.
+                </small>
               </div>
 
               {availableClassLevels.length > 0 && (
@@ -262,12 +246,15 @@ export default function AddQuestion({
                 </div>
               )}
 
-              <div className={styles.subjectCaption}>
-                <span className={styles.fieldLabel}>Subject</span>
-                <small>Tap a subject pill or type a custom category.</small>
-              </div>
+              <span className={styles.fieldLabel} id="add-subject-label">
+                Subject
+              </span>
 
-              <div className={styles.subjectCardGrid}>
+              <div
+                className={styles.subjectCardGrid}
+                role="group"
+                aria-labelledby="add-subject-label"
+              >
                 {availableSubjects.map((option) => (
                   <Button
                     key={option.label}
@@ -286,24 +273,30 @@ export default function AddQuestion({
               </div>
 
               <div className={styles.field}>
+                <label htmlFor="add-subject" className={styles.fieldLabel}>
+                  Or type a subject
+                </label>
                 <input
+                  id="add-subject"
                   name="subject"
-                  placeholder="Type a custom subject"
+                  placeholder="Example: Geography"
                   value={form.subject}
                   onChange={handleChange}
                   required
                 />
-                <label>Custom subject</label>
               </div>
 
               <div className={styles.field}>
+                <label htmlFor="add-chapter" className={styles.fieldLabel}>
+                  Chapter / Topic
+                </label>
                 <input
+                  id="add-chapter"
                   name="chapter"
-                  placeholder="Chapter or topic, e.g., Chapter 1"
+                  placeholder="Example: Chapter 1"
                   value={form.chapter}
                   onChange={handleChange}
                 />
-                <label>Chapter / Topic</label>
               </div>
             </div>
 
@@ -326,17 +319,20 @@ export default function AddQuestion({
 
           <div className={styles.optionsGrid}>
             {['a', 'b', 'c', 'd'].map((key) => (
-              <div key={key} className={styles.optionBox}>
-                <span className={styles.optionBadge}>{key.toUpperCase()}</span>
-
+              <label key={key} className={styles.optionBox}>
+                <span className={styles.optionBadge} aria-hidden>
+                  {key.toUpperCase()}
+                </span>
+                <span className="sr-only">Option {key.toUpperCase()}</span>
                 <input
+                  className={styles.optionInput}
                   name={`option_${key}`}
                   placeholder={`Option ${key.toUpperCase()}`}
                   value={form[`option_${key}`]}
                   onChange={handleChange}
                   required
                 />
-              </div>
+              </label>
             ))}
           </div>
 
