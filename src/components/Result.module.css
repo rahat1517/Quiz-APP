@@ -44,7 +44,7 @@
 
 .pageEyebrow {
   color: #8b5cf6;
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   font-weight: 900;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -144,7 +144,7 @@
 .scoreRing span {
   margin-top: 0.3rem;
   color: #8f8aa6;
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -169,7 +169,7 @@
   display: inline-flex;
   padding: 0.4rem 0.7rem;
   border-radius: 999px;
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -213,7 +213,7 @@
 
 .summaryBox div span {
   color: #777287;
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   font-weight: 800;
 }
 
@@ -262,7 +262,7 @@
 .resultTable th {
   color: #8f8aa6;
   background: rgba(255, 255, 255, 0.025);
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
 }
 
@@ -276,7 +276,7 @@
 .skippedText { color: #fbbf24 !important; font-weight: 900; }
 
 .detailsButton {
-  min-height: 36px;
+  min-height: 44px;
   color: #ddd6fe;
   background: rgba(124, 92, 252, 0.13);
   font-size: 0.75rem;
@@ -366,7 +366,7 @@
   flex-shrink: 0;
   padding: 0.35rem 0.6rem;
   border-radius: 999px;
-  font-size: 0.62rem;
+  font-size: 0.75rem;
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -428,7 +428,7 @@
   display: block;
   margin-bottom: 0.35rem;
   color: #777287;
-  font-size: 0.62rem;
+  font-size: 0.75rem;
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -448,7 +448,7 @@
 
 .explanationBox span {
   color: #7dd3fc;
-  font-size: 0.62rem;
+  font-size: 0.75rem;
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -503,16 +503,39 @@
   .reviewButton { width: 100%; }
   .summaryGrid { gap: 0.45rem; }
   .summaryBox { display: grid; justify-items: center; gap: 0.35rem; padding: 0.7rem 0.3rem; text-align: center; }
-  .summaryBox div span { font-size: 0.6rem; }
+  .summaryBox div span { font-size: 0.75rem; }
   .tableWrapper { overflow: visible; border: 0; }
   .resultTable { min-width: 0; border-collapse: separate; border-spacing: 0 0.65rem; }
   .resultTable thead { display: none; }
   .resultTable, .resultTable tbody, .resultTable tr, .resultTable td { display: block; width: 100%; }
-  .resultTable tr { padding: 0.85rem; border: 1px solid rgba(196,181,253,0.12); border-radius: 16px; background: rgba(255,255,255,0.025); }
-  .resultTable td { display: flex; justify-content: space-between; gap: 1rem; padding: 0.45rem 0; white-space: normal; }
-  .resultTable td::before { content: attr(data-label); color: #777287; font-weight: 800; }
-  .resultTable td:last-child { display: block; border: 0; padding-top: 0.7rem; }
-  .resultTable td:last-child::before { display: none; }
+  /* Compact card per attempt: subject + %, date, then correct / wrong / skipped
+     side by side, then the button. Class, total and score repeat what the
+     card already says, so they're hidden here. */
+  .resultTable tr {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 0.5rem;
+    padding: 0.9rem;
+    border: 1px solid rgba(196,181,253,0.12);
+    border-radius: 16px;
+    background: rgba(255,255,255,0.025);
+  }
+  .resultTable td { display: grid; gap: 0.15rem; width: auto; padding: 0; border: 0; white-space: normal; }
+  .resultTable td::before { content: attr(data-label); color: #8f8aa6; font-size: 0.75rem; font-weight: 700; }
+  .resultTable td[data-label='Class'],
+  .resultTable td[data-label='Total'],
+  .resultTable td[data-label='Score'] { display: none; }
+  .resultTable td[data-label='Subject'] { grid-column: 1 / 3; grid-row: 1; color: #f8fafc; font-size: 1.05rem; font-weight: 800; }
+  .resultTable td[data-label='Percentage'] { grid-column: 3; grid-row: 1; justify-self: end; color: #f8fafc; font-size: 1.05rem; font-weight: 800; }
+  .resultTable td[data-label='Date'] { grid-column: 1 / -1; grid-row: 2; margin-bottom: 0.75rem; color: #a8a3bf; font-size: 0.85rem; }
+  .resultTable td[data-label='Subject']::before,
+  .resultTable td[data-label='Percentage']::before,
+  .resultTable td[data-label='Date']::before,
+  .resultTable td[data-label='Details']::before { display: none; }
+  .resultTable td[data-label='Correct'],
+  .resultTable td[data-label='Wrong'],
+  .resultTable td[data-label='Skipped'] { grid-row: 3; font-size: 1.05rem; font-weight: 800; }
+  .resultTable td[data-label='Details'] { grid-column: 1 / -1; grid-row: 4; padding-top: 0.8rem; }
   .detailsButton { width: 100%; }
   .detailsDrawer { width: 100%; border-left: 0; }
   .drawerBody, .drawerHeader { padding: 0.9rem; }

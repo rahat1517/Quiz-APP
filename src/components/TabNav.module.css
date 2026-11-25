@@ -83,7 +83,9 @@
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 0;
     box-shadow: 0 -18px 40px rgba(15, 23, 42, 0.24);
-    z-index: 20;
+    /* Above page content (some cards create their own stacking layers and
+       were catching taps meant for the bar), below dialogs (100) and toasts. */
+    z-index: 60;
   }
 
   :global([data-theme='light']) .bottomNav {
@@ -94,7 +96,7 @@
 
   .bottomNav .tabItem {
     padding: 0.7rem 0.2rem;
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     min-height: 3rem;
     white-space: normal;
   }
@@ -178,7 +180,7 @@
   color: #3b227c;
 }
 
-@media (max-width: 780px) {
+@media (max-width: 1100px) {
   .leftNav {
     display: none;
   }

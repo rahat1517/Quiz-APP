@@ -114,17 +114,19 @@ export default function QuestionList({
       </div>
 
       <div className={styles.controls}>
-        <div className={styles.searchField}>
-          <span>🔎</span>
+        <label className={styles.searchField}>
+          <span aria-hidden>🔎</span>
+          <span className="sr-only">Search questions</span>
           <input
-            type="text"
+            type="search"
+            enterKeyHint="search"
             placeholder="Search questions"
             value={search}
             onChange={(event) => {
               setSearch(event.target.value);
             }}
           />
-        </div>
+        </label>
         <span className={styles.resultCount}>
           {filtered.length} question{filtered.length === 1 ? '' : 's'}
         </span>
