@@ -23,6 +23,7 @@ import Toast from './components/Toast';
 import SkeletonLoader from './components/SkeletonLoader';
 import TabNav from './components/TabNav';
 import Hero from './components/Hero';
+import ConfirmDialog from './components/ConfirmDialog';
 import { Button } from './components/ui/Button';
 import styles from './App.module.css';
 import './index.css';
@@ -45,6 +46,10 @@ export default function App() {
   const [quizResult, setQuizResult] = useState(null);
   const [reviewQuestions, setReviewQuestions] = useState([]);
   const [quizStarted, setQuizStarted] = useState(false);
+  // True once the timer is running and until the attempt is submitted.
+  const [quizInProgress, setQuizInProgress] = useState(false);
+  // Navigation the user asked for mid-quiz; held until they confirm leaving.
+  const [pendingLeave, setPendingLeave] = useState(null);
   const [quizHistory, setQuizHistory] = useState([]);
   const [resultsLoading, setResultsLoading] = useState(false);
   const [resultsError, setResultsError] = useState('');
@@ -200,7 +205,21 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
     loadQuestions();
   }
 
-  async function handleSignOut() {
+  // Run an action that would end the current quiz, asking first if one is underway.
+  function confirmQuizExit(action) {
+    if (quizInProgress) {
+      setPendingLeave(() => action);
+      return;
+    }
+
+    action();
+  }
+
+  function handleSignOut() {
+    confirmQuizExit(signOutNow);
+  }
+
+  async function signOutNow() {
     try {
       await signOut();
       setUser(null);
@@ -276,6 +295,15 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
       return;
     }
 
+    if (tab !== 'quiz') {
+      confirmQuizExit(() => applyTabChange(tab));
+      return;
+    }
+
+    applyTabChange(tab);
+  }
+
+  function applyTabChange(tab) {
     if (tab !== 'add') {
       setEditingQuestion(null);
     }
@@ -476,6 +504,21 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
       });
     }
   }, [isAdmin, activeTab]);
+
+  useEffect(() => {
+    if (!quizInProgress) {
+      return undefined;
+    }
+
+    // Warn before a reload or closing the tab discards the attempt.
+    function handleBeforeUnload(event) {
+      event.preventDefault();
+      event.returnValue = '';
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [quizInProgress]);
 
   if (authLoading) {
     return (
@@ -944,6 +987,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
                 durationMinutes={selectedTimeLimit}
                 storageKey={`quiz-answers-${quizQuestions.map((question) => question.id).join('-')}`}
                 onComplete={handleQuizComplete}
+                onProgressChange={setQuizInProgress}
                 onBackToSetup={() => {
                   setQuizStarted(false);
                   setQuizQuestions([]);
@@ -983,6 +1027,25 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
         onChange={handleTabChange}
         variant="bottom"
         isAdmin={isAdmin}
+      />
+
+      <ConfirmDialog
+        open={Boolean(pendingLeave)}
+        onOpenChange={(open) => {
+          if (!open) setPendingLeave(null);
+        }}
+        title="Leave this quiz?"
+        description="Your timer is still running. If you leave now, this attempt ends and your answers won't be saved."
+        confirmLabel="Leave quiz"
+        cancelLabel="Keep going"
+        tone="danger"
+        icon="!"
+        onConfirm={() => {
+          const action = pendingLeave;
+          setPendingLeave(null);
+          setQuizInProgress(false);
+          action?.();
+        }}
       />
 
       <Toast toast={toast} />

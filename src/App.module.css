@@ -421,6 +421,11 @@
   background: rgba(124, 92, 252, 0.14);
 }
 
+/* The control clips overflow, so draw the ring inside the button. */
+.numberControl button:focus-visible {
+  outline-offset: -3px;
+}
+
 .numberInput {
   width: 100%;
   padding: 0.75rem 0.25rem;
@@ -619,4 +624,11 @@
   border-color: #38bdf8;
   box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.22);
   outline: none;
+}
+
+
+/* Hover and focus looked identical; give keyboard focus its own ring. */
+.subjectSelect:focus-visible {
+  outline: 2px solid #c4b5fd;
+  outline-offset: 2px;
 }

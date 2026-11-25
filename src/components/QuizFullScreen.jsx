@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from './ui/Button';
+import ConfirmDialog from './ConfirmDialog';
 import styles from './QuizFullScreen.module.css';
 import useQuiz from '../hooks/useQuiz';
 import { formatClassLevel } from '../lib/normalizeClassLevel';
 
 export default function QuizFullScreen(props) {
-  const { questions = [] } = props;
+  const { questions = [], onProgressChange } = props;
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const {
@@ -26,6 +27,15 @@ export default function QuizFullScreen(props) {
   } = useQuiz(props);
 
   const totalQuestions = questions.length;
+  const inProgress = hasStarted && !submitted;
+
+  // Let the parent know when an attempt is underway so it can warn before
+  // navigation throws the attempt away.
+  useEffect(() => {
+    onProgressChange?.(inProgress);
+  }, [inProgress, onProgressChange]);
+
+  useEffect(() => () => onProgressChange?.(false), [onProgressChange]);
   const q = questions[currentIndex];
   const progress = totalQuestions > 0 ? ((currentIndex + 1) / totalQuestions) * 100 : 0;
   const completion = totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0;
@@ -236,39 +246,17 @@ export default function QuizFullScreen(props) {
         </div>
       </main>
 
-      {confirmOpen && (
-        <div className={styles.confirmOverlay} role="dialog" aria-modal="true">
-          <div className={styles.confirmBox}>
-            <span className={styles.confirmIcon}>✓</span>
-            <h4>Submit exam?</h4>
-            <p>
-              You answered {answeredCount} of {totalQuestions} questions.
-              Submitting will end this attempt.
-            </p>
-
-            <div className={styles.confirmActions}>
-              <Button
-                type="button"
-                className={styles.cancelButton}
-                onClick={() => setConfirmOpen(false)}
-              >
-                Cancel
-              </Button>
-
-              <Button
-                type="button"
-                className={styles.primaryButton}
-                onClick={() => {
-                  setConfirmOpen(false);
-                  handleSubmit();
-                }}
-              >
-                Yes, submit
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDialog
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
+        title="Submit exam?"
+        description={`You answered ${answeredCount} of ${totalQuestions} questions. Submitting ends this attempt.`}
+        confirmLabel="Yes, submit"
+        onConfirm={() => {
+          setConfirmOpen(false);
+          handleSubmit();
+        }}
+      />
     </section>
   );
 }
