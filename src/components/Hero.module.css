@@ -1,66 +1,275 @@
-/* Compact home screen. Colours and type come from the tokens in src/index.css. */
-.home {
+/* Dashboard: quick actions + report/recent on the left, setup checklist and
+   subjects on the right. Colours and type come from tokens in src/index.css. */
+.dashboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+  gap: 1rem;
+  align-items: start;
+}
+
+.mainColumn,
+.sideColumn {
   display: grid;
   gap: 1rem;
-  max-width: 720px;
+  min-width: 0;
 }
 
-/* One-line greeting */
-.greeting h1 {
-  margin: 0;
-  color: var(--ink);
-  font-size: var(--text-xl);
-  font-weight: var(--weight-bold);
-}
-
-.greeting p {
-  margin: 0.15rem 0 0;
-  color: var(--muted);
-  font-size: var(--text-sm);
-}
-
-/* Progress strip: three small numbers in one row */
-.progress {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin: 0;
+.card {
+  min-width: 0;
+  padding: 1rem 1.1rem;
   border: 1px solid var(--rule);
-  border-radius: 14px;
+  border-radius: 16px;
   background: var(--sheet);
 }
 
-.progress div {
-  padding: 0.75rem 0.9rem;
+.cardHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
-.progress div + div {
-  border-left: 1px solid var(--rule);
-}
-
-.progress dt {
-  color: var(--muted);
-  font-size: var(--text-xs);
-}
-
-.progress dd {
-  margin: 0.1rem 0 0;
-  color: var(--ink);
-  font-size: var(--text-lg);
-  font-weight: var(--weight-bold);
-}
-
-/* Subject list: the main action on this screen */
-.subjects h2 {
-  margin: 0 0 0.5rem;
+.cardTitle {
+  margin: 0 0 0.75rem;
   color: var(--ink);
   font-size: var(--text-base);
   font-weight: var(--weight-semibold);
 }
 
+.cardMeta {
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+.linkButton {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  color: var(--accent);
+  background: transparent;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+/* Quick actions: four large icon tiles */
+.quickActions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+  padding: 0.75rem;
+}
+
+.action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 96px;
+  padding: 0.75rem 0.25rem;
+  border: 0;
+  border-radius: 12px;
+  color: var(--ink);
+  background: transparent;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.action:hover {
+  background: var(--inset);
+}
+
+.actionIcon {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 14px;
+}
+
+.blue { color: var(--tint-blue); background: var(--tint-blue-soft); }
+.orange { color: var(--tint-orange); background: var(--tint-orange-soft); }
+.rose { color: var(--tint-rose); background: var(--tint-rose-soft); }
+.teal { color: var(--tint-teal); background: var(--tint-teal-soft); }
+.violet { color: var(--tint-violet); background: var(--tint-violet-soft); }
+
+.cardRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.cardRow .card {
+  min-height: 210px;
+}
+
+/* Empty states */
+.emptyState {
+  display: grid;
+  justify-items: center;
+  gap: 0.25rem;
+  padding: 1.25rem 0.5rem;
+  text-align: center;
+}
+
+.emptyIcon {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 0.35rem;
+  border-radius: 50%;
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.emptyTitle {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.emptyText {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+/* Report numbers */
+.reportStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.reportStats div {
+  padding: 0.75rem;
+  border-radius: 12px;
+  background: var(--inset);
+}
+
+.reportStats dt {
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+.reportStats dd {
+  margin: 0.15rem 0 0;
+  color: var(--ink);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+}
+
+/* Recent quizzes */
+.recentList {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recentList li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0;
+  border-top: 1px solid var(--rule);
+}
+
+.recentList li:first-child {
+  border-top: 0;
+}
+
+.recentSubject {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recentDate {
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+.recentScore {
+  min-width: 3rem;
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  text-align: right;
+}
+
+/* Get started checklist */
+.setupBar {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--inset);
+}
+
+.setupBar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 300ms ease;
+}
+
+.setupCaption {
+  margin: 0.4rem 0 0.75rem;
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+.steps {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.steps li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--ink-2);
+  font-size: var(--text-sm);
+}
+
+.stepMark {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 1.35rem;
+  height: 1.35rem;
+  border: 2px solid var(--rule-strong);
+  border-radius: 50%;
+  color: var(--on-accent);
+}
+
+.stepDone {
+  color: var(--muted);
+}
+
+.stepDone .stepMark {
+  border-color: var(--correct-ink);
+  background: var(--correct-ink);
+}
+
+/* Subjects */
 .subjectList {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 0.5rem;
+  gap: 0.4rem;
 }
 
 .subjectItem {
@@ -68,13 +277,13 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  min-height: 48px;
-  padding: 0.65rem 0.9rem;
+  min-height: 44px;
+  padding: 0.55rem 0.8rem;
   border: 1px solid var(--rule);
-  border-radius: 12px;
+  border-radius: 10px;
   color: var(--ink);
   background: var(--sheet);
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
   font-weight: var(--weight-medium);
   text-align: left;
   cursor: pointer;
@@ -92,18 +301,40 @@
   line-height: 1;
 }
 
-.empty {
-  margin: 0;
-  color: var(--muted);
-  font-size: var(--text-sm);
+@media (prefers-reduced-motion: reduce) {
+  .setupBar span {
+    transition: none;
+  }
 }
 
-@media (max-width: 480px) {
-  .subjectList {
-    grid-template-columns: 1fr;
+/* Tablet: one column, side cards after the main ones */
+@media (max-width: 980px) {
+  .dashboard {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .cardRow {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .progress div {
-    padding: 0.65rem 0.75rem;
+  .cardRow .card {
+    min-height: 0;
+  }
+
+  .quickActions {
+    padding: 0.5rem;
+    gap: 0.25rem;
+  }
+
+  .action {
+    min-height: 84px;
+    font-size: var(--text-xs);
+  }
+
+  .actionIcon {
+    width: 2.6rem;
+    height: 2.6rem;
   }
 }

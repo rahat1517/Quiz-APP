@@ -21,6 +21,10 @@ import Footer from './components/Footer';
 import Toast from './components/Toast';
 import SkeletonLoader from './components/SkeletonLoader';
 import TabNav from './components/TabNav';
+import Sidebar from './components/Sidebar';
+import { Flame, Star, LogOut } from 'lucide-react';
+import { quizStats } from './lib/quizStats';
+import { pageTitle } from './lib/navItems';
 import Hero from './components/Hero';
 import ConfirmDialog from './components/ConfirmDialog';
 import { Button } from './components/ui/Button';
@@ -65,6 +69,7 @@ export default function App() {
   const displayName =
     user?.user_metadata?.full_name || user?.email?.split('@')?.[0] || 'Learner';
   const userInitial = String(displayName).trim().charAt(0).toUpperCase() || 'Q';
+  const stats = useMemo(() => quizStats(quizHistory), [quizHistory]);
 
   const assignedClassLevel =
   profile?.class_level ??
@@ -558,73 +563,55 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
       className={styles.appRoot}
     >
       <div className={styles.pageShell}>
-        <header className={styles.topBar}>
+        <header className={styles.appBar}>
           <Button
             type="button"
-            className={styles.brandButton}
+            className={styles.barBrand}
             onClick={() => handleTabChange('dashboard')}
-            aria-label="Go to dashboard"
+            aria-label="Quiz World, go to dashboard"
           >
-            <span className={styles.brandMark}>Q</span>
-            <span className={styles.titleBlock}>
-              <strong>Quiz World</strong>
-              <small>Learn, practice, improve</small>
-            </span>
+            <span className={styles.brandMark} aria-hidden>Q</span>
+            <span className={styles.barBrandName}>Quiz World</span>
           </Button>
 
-          <div className={styles.controlsRow}>
-            {activeTab !== 'quiz' && (
-              <div className={styles.filterControl}>
-                <label htmlFor="top-subject-filter" className="sr-only">
-                  Filter subject
-                </label>
-                <span className={styles.filterIcon} aria-hidden>⌕</span>
-                <select
-                  id="top-subject-filter"
-                  className={styles.subjectSelect}
-                  value={selectedSubject}
-                  onChange={(event) => {
-                    setSelectedSubject(event.target.value);
-                    setSelectedChapter('All Chapters');
-                  }}
-                >
-                  {subjects.map((subject) => (
-                    <option key={subject} value={subject}>
-                      {subject === 'All Subjects' ? '📚 All' : `📚 ${subject}`}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+          <h1 className={styles.pageTitle}>{pageTitle(activeTab)}</h1>
+
+          <div className={styles.barRight}>
+            <span
+              className={styles.statPill}
+              title="Streak: days in a row with at least one quiz"
+              aria-label={`Streak: ${stats.streak} day${stats.streak === 1 ? '' : 's'}`}
+            >
+              <Flame size={16} className={styles.flame} aria-hidden />
+              {stats.streak}
+            </span>
+            <span
+              className={styles.statPill}
+              title="Points: one for every correct answer"
+              aria-label={`${stats.points} points`}
+            >
+              <Star size={16} className={styles.star} aria-hidden />
+              {stats.points}
+              <span className={styles.statUnit}>points</span>
+            </span>
 
             <Button
               type="button"
-              className={styles.userCard}
+              className={styles.barAvatar}
               onClick={() => handleTabChange('profile')}
-              aria-label="Open profile"
+              aria-label={`Profile: ${displayName}`}
             >
-              <span className={styles.userIcon}>{userInitial}</span>
-              <span className={styles.userDetails}>
-                <strong>{displayName}</strong>
-                <small>
-                  {isAdmin ? 'Admin' : formatClassLabel(assignedClassLabel) || 'Student'}
-                </small>
-              </span>
-              <span className={styles.profileArrow} aria-hidden>›</span>
+              {userInitial}
             </Button>
-
-            <div className={styles.actionGroup}>
-              <Button
-                className={styles.signOutButton}
-                type="button"
-                onClick={handleSignOut}
-                aria-label="Log out"
-                title="Log out"
-              >
-                <span className={styles.signOutIcon} aria-hidden>↪</span>
-                <span className={styles.signOutText}>Log out</span>
-              </Button>
-            </div>
+            <Button
+              type="button"
+              className={styles.barLogout}
+              onClick={handleSignOut}
+              aria-label="Log out"
+              title="Log out"
+            >
+              <LogOut size={18} aria-hidden />
+            </Button>
           </div>
         </header>
 
@@ -645,10 +632,10 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
           <section className={styles.sectionGap}>
             <Hero
               totalQuestions={totalQuestions}
-              userName={user?.user_metadata?.full_name || user?.email?.split('@')?.[0]}
               classLabel={assignedClassLabel || selectedClassLevel}
               subjects={subjects.filter((subject) => subject !== 'All Subjects')}
               history={quizHistory}
+              onNavigate={handleTabChange}
               onStartSubject={(subject) => {
                 setSelectedSubject(subject);
                 setSelectedChapter('All Chapters');
@@ -1012,11 +999,15 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
         <Footer />
       </div>
 
-      <TabNav
+      <Sidebar
         activeTab={activeTab}
         onChange={handleTabChange}
-        variant="left"
         isAdmin={isAdmin}
+        classLabel={isAdmin ? 'Admin' : formatClassLabel(assignedClassLabel) || null}
+        displayName={displayName}
+        userInitial={userInitial}
+        roleLabel={isAdmin ? 'Admin' : formatClassLabel(assignedClassLabel) || 'Student'}
+        onSignOut={handleSignOut}
       />
 
       <TabNav

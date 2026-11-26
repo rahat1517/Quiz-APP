@@ -620,3 +620,170 @@
   outline: 2px solid var(--rule);
   outline-offset: 2px;
 }
+
+/* ── App bar ──────────────────────────────────────────────────
+   Desktop: page title on the left, streak and points on the right (the
+   sidebar holds the brand and the user). Tablet/phone: brand, the same
+   pills, then avatar and log out. */
+.appBar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 60px;
+  margin: -1.25rem 0 1.25rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--rule);
+  background: var(--paper);
+}
+
+.appBar + :global(nav) {
+  margin-bottom: 1rem;
+}
+
+.barBrand {
+  display: none;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  color: var(--ink);
+  background: transparent;
+  cursor: pointer;
+}
+
+.barBrand .brandMark {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9px;
+  box-shadow: none;
+}
+
+.barBrandName {
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
+  white-space: nowrap;
+}
+
+.pageTitle {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+}
+
+.barRight {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.statPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  height: 34px;
+  padding: 0 0.75rem;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  color: var(--ink);
+  background: var(--sheet);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+}
+
+.statUnit {
+  color: var(--muted);
+  font-weight: var(--weight-medium);
+}
+
+.flame {
+  color: var(--tint-orange);
+}
+
+.star {
+  color: var(--skip);
+  fill: var(--skip);
+}
+
+.barAvatar,
+.barLogout {
+  display: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0;
+  cursor: pointer;
+}
+
+.barAvatar {
+  border: 0;
+  border-radius: 50%;
+  color: var(--on-accent);
+  background: var(--accent);
+  font-weight: var(--weight-bold);
+}
+
+.barLogout {
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  color: var(--muted);
+  background: var(--sheet);
+}
+
+.barLogout:hover {
+  color: var(--wrong-ink);
+  border-color: var(--wrong);
+}
+
+@media (max-width: 1100px) {
+  .appBar {
+    margin-top: -1rem;
+  }
+
+  .barBrand {
+    display: flex;
+  }
+
+  .pageTitle {
+    display: none;
+  }
+
+  .barAvatar,
+  .barLogout {
+    display: grid;
+  }
+}
+
+@media (max-width: 780px) {
+  .appBar {
+    margin: -1rem -1rem 1rem;
+    padding: 0.6rem 1rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .appBar {
+    margin: -0.65rem -0.65rem 0.85rem;
+    padding: 0.55rem 0.65rem;
+    gap: 0.4rem;
+  }
+
+  .barRight {
+    gap: 0.35rem;
+  }
+
+  .statPill {
+    padding: 0 0.55rem;
+  }
+
+  .statUnit {
+    display: none;
+  }
+}
