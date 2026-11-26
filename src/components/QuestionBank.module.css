@@ -24,8 +24,8 @@
   border-radius: 999px;
   color: var(--ink);
   background: var(--accent-soft);
-  font-size: 0.75rem;
-  font-weight: 800;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
   white-space: nowrap;
 }
 
@@ -93,7 +93,7 @@
   gap: 0.75rem;
   margin-bottom: 1rem;
   color: var(--muted);
-  font-size: 0.95rem;
+  font-size: var(--text-base);
 }
 
 .subjectBadge {
@@ -104,8 +104,8 @@
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--ink);
-  font-weight: 700;
-  font-size: 0.9rem;
+  font-weight: var(--weight-bold);
+  font-size: var(--text-sm);
 }
 
 .optionList {
@@ -125,7 +125,7 @@
   cursor: pointer;
   border-radius: 16px;
   padding: 0.75rem 1rem;
-  font-weight: 700;
+  font-weight: var(--weight-bold);
 }
 
 .edit {
@@ -273,8 +273,8 @@
   border-radius: 50%;
   color: var(--ink-2);
   background: var(--sheet);
-  font-size: 0.75rem;
-  font-weight: 800;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
 }
 
 /* Answer key (admins only): the correct row is ticked like a marked sheet. */
@@ -282,7 +282,7 @@
   color: var(--correct-ink);
   background: var(--correct-soft);
   border-color: var(--correct);
-  font-weight: 700;
+  font-weight: var(--weight-bold);
 }
 
 .correctOption .optionKey {
@@ -295,7 +295,7 @@
   color: var(--correct-ink);
   background: var(--correct-soft) !important;
   border: 1px solid var(--correct);
-  font-weight: 800;
+  font-weight: var(--weight-semibold);
 }
 
 .explanationPreview {
@@ -392,7 +392,7 @@
   gap: 1rem;
   margin-top: 1.25rem;
   color: var(--muted);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
 }
 
 .showMoreButton {
@@ -402,7 +402,7 @@
   border-radius: 14px;
   color: var(--ink);
   background: var(--accent-soft);
-  font-weight: 800;
+  font-weight: var(--weight-semibold);
   cursor: pointer;
 }
 

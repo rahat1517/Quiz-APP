@@ -18,7 +18,7 @@
   padding: 0.85rem 1.4rem;
   border-radius: 999px;
   cursor: pointer;
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   transition: all 0.25s ease;
 }
 
@@ -41,6 +41,21 @@
 
 .shortLabel {
   display: none;
+}
+
+/* Tablets and phones held sideways: keep all six admin tabs on one line. */
+@media (min-width: 781px) and (max-width: 1100px) {
+  .tabNav {
+    flex-wrap: nowrap;
+    gap: 0.25rem;
+    padding: 0.5rem;
+  }
+
+  .tabItem {
+    padding: 0.6rem 0.85rem;
+    font-size: var(--text-sm);
+    white-space: nowrap;
+  }
 }
 
 @media (max-width: 780px) {
@@ -71,7 +86,7 @@
 
   .bottomNav .tabItem {
     padding: 0.7rem 0.2rem;
-    font-size: 0.75rem;
+    font-size: var(--text-xs);
     min-height: 3rem;
     white-space: normal;
   }
@@ -118,7 +133,7 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 0.95rem;
+  font-size: var(--text-base);
 }
 
 .leftNav .tabItem:hover {

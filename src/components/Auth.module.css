@@ -89,8 +89,8 @@
   align-items: center;
   gap: 0.75rem;
   color: var(--on-accent);
-  font-size: 1.05rem;
-  font-weight: 900;
+  font-size: var(--text-base);
+  font-weight: var(--weight-bold);
   letter-spacing: 0.02em;
 }
 
@@ -119,10 +119,10 @@
   display: inline-flex;
   padding: 0.4rem 0.75rem;
   border-radius: 999px;
-  font-size: 0.74rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 .eyebrow {
@@ -134,9 +134,9 @@
 .brandContent h1 {
   margin: 1.25rem 0 1rem;
   color: var(--on-accent);
-  font-size: clamp(2.75rem, 5vw, 4.75rem);
-  line-height: 0.98;
-  letter-spacing: -0.055em;
+  font-size: var(--text-3xl);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
 }
 
 .brandContent p {
@@ -162,16 +162,16 @@
 
 .benefits span {
   color: var(--accent-on-cover);
-  font-size: 0.7rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: normal;
 }
 
 .benefits p,
 .brandFooter {
   margin: 0;
   color: var(--on-accent);
-  font-size: 0.87rem;
+  font-size: var(--text-sm);
 }
 
 .brandFooter {
@@ -213,7 +213,7 @@
   color: var(--muted);
   background: transparent;
   cursor: pointer;
-  font-weight: 800;
+  font-weight: var(--weight-semibold);
 }
 
 .viewTabs button.activeTab {
@@ -234,9 +234,9 @@
 .authHeader h2 {
   margin: 0.65rem 0 0.45rem;
   color: var(--ink);
-  font-size: clamp(2rem, 4vw, 2.75rem);
-  line-height: 1.05;
-  letter-spacing: -0.04em;
+  font-size: var(--text-2xl);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
 }
 
 .authHeader p {
@@ -257,8 +257,8 @@
 
 .fieldLabel {
   color: var(--ink);
-  font-size: 0.82rem;
-  font-weight: 800;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
 }
 
 .inputWrap {
@@ -271,7 +271,7 @@
   top: 50%;
   transform: translateY(-50%);
   color: var(--accent);
-  font-weight: 900;
+  font-weight: var(--weight-bold);
   pointer-events: none;
 }
 
@@ -321,8 +321,8 @@
   color: var(--accent);
   background: transparent;
   cursor: pointer;
-  font-size: 0.75rem;
-  font-weight: 800;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
 }
 
 .authSubmit {
@@ -338,7 +338,7 @@
   background: var(--accent);
   box-shadow: var(--shadow-md);
   cursor: pointer;
-  font-weight: 900;
+  font-weight: var(--weight-bold);
   transition: transform 160ms ease, box-shadow 160ms ease;
 }
 
@@ -355,7 +355,7 @@
 .authFeedback {
   padding: 0.85rem 1rem;
   border-radius: 13px;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
 }
 
 .success {
@@ -380,8 +380,8 @@
   color: var(--ink);
   background: transparent;
   cursor: pointer;
-  font-size: 0.8rem;
-  font-weight: 800;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
 }
 
 .switchPrompt {
@@ -392,7 +392,7 @@
   align-items: center;
   margin: 0.4rem 0 0;
   color: var(--muted);
-  font-size: 0.82rem;
+  font-size: var(--text-sm);
   text-align: center;
 }
 
@@ -405,7 +405,7 @@
   background: transparent;
   cursor: pointer;
   font-size: inherit;
-  font-weight: 800;
+  font-weight: var(--weight-semibold);
 }
 
 @media (max-width: 900px) {
@@ -463,6 +463,6 @@
   }
 
   .authHeader h2 {
-    font-size: 2rem;
+    font-size: var(--text-2xl);
   }
 }
