@@ -68,3 +68,10 @@ export async function updateUserProfile(updates) {
 
   return data.user;
 }
+export async function updatePassword(password) {
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}

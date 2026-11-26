@@ -8,7 +8,7 @@ import {
   isClassInGroup,
 } from './lib/normalizeClassLevel';
 import { getSession, signOut } from './services/authService';
-import { getCurrentProfile, updateUserProfile } from './services/profileService';
+import { getCurrentProfile, updateUserProfile, updatePassword } from './services/profileService';
 import { saveQuizResult, getMyQuizResults, getAllQuizResultsForAdmin } from './services/resultService';
 
 import Auth from './components/Auth';
@@ -723,6 +723,9 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
               loading={resultsLoading}
               error={resultsError}
               onSave={handleProfileSave}
+              onChangePassword={updatePassword}
+              onNavigate={handleTabChange}
+              onSignOut={handleSignOut}
               isAdmin={isAdmin}
             />
           </section>
