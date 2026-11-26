@@ -148,9 +148,10 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
         ? availableQuestions
         : availableQuestions.filter((question) => question.subject === selectedSubject);
 
+    // Natural order, so "Chapter 2" comes before "Chapter 10".
     const unique = Array.from(
       new Set(filtered.map((question) => normalizeChapter(question.chapter || 'General')))
-    );
+    ).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 
     return ['All Chapters', ...unique];
   }, [availableQuestions, selectedSubject]);
@@ -172,20 +173,6 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
     });
     return best;
   }, [quizHistory]);
-
-  const filteredQuestions = useMemo(() => {
-    return availableQuestions.filter((question) => {
-      const subjectMatched =
-        selectedSubject === 'All Subjects' || question.subject === selectedSubject;
-
-      const questionChapter = normalizeChapter(question.chapter || 'General');
-
-      const chapterMatched =
-        selectedChapter === 'All Chapters' || questionChapter === selectedChapter;
-
-      return subjectMatched && chapterMatched;
-    });
-  }, [availableQuestions, selectedSubject, selectedChapter]);
 
   const totalQuestions = availableQuestions.length;
 
@@ -699,36 +686,8 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
 
         {!loading && !error && activeTab === 'bank' && (
           <section className={styles.sectionGap}>
-            <div className={styles.fieldGroupInline}>
-              <div className={styles.field}>
-                <label htmlFor="bank-class" className={styles.fieldLabel}>
-                  Select class/exam
-                </label>
-                <select
-                  id="bank-class"
-                  className={styles.subjectSelect}
-                  value={isClassRestricted ? assignedClassLabel : selectedClassLevel}
-                  onChange={(event) => {
-                    if (isClassRestricted) return;
-                    setSelectedClassLevel(event.target.value);
-                  }}
-                  disabled={isClassRestricted}
-                >
-                  {classLevels.length === 0 ? (
-                    <option value="">No class found</option>
-                  ) : (
-                    classLevels.map((level) => (
-                      <option key={level} value={level}>
-                        {formatClassLabel(level)}
-                      </option>
-                    ))
-                  )}
-                </select>
-              </div>
-            </div>
-
             <QuestionList
-              questions={filteredQuestions}
+              questions={availableQuestions}
               subjects={subjects}
               chapters={chapters}
               selectedSubject={selectedSubject}
@@ -741,6 +700,16 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
               onDelete={isAdmin ? handleDeleteQuestion : undefined}
               onEdit={isAdmin ? handleEditQuestion : undefined}
               isAdmin={isAdmin}
+              classOptions={classLevels}
+              selectedClass={selectedClass}
+              isClassRestricted={isClassRestricted}
+              onClassChange={(level) => {
+                if (isClassRestricted) return;
+                setSelectedClassLevel(level);
+                setSelectedSubject('All Subjects');
+                setSelectedChapter('All Chapters');
+              }}
+              formatClass={formatClassLabel}
             />
           </section>
         )}
