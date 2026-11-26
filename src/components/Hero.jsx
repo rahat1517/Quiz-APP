@@ -2,21 +2,18 @@ import styles from './Hero.module.css';
 import { Button } from './ui/Button';
 import { formatClassLevel } from '../lib/normalizeClassLevel';
 
-const subjectIcons = ['∑', '⚗', 'A', '⌘'];
-
+// Compact home screen: a one-line greeting, a small progress strip and the
+// subject list. Tapping a subject opens the quiz setup for it; everything
+// else is one tap away in the tab bar.
 export default function Hero({
   totalQuestions,
-  totalSubjects,
-  totalQuizzes,
   userName = 'Learner',
   classLabel,
   subjects = [],
   history = [],
-  onNavigate,
   onStartSubject,
 }) {
-  const displaySubjects =
-    subjects.length > 0 ? subjects : ['Mathematics', 'Science', 'Language', 'Technology'];
+  const firstName = String(userName).trim().split(/\s+/)[0] || 'Learner';
   const displayClass = classLabel ? formatClassLevel(classLabel) : null;
   const bestPercentage = history.reduce(
     (best, item) => Math.max(best, Number(item.percentage) || 0),
@@ -25,155 +22,52 @@ export default function Hero({
   const latestResult = history[0];
 
   return (
-    <section className={styles.heroSection}>
-      <div className={styles.heroPanel}>
-        <div className={styles.heroContent}>
-          <span className={styles.badge}>
-            <span className={styles.liveDot} />
-            Ready when you are
-          </span>
-          <p className={styles.welcome}>Welcome back, {userName}</p>
-          <h1>How far can your knowledge take you today?</h1>
-          <p className={styles.heroCopy}>
-            Build a quiz from your class, subject, and chapter. Get instant
-            results and learn from every answer.
-          </p>
+    <section className={styles.home}>
+      <header className={styles.greeting}>
+        <h1>Hi, {firstName}</h1>
+        <p>
+          {displayClass ? `${displayClass}, ` : ''}
+          {totalQuestions} question{totalQuestions === 1 ? '' : 's'} ready
+        </p>
+      </header>
 
-          <div className={styles.heroActions}>
-            <Button
-              type="button"
-              className={styles.primaryAction}
-              onClick={() => onNavigate?.('quiz')}
-            >
-              Start a quiz <span aria-hidden>→</span>
-            </Button>
-            <Button
-              type="button"
-              className={styles.secondaryAction}
-              onClick={() => onNavigate?.('bank')}
-            >
-              Explore questions
-            </Button>
-          </div>
+      <dl className={styles.progress} aria-label="Your progress">
+        <div>
+          <dt>Quizzes taken</dt>
+          <dd>{history.length}</dd>
         </div>
+        <div>
+          <dt>Best score</dt>
+          <dd>{history.length ? `${Math.round(bestPercentage)}%` : '–'}</dd>
+        </div>
+        <div>
+          <dt>Last score</dt>
+          <dd>
+            {latestResult ? `${Math.round(Number(latestResult.percentage) || 0)}%` : '–'}
+          </dd>
+        </div>
+      </dl>
 
-        <Button
-          type="button"
-          className={styles.challengeCard}
-          onClick={() => onNavigate?.('quiz')}
-        >
-          <div className={styles.challengeTop}>
-            <span>Quick challenge</span>
-            <span className={styles.challengeIcon}>Q</span>
-          </div>
-          <div className={styles.challengeScore}>
-            <strong>5</strong>
-            <span>questions</span>
-          </div>
-          <p>A short quiz is the easiest way to keep your momentum going.</p>
-          <div className={styles.challengeMeta}>
-            <span>{displayClass || 'Choose a class'}</span>
-            <span>5 min</span>
-          </div>
-          <span className={styles.challengeAction}>Start challenge →</span>
-        </Button>
-
-      </div>
-
-      <div className={styles.statsGrid}>
-        <article className={styles.statCard}>
-          <span className={`${styles.statIcon} ${styles.purpleIcon}`} aria-hidden>
-            Q
-          </span>
-          <div className={styles.statContent}>
-            <p>Available questions</p>
-            <strong>{totalQuestions}</strong>
-            <small>Ready for your next quiz</small>
-          </div>
-        </article>
-        <article className={styles.statCard}>
-          <span className={`${styles.statIcon} ${styles.blueIcon}`} aria-hidden>
-            S
-          </span>
-          <div className={styles.statContent}>
-            <p>Available subjects</p>
-            <strong>{totalSubjects}</strong>
-            <small>Choose a topic to practice</small>
-          </div>
-        </article>
-        <article className={styles.statCard}>
-          <span className={`${styles.statIcon} ${styles.greenIcon}`} aria-hidden>
-            C
-          </span>
-          <div className={styles.statContent}>
-            <p>{displayClass ? 'Selected class' : 'Available classes'}</p>
-            <strong>{displayClass || totalQuizzes}</strong>
-            <small>
-              {displayClass
-                ? `${totalQuizzes} class categories available`
-                : 'Choose your class to begin'}
-            </small>
-          </div>
-        </article>
-      </div>
-
-      <div className={styles.dashboardGrid}>
-        <section className={styles.subjectSection}>
-          <div className={styles.sectionHeader}>
-            <div>
-              <span>Pick a direction</span>
-              <h2>Explore subjects</h2>
-            </div>
-            <Button type="button" onClick={() => onNavigate?.('bank')}>
-              View question bank →
-            </Button>
-          </div>
-
-          <div className={styles.subjectGrid}>
-            {displaySubjects.slice(0, 4).map((subject, index) => (
+      <section className={styles.subjects} aria-labelledby="home-subjects">
+        <h2 id="home-subjects">Practice a subject</h2>
+        {subjects.length === 0 ? (
+          <p className={styles.empty}>No questions yet for your class.</p>
+        ) : (
+          <div className={styles.subjectList}>
+            {subjects.map((subject) => (
               <Button
                 key={subject}
                 type="button"
-                className={styles.subjectCard}
+                className={styles.subjectItem}
                 onClick={() => onStartSubject?.(subject)}
               >
-                <span className={styles.subjectIcon}>{subjectIcons[index]}</span>
-                <strong>{subject}</strong>
-                <small>Practice now</small>
-                <span className={styles.subjectArrow} aria-hidden>→</span>
+                <span>{subject}</span>
+                <span className={styles.chevron} aria-hidden>›</span>
               </Button>
             ))}
           </div>
-        </section>
-
-        <aside className={styles.quickPanel}>
-          <span className={styles.quickEyebrow}>Your progress</span>
-          <h2>Learning snapshot</h2>
-          <div className={styles.progressSnapshot}>
-            <div>
-              <strong>{history.length}</strong>
-              <span>Attempts</span>
-            </div>
-            <div>
-              <strong>{Math.round(bestPercentage)}%</strong>
-              <span>Best score</span>
-            </div>
-            <div>
-              <strong>{latestResult ? `${Math.round(Number(latestResult.percentage) || 0)}%` : '-'}</strong>
-              <span>Latest score</span>
-            </div>
-          </div>
-          <Button type="button" onClick={() => onNavigate?.('results')}>
-            <span>Review your results</span><span aria-hidden>→</span>
-          </Button>
-          <Button type="button" onClick={() => onNavigate?.('profile')}>
-            <span>View your progress</span><span aria-hidden>→</span>
-          </Button>
-          <Button type="button" onClick={() => onNavigate?.('bank')}>
-            <span>Browse all questions</span><span aria-hidden>→</span>
-          </Button>
-        </aside>
-      </div>
+        )}
+      </section>
     </section>
   );
 }

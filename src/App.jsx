@@ -164,8 +164,6 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
   }, [availableQuestions, selectedSubject, selectedChapter]);
 
   const totalQuestions = availableQuestions.length;
-  const totalSubjects = subjects.length > 1 ? subjects.length - 1 : 0;
-  const totalQuizzes = classLevels.length;
 
   async function loadQuestions() {
     setLoading(true);
@@ -647,13 +645,10 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
           <section className={styles.sectionGap}>
             <Hero
               totalQuestions={totalQuestions}
-              totalSubjects={totalSubjects}
-              totalQuizzes={totalQuizzes}
               userName={user?.user_metadata?.full_name || user?.email?.split('@')?.[0]}
               classLabel={assignedClassLabel || selectedClassLevel}
-              subjects={subjects.filter((subject) => subject !== 'All Subjects').slice(0, 4)}
+              subjects={subjects.filter((subject) => subject !== 'All Subjects')}
               history={quizHistory}
-              onNavigate={handleTabChange}
               onStartSubject={(subject) => {
                 setSelectedSubject(subject);
                 setSelectedChapter('All Chapters');

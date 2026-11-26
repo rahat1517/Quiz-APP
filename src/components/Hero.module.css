@@ -1,521 +1,109 @@
-.heroSection {
+/* Compact home screen. Colours and type come from the tokens in src/index.css. */
+.home {
   display: grid;
-  gap: 1.1rem;
+  gap: 1rem;
+  max-width: 720px;
 }
 
-.heroPanel {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(250px, 0.55fr);
-  gap: 2rem;
-  align-items: center;
-  overflow: hidden;
-  border-radius: 24px;
-  padding: clamp(1.5rem, 3.5vw, 2.75rem);
-  /* the exam-booklet cover: ink navy with paper-white type */
-  color: var(--on-accent);
-  background: var(--cover);
-  box-shadow: none;
-}
-
-.heroContent,
-.challengeCard {
-  position: relative;
-  z-index: 1;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.45rem 0.75rem;
-  border: 1px solid var(--rule-on-cover);
-  border-radius: 999px;
-  color: var(--on-accent);
-  background: transparent;
-  font-size: var(--text-xs);
-  font-weight: var(--weight-semibold);
-  letter-spacing: normal;
-  text-transform: none;
-}
-
-.liveDot {
-  width: 0.45rem;
-  height: 0.45rem;
-  border-radius: 999px;
-  background: var(--correct);
-}
-
-.welcome {
-  margin: 1.6rem 0 0.35rem;
-  color: var(--accent-on-cover);
-  font-weight: var(--weight-bold);
-}
-
-.heroPanel h1 {
-  max-width: 780px;
+/* One-line greeting */
+.greeting h1 {
   margin: 0;
-  color: var(--on-accent);
-  font-size: var(--text-3xl);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-}
-
-.heroCopy {
-  max-width: 600px;
-  margin: 1.2rem 0 0;
-  color: var(--on-cover-muted);
-  line-height: 1.7;
-}
-
-.heroActions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 1.7rem;
-}
-
-.primaryAction,
-.secondaryAction {
-  min-height: 50px;
-  border: 0;
-  border-radius: 15px;
-  padding: 0.75rem 1.15rem;
-  cursor: pointer;
-  font-weight: var(--weight-semibold);
-}
-
-.primaryAction {
-  display: inline-flex;
-  align-items: center;
-  gap: 1rem;
-  color: var(--ink);
-  background: var(--sheet);
-}
-
-.secondaryAction {
-  color: var(--on-accent);
-  border: 1px solid var(--rule-on-cover);
-  background: transparent;
-}
-
-.challengeCard {
-  width: 100%;
-  color: var(--ink);
-  cursor: pointer;
-  text-align: left;
-  padding: 1.3rem;
-  border: 1px solid var(--rule);
-  border-radius: 24px;
-  background: var(--sheet);
-  box-shadow: none;
-  backdrop-filter: blur(14px);
-  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
-}
-
-.challengeCard:hover {
-  transform: translateY(-3px);
-  border-color: var(--rule);
-  background: var(--sheet);
-}
-
-.challengeTop,
-.challengeMeta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.challengeAction {
-  display: block;
-  margin-top: 1rem;
-  color: var(--ink);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-bold);
-}
-
-.challengeTop {
-  color: var(--ink);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-semibold);
-  text-transform: none;
-}
-
-.challengeIcon {
-  width: 2.25rem;
-  height: 2.25rem;
-  display: grid;
-  place-items: center;
-  border-radius: 12px;
-  color: var(--accent);
-  background: var(--sheet);
-  font-weight: var(--weight-bold);
-}
-
-.challengeScore {
-  display: flex;
-  align-items: end;
-  gap: 0.55rem;
-  margin-top: 1.5rem;
-}
-
-.challengeScore strong {
-  color: var(--ink);
-  font-size: var(--text-3xl);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-}
-
-.challengeScore span {
-  color: var(--ink);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-bold);
-}
-
-.challengeCard p {
-  margin: 1.25rem 0;
-  color: var(--ink);
-  font-size: var(--text-sm);
-  line-height: 1.55;
-}
-
-.challengeMeta {
-  padding-top: 0.9rem;
-  border-top: 1px solid var(--rule);
-  color: var(--ink);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-bold);
-}
-
-.statsGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.statCard {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  min-width: 0;
-  border: 1px solid var(--rule);
-  border-radius: 22px;
-  padding: 1.1rem;
-  color: var(--ink);
-  background: var(--sheet);
-  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
-}
-
-.statCard:hover {
-  transform: translateY(-2px);
-  border-color: var(--rule);
-  background: var(--sheet);
-}
-
-.statIcon,
-.subjectIcon {
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  border-radius: 15px;
-  font-weight: var(--weight-bold);
-}
-
-.statIcon {
-  width: 3.2rem;
-  height: 3.2rem;
-  font-size: var(--text-lg);
-}
-
-.purpleIcon { color: var(--ink); background: var(--accent-soft); }
-.blueIcon { color: var(--ink); background: var(--accent-soft); }
-.greenIcon { color: var(--correct-ink); background: var(--correct-soft); }
-
-.statCard p {
-  margin: 0;
-  color: var(--ink);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-semibold);
-}
-
-.statCard strong {
-  display: block;
-  margin-top: 0.1rem;
-  color: var(--ink);
-  font-size: var(--text-2xl);
-  line-height: 1.1;
-  overflow-wrap: anywhere;
-}
-
-.statContent {
-  min-width: 0;
-}
-
-.statContent small {
-  display: block;
-  margin-top: 0.25rem;
-  color: var(--muted);
-  font-size: var(--text-xs);
-  line-height: 1.35;
-}
-
-.dashboardGrid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.8fr) minmax(260px, 0.7fr);
-  gap: 1rem;
-  align-items: start; /* cards keep their own height instead of stretching */
-}
-
-.subjectSection,
-.quickPanel {
-  border: 1px solid var(--rule);
-  border-radius: 26px;
-  padding: 1.4rem;
-  background: var(--sheet);
-}
-
-.sectionHeader {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 1.2rem;
-}
-
-.sectionHeader span,
-.quickEyebrow {
-  color: var(--accent);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-bold);
-  letter-spacing: normal;
-  text-transform: none;
-}
-
-.sectionHeader h2,
-.quickPanel h2 {
-  margin: 0.25rem 0 0;
   color: var(--ink);
   font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
 }
 
-.sectionHeader button {
-  border: 0;
-  color: var(--accent);
-  background: transparent;
-  cursor: pointer;
+.greeting p {
+  margin: 0.15rem 0 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+/* Progress strip: three small numbers in one row */
+.progress {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  background: var(--sheet);
+}
+
+.progress div {
+  padding: 0.75rem 0.9rem;
+}
+
+.progress div + div {
+  border-left: 1px solid var(--rule);
+}
+
+.progress dt {
+  color: var(--muted);
   font-size: var(--text-xs);
+}
+
+.progress dd {
+  margin: 0.1rem 0 0;
+  color: var(--ink);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+}
+
+/* Subject list: the main action on this screen */
+.subjects h2 {
+  margin: 0 0 0.5rem;
+  color: var(--ink);
+  font-size: var(--text-base);
   font-weight: var(--weight-semibold);
 }
 
-.subjectGrid {
+.subjectList {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.75rem;
-}
-
-.subjectCard {
-  position: relative;
-  min-width: 0;
-  display: grid;
-  justify-items: start;
-  gap: 0.4rem;
-  border: 1px solid var(--rule);
-  border-radius: 18px;
-  padding: 1rem;
-  color: var(--ink);
-  background: var(--inset);
-  cursor: pointer;
-  text-align: left;
-  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
-}
-
-.subjectCard:hover {
-  transform: translateY(-2px);
-  border-color: var(--rule);
-  background: var(--accent-soft);
-}
-
-.subjectIcon {
-  width: 2.5rem;
-  height: 2.5rem;
-  margin-bottom: 0.55rem;
-  color: var(--ink);
-  background: var(--accent-soft);
-}
-
-.subjectCard strong {
-  max-width: 100%;
-  overflow-wrap: anywhere;
-  font-size: var(--text-sm);
-}
-
-.subjectCard small {
-  color: var(--muted);
-  font-size: var(--text-xs);
-}
-
-.subjectArrow {
-  position: absolute;
-  right: 0.8rem;
-  top: 0.8rem;
-  color: var(--accent);
-}
-
-.quickPanel {
-  display: flex;
-  flex-direction: column;
-}
-
-.quickPanel h2 {
-  margin-bottom: 1rem;
-}
-
-.progressSnapshot {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 0.5rem;
-  margin-bottom: 0.65rem;
 }
 
-.progressSnapshot div {
-  min-width: 0;
-  padding: 0.75rem 0.5rem;
-  border: 1px solid var(--rule);
-  border-radius: 14px;
-  background: var(--accent-soft);
-  text-align: center;
-}
-
-.progressSnapshot strong,
-.progressSnapshot span {
-  display: block;
-}
-
-.progressSnapshot strong {
-  color: var(--ink);
-  font-size: var(--text-base);
-}
-
-.progressSnapshot span {
-  margin-top: 0.2rem;
-  color: var(--muted);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-bold);
-}
-
-.quickPanel button {
+.subjectItem {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  border: 0;
-  border-top: 1px solid var(--rule);
-  padding: 1rem 0;
+  gap: 0.75rem;
+  min-height: 48px;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
   color: var(--ink);
-  background: transparent;
-  cursor: pointer;
+  background: var(--sheet);
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
   text-align: left;
-  font-size: var(--text-sm);
-  font-weight: var(--weight-bold);
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease;
 }
 
-@media (max-width: 980px) {
-  .heroPanel,
-  .dashboardGrid {
+.subjectItem:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.chevron {
+  color: var(--muted);
+  font-size: var(--text-lg);
+  line-height: 1;
+}
+
+.empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+@media (max-width: 480px) {
+  .subjectList {
     grid-template-columns: 1fr;
   }
 
-  .challengeCard {
-    display: none;
-  }
-
-  .subjectGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 680px) {
-  .heroSection {
-    gap: 0.8rem;
-  }
-
-  .heroPanel {
-    min-height: auto;
-    padding: 1.3rem;
-    border-radius: 22px;
-  }
-
-  .heroPanel h1 {
-    font-size: var(--text-2xl);
-  }
-
-  .heroActions,
-  .heroActions button {
-    width: 100%;
-  }
-
-  .heroActions {
-    display: grid;
-  }
-
-  .primaryAction {
-    justify-content: space-between;
-  }
-
-  .statsGrid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.55rem;
-  }
-
-  .statCard {
-    display: grid;
-    justify-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 0.35rem;
-    border-radius: 16px;
-    text-align: center;
-  }
-
-  .statIcon {
-    width: 2.35rem;
-    height: 2.35rem;
-    border-radius: 11px;
-  }
-
-  .statCard p {
-    color: var(--ink);
-    font-size: var(--text-xs);
-  }
-
-  .statCard strong {
-    font-size: var(--text-xl);
-  }
-
-  .statContent small {
-    display: none;
-  }
-
-  .subjectSection,
-  .quickPanel {
-    padding: 1rem;
-    border-radius: 20px;
-  }
-
-  .sectionHeader {
-    align-items: start;
-    flex-direction: column;
-  }
-
-  .subjectGrid {
-    gap: 0.6rem;
-  }
-
-  .subjectCard {
-    min-height: 132px;
-    padding: 0.85rem;
-  }
-
-  .progressSnapshot {
-    gap: 0.4rem;
+  .progress div {
+    padding: 0.65rem 0.75rem;
   }
 }

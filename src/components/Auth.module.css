@@ -466,3 +466,145 @@
     font-size: var(--text-2xl);
   }
 }
+
+/* ── One screen, no page scroll ──────────────────────────────────────
+   The login/sign-up page is exactly the viewport and never scrolls.
+   Spacing shrinks with the screen height; if a very small screen still
+   can't fit the form (sign-up on a phone held sideways), only the white
+   form panel scrolls, never the page. */
+.authShell {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  padding: clamp(0.75rem, 3vh, 2rem);
+}
+
+.authCard {
+  height: 100%;
+  min-height: 0;
+  max-height: 840px;
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.brandPanel,
+.formPanel {
+  min-height: 0;
+}
+
+.brandPanel {
+  padding: clamp(1.5rem, 5vh, 3.25rem) clamp(1.5rem, 4vw, 3.5rem);
+}
+
+.brandContent {
+  margin-top: clamp(1rem, 6vh, 3.5rem);
+}
+
+.benefits {
+  margin-top: clamp(1rem, 4vh, 2.25rem);
+}
+
+.brandFooter {
+  margin-top: clamp(0.75rem, 3vh, 1.5rem);
+}
+
+.formPanel {
+  padding: clamp(1.25rem, 4.5vh, 3rem) clamp(1.5rem, 4vw, 3.5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  justify-content: safe center;
+}
+
+.viewTabs {
+  margin-bottom: clamp(1rem, 3vh, 1.75rem);
+}
+
+.authHeader {
+  margin-bottom: clamp(0.9rem, 2.6vh, 1.5rem);
+}
+
+/* "Welcome" / "Join us" only repeated the heading below it. */
+.welcomeIcon {
+  display: none;
+}
+
+.authHeader h2 {
+  margin: 0 0 0.35rem;
+}
+
+.authForm {
+  gap: clamp(0.7rem, 1.8vh, 1rem);
+}
+
+.fieldGroup {
+  gap: 0.35rem;
+}
+
+.authForm input,
+.authSelect {
+  min-height: 48px;
+  padding-top: 0.65rem;
+  padding-bottom: 0.65rem;
+}
+
+.authSubmit {
+  min-height: 50px;
+  margin-top: 0.25rem;
+}
+
+/* Short screens: the heading is enough; drop the one-line description. */
+@media (max-height: 820px) {
+  .authHeader p {
+    display: none;
+  }
+}
+
+/* Short laptop screens: keep the brand panel to the essentials. */
+@media (min-width: 901px) and (max-height: 760px) {
+  .benefits,
+  .brandFooter {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .authShell {
+    overflow: hidden;
+    padding: clamp(0.5rem, 2vh, 1rem);
+  }
+
+  .authCard {
+    height: auto;
+    max-height: none;
+  }
+
+  .formPanel {
+    max-height: calc(100dvh - 2 * clamp(0.5rem, 2vh, 1rem));
+    padding: clamp(1rem, 3.5vh, 2.5rem) clamp(1.25rem, 6vw, 2.5rem);
+  }
+
+  .mobileBrand {
+    margin-bottom: clamp(0.75rem, 3vh, 1.5rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .authShell {
+    padding: 0;
+  }
+
+  .authCard {
+    height: 100dvh;
+    min-height: 0;
+  }
+
+  .formPanel {
+    max-height: 100dvh;
+    padding: clamp(1rem, 3vh, 1.5rem) 1.25rem;
+  }
+
+  .mobileBrand,
+  .viewTabs {
+    margin-bottom: clamp(0.75rem, 2.5vh, 1.5rem);
+  }
+}
