@@ -235,3 +235,14 @@ select option {
   color: var(--ink);
   background-color: var(--sheet);
 }
+
+/* No bottom tab bar while a quiz attempt runs, so nothing to reserve. */
+body[data-exam='running'] {
+  --bottom-nav-space: 0px;
+}
+
+@media (max-width: 780px) {
+  body[data-exam='running'] footer {
+    display: none;
+  }
+}

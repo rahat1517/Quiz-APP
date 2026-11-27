@@ -418,15 +418,6 @@
 .startStats strong, .startStats span { display: block; overflow-wrap: anywhere; }
 .startStats strong { color: var(--ink); font-size: var(--text-lg); }
 .startStats span { color: var(--muted); font-size: var(--text-xs); }
-.startClass {
-  margin: -0.9rem 0 1.4rem;
-  padding: 0.4rem 0.75rem;
-  border-radius: 999px;
-  color: var(--ink);
-  background: var(--accent-soft);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-semibold);
-}
 .startActions {
   display: flex;
   justify-content: center;
@@ -532,4 +523,49 @@
 .timeLow .timerValue,
 .mobileStatusRow .timeLowText {
   color: var(--wrong-ink);
+}
+
+/* ── Phones: everything for one question on one screen ─────────
+   The bottom tab bar is hidden while an attempt runs, so the sticky
+   Previous/Next bar sits at the very bottom. Spacing, the question
+   chips and options are tightened; short options go two per row. */
+@media (max-width: 780px) {
+  .wrapper { margin-top: 0; }
+  .centerColumn { gap: 0.6rem; padding: 0.75rem 0.85rem 0; border-radius: 16px; }
+  .mobileStatus { gap: 0.4rem; margin-bottom: 0; }
+  .mobileDots { padding: 0.1rem 0.1rem 0.2rem; }
+  .mobileDots .progressDot { flex-basis: 2.4rem; min-height: 2.4rem; }
+  .mobileJump .submitButton { min-height: 2.4rem; padding: 0.35rem 0.8rem; }
+  .questionHeader { padding-bottom: 0.6rem; }
+  .questionNumber { display: none; }
+  .questionText { margin-top: 0.45rem; font-size: var(--text-base); font-weight: var(--weight-semibold); line-height: 1.45; }
+  .answerHint { display: none; }
+  .optionsGrid { gap: 0.5rem; }
+  .optionsShort { grid-template-columns: 1fr 1fr; }
+  .optionCard { min-height: 50px; gap: 0.6rem; padding: 0.55rem 0.7rem; border-radius: 12px; }
+  .optionKey { width: 1.85rem; height: 1.85rem; border-width: 1.5px; font-size: var(--text-sm); }
+  .optionText { font-weight: var(--weight-semibold); line-height: 1.35; }
+  .explanationBox { padding: 0.65rem 0.8rem; border-radius: 12px; font-size: var(--text-sm); }
+  .explanationBox p { line-height: 1.5; }
+  .explanationTitle { margin-bottom: 0.2rem; }
+  .centerActions { margin: auto -0.85rem 0; padding: 0.55rem 0.85rem; border-radius: 0 0 16px 16px; }
+  .navButton { min-height: 44px; padding: 0.55rem 1rem; }
+
+  /* Start screen: compact card, both buttons in one row */
+  .startScreen { display: block; min-height: 0; margin-top: 0; }
+  .startCard { padding: 1.1rem 1rem; border-radius: 16px; }
+  .startIcon { width: 3rem; height: 3rem; margin-top: 0.9rem; border-radius: 14px; font-size: var(--text-xl); }
+  .startCard h2 { margin: 0.8rem 0 0.3rem; font-size: var(--text-xl); }
+  .startTagline { font-size: var(--text-sm); }
+  .startStats { margin: 1rem 0; }
+  .startStats strong { font-size: var(--text-base); }
+  .startActions { grid-template-columns: 1fr 1fr; }
+  .startActions button { min-height: 46px; padding: 0.6rem 0.75rem; white-space: nowrap; }
+  .startButton { min-width: 0; gap: 0.5rem; }
+}
+
+/* Short phones (and phones with large system text): drop the decoration */
+@media (max-width: 780px) and (max-height: 700px) {
+  .startIcon, .startTagline { display: none; }
+  .startCard h2 { margin-top: 0.6rem; }
 }
