@@ -8,7 +8,7 @@ import {
   isClassInGroup,
 } from './lib/normalizeClassLevel';
 import { getSession, signOut } from './services/authService';
-import { getCurrentProfile, updateUserProfile } from './services/profileService';
+import { getCurrentProfile, updateUserProfile, updatePassword } from './services/profileService';
 import { saveQuizResult, getMyQuizResults, getAllQuizResultsForAdmin } from './services/resultService';
 
 import Auth from './components/Auth';
@@ -21,6 +21,11 @@ import Footer from './components/Footer';
 import Toast from './components/Toast';
 import SkeletonLoader from './components/SkeletonLoader';
 import TabNav from './components/TabNav';
+import Sidebar from './components/Sidebar';
+import QuizSetup from './components/QuizSetup';
+import { Flame, Star, Menu } from 'lucide-react';
+import { quizStats } from './lib/quizStats';
+import { pageTitle } from './lib/navItems';
 import Hero from './components/Hero';
 import ConfirmDialog from './components/ConfirmDialog';
 import { Button } from './components/ui/Button';
@@ -55,6 +60,9 @@ export default function App() {
   const [resultsError, setResultsError] = useState('');
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [resultsStartTab, setResultsStartTab] = useState('exams');
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
   const [authLoading, setAuthLoading] = useState(true);
   const [isAuthCallback, setIsAuthCallback] = useState(
     () => window.location.pathname === '/auth/callback'
@@ -65,6 +73,7 @@ export default function App() {
   const displayName =
     user?.user_metadata?.full_name || user?.email?.split('@')?.[0] || 'Learner';
   const userInitial = String(displayName).trim().charAt(0).toUpperCase() || 'Q';
+  const stats = useMemo(() => quizStats(quizHistory), [quizHistory]);
 
   const assignedClassLevel =
   profile?.class_level ??
@@ -142,30 +151,33 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
         ? availableQuestions
         : availableQuestions.filter((question) => question.subject === selectedSubject);
 
+    // Natural order, so "Chapter 2" comes before "Chapter 10".
     const unique = Array.from(
       new Set(filtered.map((question) => normalizeChapter(question.chapter || 'General')))
-    );
+    ).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 
     return ['All Chapters', ...unique];
   }, [availableQuestions, selectedSubject]);
 
-  const filteredQuestions = useMemo(() => {
-    return availableQuestions.filter((question) => {
-      const subjectMatched =
-        selectedSubject === 'All Subjects' || question.subject === selectedSubject;
-
-      const questionChapter = normalizeChapter(question.chapter || 'General');
-
-      const chapterMatched =
-        selectedChapter === 'All Chapters' || questionChapter === selectedChapter;
-
-      return subjectMatched && chapterMatched;
+  const questionCountsBySubject = useMemo(() => {
+    const counts = {};
+    availableQuestions.forEach((question) => {
+      const subject = question.subject || 'General';
+      counts[subject] = (counts[subject] || 0) + 1;
     });
-  }, [availableQuestions, selectedSubject, selectedChapter]);
+    return counts;
+  }, [availableQuestions]);
+
+  const bestScoreBySubject = useMemo(() => {
+    const best = {};
+    quizHistory.forEach((result) => {
+      if (!result.subject || result.subject === 'All Subjects') return;
+      best[result.subject] = Math.max(best[result.subject] ?? 0, Math.round(Number(result.percentage) || 0));
+    });
+    return best;
+  }, [quizHistory]);
 
   const totalQuestions = availableQuestions.length;
-  const totalSubjects = subjects.length > 1 ? subjects.length - 1 : 0;
-  const totalQuizzes = classLevels.length;
 
   async function loadQuestions() {
     setLoading(true);
@@ -314,6 +326,10 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
       setQuizStarted(false);
     }
 
+    if (tab !== 'results') {
+      setResultsStartTab('exams');
+    }
+
     setActiveTab(tab);
   }
 
@@ -322,14 +338,21 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
     setActiveTab('add');
   }
 
-  async function handleStartQuiz() {
+  // `overrides` lets Quick practice start straight from a tap, before the
+  // selected* state from that same tap has been applied.
+  async function handleStartQuiz(overrides = {}) {
+    const subject = overrides.subject ?? selectedSubject;
+    const chapter = overrides.chapter ?? selectedChapter;
+    const questionCount = overrides.questionCount ?? selectedQuestionCount;
+    const timeLimit = overrides.timeLimit ?? selectedTimeLimit;
+
     setQuizError('');
     setQuizLoading(true);
     setQuizQuestions([]);
 
     try {
-      const subjectFilter = selectedSubject === 'All Subjects' ? null : selectedSubject;
-      const chapterFilter = selectedChapter === 'All Chapters' ? null : selectedChapter;
+      const subjectFilter = subject === 'All Subjects' ? null : subject;
+      const chapterFilter = chapter === 'All Chapters' ? null : chapter;
       const classLevelToUse = String( isClassRestricted ? assignedClassLabel : selectedClassLevel ).trim();
 
       if (!classLevelToUse) {
@@ -338,7 +361,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
         return;
       }
 
-      const requestedQuestionCount = Number(selectedQuestionCount);
+      const requestedQuestionCount = Number(questionCount);
 
       if (
         !Number.isInteger(requestedQuestionCount) ||
@@ -350,7 +373,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
         return;
       }
 
-      const requestedTimeLimit = Number(selectedTimeLimit);
+      const requestedTimeLimit = Number(timeLimit);
 
       if (
         !Number.isInteger(requestedTimeLimit) ||
@@ -560,77 +583,50 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
       className={styles.appRoot}
     >
       <div className={styles.pageShell}>
-        <header className={styles.topBar}>
+        <header className={styles.appBar}>
           <Button
             type="button"
-            className={styles.brandButton}
-            onClick={() => handleTabChange('dashboard')}
-            aria-label="Go to dashboard"
+            className={styles.barMenu}
+            onClick={() => setMenuOpen(true)}
+            aria-label="Open menu"
+            aria-expanded={menuOpen}
+            aria-controls="app-drawer"
           >
-            <span className={styles.brandMark}>Q</span>
-            <span className={styles.titleBlock}>
-              <strong>Quiz World</strong>
-              <small>Learn, practice, improve</small>
-            </span>
+            <Menu size={22} aria-hidden />
           </Button>
 
-          <div className={styles.controlsRow}>
-            {activeTab !== 'quiz' && (
-              <div className={styles.filterControl}>
-                <label htmlFor="top-subject-filter" className="sr-only">
-                  Filter subject
-                </label>
-                <span className={styles.filterIcon} aria-hidden>⌕</span>
-                <select
-                  id="top-subject-filter"
-                  className={styles.subjectSelect}
-                  value={selectedSubject}
-                  onChange={(event) => {
-                    setSelectedSubject(event.target.value);
-                    setSelectedChapter('All Chapters');
-                  }}
-                >
-                  {subjects.map((subject) => (
-                    <option key={subject} value={subject}>
-                      {subject === 'All Subjects' ? '📚 All' : `📚 ${subject}`}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+          <Button
+            type="button"
+            className={styles.barBrand}
+            onClick={() => handleTabChange('dashboard')}
+            aria-label="Quiz World, go to dashboard"
+          >
+            <span className={styles.brandMark} aria-hidden>Q</span>
+            <span className={styles.barBrandName}>Quiz World</span>
+          </Button>
 
-            <Button
-              type="button"
-              className={styles.userCard}
-              onClick={() => handleTabChange('profile')}
-              aria-label="Open profile"
+          <h1 className={styles.pageTitle}>{pageTitle(activeTab)}</h1>
+
+          <div className={styles.barRight}>
+            <span
+              className={styles.statPill}
+              title="Streak: days in a row with at least one quiz"
+              aria-label={`Streak: ${stats.streak} day${stats.streak === 1 ? '' : 's'}`}
             >
-              <span className={styles.userIcon}>{userInitial}</span>
-              <span className={styles.userDetails}>
-                <strong>{displayName}</strong>
-                <small>
-                  {isAdmin ? 'Admin' : formatClassLabel(assignedClassLabel) || 'Student'}
-                </small>
-              </span>
-              <span className={styles.profileArrow} aria-hidden>›</span>
-            </Button>
-
-            <div className={styles.actionGroup}>
-              <Button
-                className={styles.signOutButton}
-                type="button"
-                onClick={handleSignOut}
-                aria-label="Log out"
-                title="Log out"
-              >
-                <span className={styles.signOutIcon} aria-hidden>↪</span>
-                <span className={styles.signOutText}>Log out</span>
-              </Button>
-            </div>
+              <Flame size={16} className={styles.flame} aria-hidden />
+              {stats.streak}
+            </span>
+            <span
+              className={styles.statPill}
+              title="Points: one for every correct answer"
+              aria-label={`${stats.points} points`}
+            >
+              <Star size={16} className={styles.star} aria-hidden />
+              {stats.points}
+              <span className={styles.statUnit}>points</span>
+            </span>
           </div>
         </header>
-
-        <TabNav activeTab={activeTab} onChange={handleTabChange} isAdmin={isAdmin} />
 
         {loading && <SkeletonLoader />}
 
@@ -647,13 +643,14 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
           <section className={styles.sectionGap}>
             <Hero
               totalQuestions={totalQuestions}
-              totalSubjects={totalSubjects}
-              totalQuizzes={totalQuizzes}
-              userName={user?.user_metadata?.full_name || user?.email?.split('@')?.[0]}
               classLabel={assignedClassLabel || selectedClassLevel}
-              subjects={subjects.filter((subject) => subject !== 'All Subjects').slice(0, 4)}
+              subjects={subjects.filter((subject) => subject !== 'All Subjects')}
               history={quizHistory}
-              onNavigate={handleTabChange}
+              bestBySubject={bestScoreBySubject}
+              onNavigate={(tab, options) => {
+                setResultsStartTab(options?.tab || 'exams');
+                handleTabChange(tab);
+              }}
               onStartSubject={(subject) => {
                 setSelectedSubject(subject);
                 setSelectedChapter('All Chapters');
@@ -691,36 +688,8 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
 
         {!loading && !error && activeTab === 'bank' && (
           <section className={styles.sectionGap}>
-            <div className={styles.fieldGroupInline}>
-              <div className={styles.field}>
-                <label htmlFor="bank-class" className={styles.fieldLabel}>
-                  Select class/exam
-                </label>
-                <select
-                  id="bank-class"
-                  className={styles.subjectSelect}
-                  value={isClassRestricted ? assignedClassLabel : selectedClassLevel}
-                  onChange={(event) => {
-                    if (isClassRestricted) return;
-                    setSelectedClassLevel(event.target.value);
-                  }}
-                  disabled={isClassRestricted}
-                >
-                  {classLevels.length === 0 ? (
-                    <option value="">No class found</option>
-                  ) : (
-                    classLevels.map((level) => (
-                      <option key={level} value={level}>
-                        {formatClassLabel(level)}
-                      </option>
-                    ))
-                  )}
-                </select>
-              </div>
-            </div>
-
             <QuestionList
-              questions={filteredQuestions}
+              questions={availableQuestions}
               subjects={subjects}
               chapters={chapters}
               selectedSubject={selectedSubject}
@@ -733,6 +702,16 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
               onDelete={isAdmin ? handleDeleteQuestion : undefined}
               onEdit={isAdmin ? handleEditQuestion : undefined}
               isAdmin={isAdmin}
+              classOptions={classLevels}
+              selectedClass={selectedClass}
+              isClassRestricted={isClassRestricted}
+              onClassChange={(level) => {
+                if (isClassRestricted) return;
+                setSelectedClassLevel(level);
+                setSelectedSubject('All Subjects');
+                setSelectedChapter('All Chapters');
+              }}
+              formatClass={formatClassLabel}
             />
           </section>
         )}
@@ -746,6 +725,9 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
               loading={resultsLoading}
               error={resultsError}
               onSave={handleProfileSave}
+              onChangePassword={updatePassword}
+              onNavigate={handleTabChange}
+              onSignOut={handleSignOut}
               isAdmin={isAdmin}
             />
           </section>
@@ -754,229 +736,46 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
         {!loading && !error && activeTab === 'quiz' && (
           <section className={styles.sectionGap}>
             {!quizStarted && (
-              <div className={styles.quizSelection}>
-              <div className={styles.fieldGroupInline}>
-                <div className={styles.field}>
-                  <label htmlFor="quiz-class" className={styles.fieldLabel}>
-                    Class / Exam
-                  </label>
-
-                  <select
-  id="quiz-class"
-  className={styles.subjectSelect}
-  value={selectedClass}
-  onChange={(event) => {
-    if (isClassRestricted) return;
-
-    setSelectedClassLevel(event.target.value);
-    setSelectedSubject('All Subjects');
-    setSelectedChapter('All Chapters');
-    setQuizStarted(false);
-  }}
-  disabled={isClassRestricted}
->
-  {classLevels.length === 0 ? (
-    <option value="">
-      {isClassRestricted
-        ? formatClassLabel(assignedClassLabel) || 'No assigned class'
-        : 'No class found'}
-    </option>
-  ) : (
-    Array.from(
-      new Set(isClassRestricted && assignedClassLabel
-        ? [assignedClassLabel, ...classLevels]
-        : classLevels)
-    ).map((level) => (
-      <option key={level} value={level}>
-        {formatClassLabel(level)}
-      </option>
-    ))
-  )}
-</select>
-
-                  {isClassRestricted && (
-                    <small className={styles.fieldHint}>Set by your account.</small>
-                  )}
-                </div>
-
-                <div className={styles.field}>
-                  <label htmlFor="quiz-subject" className={styles.fieldLabel}>
-                    Subject
-                  </label>
-
-                  <select
-                    id="quiz-subject"
-                    className={styles.subjectSelect}
-                    value={selectedSubject}
-                    onChange={(event) => {
-                      setSelectedSubject(event.target.value);
-                      setSelectedChapter('All Chapters');
-                      setQuizStarted(false);
-                    }}
-                  >
-                    {subjects.map((subject) => (
-                      <option key={subject} value={subject}>
-                        {subject}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className={styles.field}>
-                  <label htmlFor="quiz-chapter" className={styles.fieldLabel}>
-                    Chapter
-                  </label>
-
-                  <select
-                    id="quiz-chapter"
-                    className={styles.subjectSelect}
-                    value={selectedChapter}
-                    onChange={(event) => {
-                      setSelectedChapter(event.target.value);
-                      setQuizStarted(false);
-                    }}
-                  >
-                    {chapters.map((chapter) => (
-                      <option key={chapter} value={chapter}>
-                        {chapter}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className={styles.field}>
-                  <label htmlFor="quiz-count" className={styles.fieldLabel}>
-                    Question count
-                  </label>
-
-                  <div className={styles.numberControl}>
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        setSelectedQuestionCount((current) =>
-                          String(Math.max(1, (Number(current) || 1) - 1))
-                        );
-                        setQuizStarted(false);
-                      }}
-                      aria-label="Decrease question count"
-                    >
-                      −
-                    </Button>
-                    <input
-                      id="quiz-count"
-                      className={styles.numberInput}
-                      type="number"
-                      inputMode="numeric"
-                      min="1"
-                      max="100"
-                      step="1"
-                      value={selectedQuestionCount}
-                      onChange={(event) => {
-                        setSelectedQuestionCount(event.target.value);
-                        setQuizStarted(false);
-                      }}
-                      onBlur={() => {
-                        const value = Number(selectedQuestionCount);
-                        setSelectedQuestionCount(
-                          String(Number.isInteger(value) && value > 0 ? Math.min(value, 100) : 1)
-                        );
-                      }}
-                      aria-describedby="quiz-count-hint"
-                    />
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        setSelectedQuestionCount((current) =>
-                          String(Math.min(100, (Number(current) || 0) + 1))
-                        );
-                        setQuizStarted(false);
-                      }}
-                      aria-label="Increase question count"
-                    >
-                      +
-                    </Button>
-                  </div>
-                  <small id="quiz-count-hint" className={styles.fieldHint}>
-                    Between 1 and 100.
-                  </small>
-                </div>
-
-                <div className={styles.field}>
-                  <label htmlFor="quiz-time" className={styles.fieldLabel}>
-                    Time limit
-                  </label>
-
-                  <div className={styles.numberControl}>
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        setSelectedTimeLimit((current) =>
-                          String(Math.max(1, (Number(current) || 1) - 1))
-                        );
-                        setQuizStarted(false);
-                      }}
-                      aria-label="Decrease time limit"
-                    >
-                      −
-                    </Button>
-                    <div className={styles.timeInputWrap}>
-                      <input
-                        id="quiz-time"
-                        className={styles.numberInput}
-                        type="number"
-                        inputMode="numeric"
-                        min="1"
-                        max="180"
-                        step="1"
-                        value={selectedTimeLimit}
-                        onChange={(event) => {
-                          setSelectedTimeLimit(event.target.value);
-                          setQuizStarted(false);
-                        }}
-                        onBlur={() => {
-                          const value = Number(selectedTimeLimit);
-                          setSelectedTimeLimit(
-                            String(Number.isInteger(value) && value > 0 ? Math.min(value, 180) : 1)
-                          );
-                        }}
-                        aria-describedby="quiz-time-hint"
-                      />
-                      <span>min</span>
-                    </div>
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        setSelectedTimeLimit((current) =>
-                          String(Math.min(180, (Number(current) || 0) + 1))
-                        );
-                        setQuizStarted(false);
-                      }}
-                      aria-label="Increase time limit"
-                    >
-                      +
-                    </Button>
-                  </div>
-                  <small id="quiz-time-hint" className={styles.fieldHint}>
-                    Between 1 and 180 minutes.
-                  </small>
-                </div>
-              </div>
-
-              <Button
-                type="button"
-                className={`${styles.toggleButton} ${styles.startQuizButton}`}
-                disabled={quizLoading}
-                onClick={handleStartQuiz}
-              >
-                {quizLoading ? 'Loading exam…' : 'Start quiz'}
-              </Button>
-
-              {quizError && (
-                <p className={styles.statusBanner} role="alert">
-                  {quizError}
-                </p>
-              )}
-              </div>
+              <QuizSetup
+                subjects={subjects.filter((subject) => subject !== 'All Subjects')}
+                questionCounts={questionCountsBySubject}
+                bestBySubject={bestScoreBySubject}
+                chapters={chapters}
+                classOptions={Array.from(
+                  new Set(
+                    isClassRestricted && assignedClassLabel
+                      ? [assignedClassLabel, ...classLevels]
+                      : classLevels
+                  )
+                )}
+                selectedClass={selectedClass}
+                isClassRestricted={isClassRestricted}
+                onClassChange={(level) => {
+                  if (isClassRestricted) return;
+                  setSelectedClassLevel(level);
+                  setSelectedSubject('All Subjects');
+                  setSelectedChapter('All Chapters');
+                }}
+                formatClass={formatClassLabel}
+                selectedChapter={selectedChapter}
+                onChapterChange={setSelectedChapter}
+                questionCount={selectedQuestionCount}
+                onQuestionCountChange={setSelectedQuestionCount}
+                timeLimit={selectedTimeLimit}
+                onTimeLimitChange={setSelectedTimeLimit}
+                onSubjectChange={(subject) => {
+                  setSelectedSubject(subject);
+                  setSelectedChapter('All Chapters');
+                }}
+                onQuickStart={(subject, quick) => {
+                  setSelectedQuestionCount(quick.questionCount);
+                  setSelectedTimeLimit(quick.timeLimit);
+                  handleStartQuiz({ subject, chapter: 'All Chapters', ...quick });
+                }}
+                onStart={() => handleStartQuiz()}
+                loading={quizLoading}
+                error={quizError}
+              />
             )}
 
             {quizStarted && quizQuestions.length > 0 && (
@@ -1010,6 +809,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
               loading={resultsLoading}
               error={resultsError}
               onRestart={handleRestartQuiz}
+              initialTab={resultsStartTab}
             />
           </section>
         )}
@@ -1017,11 +817,23 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
         <Footer />
       </div>
 
-      <TabNav
+      <Sidebar
+        open={menuOpen}
+        onClose={closeMenu}
         activeTab={activeTab}
-        onChange={handleTabChange}
-        variant="left"
+        onChange={(tab) => {
+          setMenuOpen(false);
+          handleTabChange(tab);
+        }}
         isAdmin={isAdmin}
+        classLabel={isAdmin ? 'Admin' : formatClassLabel(assignedClassLabel) || null}
+        displayName={displayName}
+        userInitial={userInitial}
+        roleLabel={isAdmin ? 'Admin' : formatClassLabel(assignedClassLabel) || 'Student'}
+        onSignOut={() => {
+          setMenuOpen(false);
+          handleSignOut();
+        }}
       />
 
       <TabNav

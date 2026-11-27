@@ -1,179 +1,266 @@
+import {
+  BookOpen,
+  ClipboardList,
+  ChartColumn,
+  UserRound,
+  Lock,
+  Inbox,
+  Check,
+  Shuffle,
+  SlidersHorizontal,
+  CircleX,
+} from 'lucide-react';
 import styles from './Hero.module.css';
 import { Button } from './ui/Button';
 import { formatClassLevel } from '../lib/normalizeClassLevel';
+import { quizStats } from '../lib/quizStats';
+import { subjectIcon } from '../lib/subjectIcons';
 
-const subjectIcons = ['∑', '⚗', 'A', '⌘'];
+const REPORT_UNLOCK = 3;
+
+const QUICK_ACTIONS = [
+  { id: 'bank', label: 'Question Bank', Icon: BookOpen, tint: 'orange' },
+  { id: 'quiz', label: 'Take a quiz', Icon: ClipboardList, tint: 'rose' },
+  { id: 'results', label: 'Results', Icon: ChartColumn, tint: 'teal' },
+  { id: 'profile', label: 'Profile', Icon: UserRound, tint: 'violet' },
+];
+
+const STUDY_TILES = [
+  { id: 'bank', label: 'Question Bank', Icon: BookOpen, tint: 'orange' },
+  { id: 'quiz', label: 'Custom quiz', Icon: SlidersHorizontal, tint: 'rose' },
+  { id: 'results', label: 'Results', Icon: ChartColumn, tint: 'teal' },
+  { id: 'results', label: 'Past mistakes', Icon: CircleX, tint: 'rose', key: 'mistakes' },
+  { id: 'profile', label: 'Profile', Icon: UserRound, tint: 'violet' },
+];
+
+// Phone home: section cards with a coloured header and a two-column grid of
+// tiles. Shown instead of the card dashboard at 780px and below.
+function PhoneHome({ subjects, bestBySubject, onNavigate, onStartSubject }) {
+  return (
+    <div className={styles.phoneHome}>
+      <section className={styles.block} aria-labelledby="practice-block">
+        <h2 id="practice-block" className={styles.blockTitle}>Practice by subject</h2>
+        {subjects.length === 0 ? (
+          <p className={styles.blockEmpty}>No questions yet for your class.</p>
+        ) : (
+          <div className={styles.tileGrid}>
+            <Button type="button" className={styles.tile} onClick={() => onNavigate?.('quiz')}>
+              <span className={`${styles.tileIcon} ${styles.blue}`} aria-hidden>
+                <Shuffle size={18} />
+              </span>
+              <span className={styles.tileLabel}>All subjects</span>
+            </Button>
+            {subjects.map((subject) => {
+              const { Icon, tint } = subjectIcon(subject);
+              const best = bestBySubject[subject];
+              return (
+                <Button
+                  key={subject}
+                  type="button"
+                  className={styles.tile}
+                  onClick={() => onStartSubject?.(subject)}
+                  aria-label={`${subject}${best != null ? `, best score ${best}%` : ''}`}
+                >
+                  <span className={`${styles.tileIcon} ${styles[tint]}`} aria-hidden>
+                    <Icon size={18} />
+                  </span>
+                  <span className={styles.tileLabel}>{subject}</span>
+                  {best == null && <span className={styles.newDot} aria-hidden />}
+                </Button>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      <section className={styles.block} aria-labelledby="study-block">
+        <h2 id="study-block" className={styles.blockTitle}>Study</h2>
+        <div className={styles.tileGrid}>
+          {STUDY_TILES.map(({ id, key, label, Icon, tint }) => (
+            <Button
+              key={key || id}
+              type="button"
+              className={styles.tile}
+              onClick={() => onNavigate?.(id, key ? { tab: key } : undefined)}
+            >
+              <span className={`${styles.tileIcon} ${styles[tint]}`} aria-hidden>
+                <Icon size={18} />
+              </span>
+              <span className={styles.tileLabel}>{label}</span>
+            </Button>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function shortDate(value) {
+  return new Date(value).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+}
 
 export default function Hero({
   totalQuestions,
-  totalSubjects,
-  totalQuizzes,
-  userName = 'Learner',
   classLabel,
   subjects = [],
   history = [],
+  bestBySubject = {},
   onNavigate,
   onStartSubject,
 }) {
-  const displaySubjects =
-    subjects.length > 0 ? subjects : ['Mathematics', 'Science', 'Language', 'Technology'];
+  const stats = quizStats(history);
   const displayClass = classLabel ? formatClassLevel(classLabel) : null;
-  const bestPercentage = history.reduce(
-    (best, item) => Math.max(best, Number(item.percentage) || 0),
-    0
-  );
-  const latestResult = history[0];
+  const recent = history.slice(0, 3);
+
+  const steps = [
+    { label: 'Choose your class', done: Boolean(displayClass) },
+    { label: 'Take your first quiz', done: stats.attempts >= 1 },
+    { label: `Take ${REPORT_UNLOCK} quizzes`, done: stats.attempts >= REPORT_UNLOCK },
+    { label: 'Score 80% or more', done: stats.best >= 80 },
+  ];
+  const doneCount = steps.filter((step) => step.done).length;
+  const setupPercent = Math.round((doneCount / steps.length) * 100);
 
   return (
-    <section className={styles.heroSection}>
-      <div className={styles.heroPanel}>
-        <div className={styles.heroContent}>
-          <span className={styles.badge}>
-            <span className={styles.liveDot} />
-            Ready when you are
-          </span>
-          <p className={styles.welcome}>Welcome back, {userName}</p>
-          <h1>How far can your knowledge take you today?</h1>
-          <p className={styles.heroCopy}>
-            Build a quiz from your class, subject, and chapter. Get instant
-            results and learn from every answer.
-          </p>
-
-          <div className={styles.heroActions}>
-            <Button
-              type="button"
-              className={styles.primaryAction}
-              onClick={() => onNavigate?.('quiz')}
-            >
-              Start a quiz <span aria-hidden>→</span>
+    <>
+    <PhoneHome
+      subjects={subjects}
+      bestBySubject={bestBySubject}
+      onNavigate={onNavigate}
+      onStartSubject={onStartSubject}
+    />
+    <div className={styles.dashboard}>
+      <div className={styles.mainColumn}>
+        <nav className={`${styles.card} ${styles.quickActions}`} aria-label="Quick actions">
+          {QUICK_ACTIONS.map(({ id, label, Icon, tint }) => (
+            <Button key={id} type="button" className={styles.action} onClick={() => onNavigate?.(id)}>
+              <span className={`${styles.actionIcon} ${styles[tint]}`} aria-hidden>
+                <Icon size={24} strokeWidth={2.1} />
+              </span>
+              <span>{label}</span>
             </Button>
-            <Button
-              type="button"
-              className={styles.secondaryAction}
-              onClick={() => onNavigate?.('bank')}
-            >
-              Explore questions
-            </Button>
-          </div>
-        </div>
+          ))}
+        </nav>
 
-        <Button
-          type="button"
-          className={styles.challengeCard}
-          onClick={() => onNavigate?.('quiz')}
-        >
-          <div className={styles.challengeTop}>
-            <span>Quick challenge</span>
-            <span className={styles.challengeIcon}>Q</span>
-          </div>
-          <div className={styles.challengeScore}>
-            <strong>5</strong>
-            <span>questions</span>
-          </div>
-          <p>A short quiz is the easiest way to keep your momentum going.</p>
-          <div className={styles.challengeMeta}>
-            <span>{displayClass || 'Choose a class'}</span>
-            <span>5 min</span>
-          </div>
-          <span className={styles.challengeAction}>Start challenge →</span>
-        </Button>
+        <div className={styles.cardRow}>
+          <section className={styles.card} aria-labelledby="report-title">
+            <h2 id="report-title" className={styles.cardTitle}>Your report</h2>
+            {stats.attempts >= REPORT_UNLOCK ? (
+              <dl className={styles.reportStats}>
+                <div>
+                  <dt>Average</dt>
+                  <dd>{stats.average}%</dd>
+                </div>
+                <div>
+                  <dt>Best</dt>
+                  <dd>{stats.best}%</dd>
+                </div>
+                <div>
+                  <dt>Quizzes</dt>
+                  <dd>{stats.attempts}</dd>
+                </div>
+              </dl>
+            ) : (
+              <div className={styles.emptyState}>
+                <span className={styles.emptyIcon} aria-hidden>
+                  <Lock size={22} />
+                </span>
+                <p className={styles.emptyTitle}>Unlocks after {REPORT_UNLOCK} quizzes</p>
+                <p className={styles.emptyText}>
+                  {REPORT_UNLOCK - stats.attempts} more to go
+                </p>
+              </div>
+            )}
+          </section>
 
-      </div>
-
-      <div className={styles.statsGrid}>
-        <article className={styles.statCard}>
-          <span className={`${styles.statIcon} ${styles.purpleIcon}`} aria-hidden>
-            Q
-          </span>
-          <div className={styles.statContent}>
-            <p>Available questions</p>
-            <strong>{totalQuestions}</strong>
-            <small>Ready for your next quiz</small>
-          </div>
-        </article>
-        <article className={styles.statCard}>
-          <span className={`${styles.statIcon} ${styles.blueIcon}`} aria-hidden>
-            S
-          </span>
-          <div className={styles.statContent}>
-            <p>Available subjects</p>
-            <strong>{totalSubjects}</strong>
-            <small>Choose a topic to practice</small>
-          </div>
-        </article>
-        <article className={styles.statCard}>
-          <span className={`${styles.statIcon} ${styles.greenIcon}`} aria-hidden>
-            C
-          </span>
-          <div className={styles.statContent}>
-            <p>{displayClass ? 'Selected class' : 'Available classes'}</p>
-            <strong>{displayClass || totalQuizzes}</strong>
-            <small>
-              {displayClass
-                ? `${totalQuizzes} class categories available`
-                : 'Choose your class to begin'}
-            </small>
-          </div>
-        </article>
-      </div>
-
-      <div className={styles.dashboardGrid}>
-        <section className={styles.subjectSection}>
-          <div className={styles.sectionHeader}>
-            <div>
-              <span>Pick a direction</span>
-              <h2>Explore subjects</h2>
+          <section className={styles.card} aria-labelledby="recent-title">
+            <div className={styles.cardHeader}>
+              <h2 id="recent-title" className={styles.cardTitle}>Recent quizzes</h2>
+              {recent.length > 0 && (
+                <Button type="button" className={styles.linkButton} onClick={() => onNavigate?.('results')}>
+                  See all
+                </Button>
+              )}
             </div>
-            <Button type="button" onClick={() => onNavigate?.('bank')}>
-              View question bank →
-            </Button>
-          </div>
+            {recent.length > 0 ? (
+              <ul className={styles.recentList}>
+                {recent.map((exam) => (
+                  <li key={exam.id}>
+                    <span className={styles.recentSubject}>{exam.subject || 'Mixed'}</span>
+                    <span className={styles.recentDate}>{shortDate(exam.created_at)}</span>
+                    <span className={styles.recentScore}>{Math.round(Number(exam.percentage) || 0)}%</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className={styles.emptyState}>
+                <span className={styles.emptyIcon} aria-hidden>
+                  <Inbox size={22} />
+                </span>
+                <p className={styles.emptyTitle}>No quizzes yet</p>
+                <p className={styles.emptyText}>Your finished quizzes show up here.</p>
+              </div>
+            )}
+          </section>
+        </div>
+      </div>
 
-          <div className={styles.subjectGrid}>
-            {displaySubjects.slice(0, 4).map((subject, index) => (
-              <Button
-                key={subject}
-                type="button"
-                className={styles.subjectCard}
-                onClick={() => onStartSubject?.(subject)}
-              >
-                <span className={styles.subjectIcon}>{subjectIcons[index]}</span>
-                <strong>{subject}</strong>
-                <small>Practice now</small>
-                <span className={styles.subjectArrow} aria-hidden>→</span>
-              </Button>
-            ))}
+      <div className={styles.sideColumn}>
+        <section className={styles.card} aria-labelledby="setup-title">
+          <h2 id="setup-title" className={styles.cardTitle}>Get started</h2>
+          <div
+            className={styles.setupBar}
+            role="progressbar"
+            aria-valuenow={setupPercent}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Setup progress"
+          >
+            <span style={{ width: `${setupPercent}%` }} />
           </div>
+          <p className={styles.setupCaption}>
+            {doneCount} of {steps.length} done
+          </p>
+          <ol className={styles.steps}>
+            {steps.map((step) => (
+              <li key={step.label} className={step.done ? styles.stepDone : undefined}>
+                <span className={styles.stepMark} aria-hidden>
+                  {step.done && <Check size={14} strokeWidth={3} />}
+                </span>
+                <span>{step.label}</span>
+                <span className="sr-only">{step.done ? ' (done)' : ' (to do)'}</span>
+              </li>
+            ))}
+          </ol>
         </section>
 
-        <aside className={styles.quickPanel}>
-          <span className={styles.quickEyebrow}>Your progress</span>
-          <h2>Learning snapshot</h2>
-          <div className={styles.progressSnapshot}>
-            <div>
-              <strong>{history.length}</strong>
-              <span>Attempts</span>
-            </div>
-            <div>
-              <strong>{Math.round(bestPercentage)}%</strong>
-              <span>Best score</span>
-            </div>
-            <div>
-              <strong>{latestResult ? `${Math.round(Number(latestResult.percentage) || 0)}%` : '-'}</strong>
-              <span>Latest score</span>
-            </div>
+        <section className={styles.card} aria-labelledby="subjects-title">
+          <div className={styles.cardHeader}>
+            <h2 id="subjects-title" className={styles.cardTitle}>Practice a subject</h2>
+            <span className={styles.cardMeta}>
+              {totalQuestions} question{totalQuestions === 1 ? '' : 's'}
+            </span>
           </div>
-          <Button type="button" onClick={() => onNavigate?.('results')}>
-            <span>Review your results</span><span aria-hidden>→</span>
-          </Button>
-          <Button type="button" onClick={() => onNavigate?.('profile')}>
-            <span>View your progress</span><span aria-hidden>→</span>
-          </Button>
-          <Button type="button" onClick={() => onNavigate?.('bank')}>
-            <span>Browse all questions</span><span aria-hidden>→</span>
-          </Button>
-        </aside>
+          {subjects.length === 0 ? (
+            <p className={styles.emptyText}>No questions yet for your class.</p>
+          ) : (
+            <div className={styles.subjectList}>
+              {subjects.map((subject) => (
+                <Button
+                  key={subject}
+                  type="button"
+                  className={styles.subjectItem}
+                  onClick={() => onStartSubject?.(subject)}
+                >
+                  <span>{subject}</span>
+                  <span className={styles.chevron} aria-hidden>›</span>
+                </Button>
+              ))}
+            </div>
+          )}
+        </section>
       </div>
-    </section>
+    </div>
+    </>
   );
 }

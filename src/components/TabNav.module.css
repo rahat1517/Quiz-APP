@@ -18,7 +18,7 @@
   padding: 0.85rem 1.4rem;
   border-radius: 999px;
   cursor: pointer;
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   transition: all 0.25s ease;
 }
 
@@ -41,6 +41,21 @@
 
 .shortLabel {
   display: none;
+}
+
+/* Tablets and phones held sideways: keep all six admin tabs on one line. */
+@media (min-width: 781px) and (max-width: 1100px) {
+  .tabNav {
+    flex-wrap: nowrap;
+    gap: 0.25rem;
+    padding: 0.5rem;
+  }
+
+  .tabItem {
+    padding: 0.6rem 0.85rem;
+    font-size: var(--text-sm);
+    white-space: nowrap;
+  }
 }
 
 @media (max-width: 780px) {
@@ -69,11 +84,30 @@
     z-index: 60;
   }
 
+  /* Icon above a short label; the current tab is blue on a soft tint. */
   .bottomNav .tabItem {
-    padding: 0.7rem 0.2rem;
-    font-size: 0.75rem;
-    min-height: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    min-height: 3.25rem;
+    padding: 0.35rem 0.15rem;
+    border-radius: 12px;
+    color: var(--muted);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
     white-space: normal;
+  }
+
+  .bottomNav .active,
+  .bottomNav .active:hover {
+    color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .tabIcon {
+    flex-shrink: 0;
   }
 
   .fullLabel {
@@ -86,70 +120,7 @@
   }
 }
 
-/* ── Left sidebar (desktop) ────────────────────────────────── */
-.leftNav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 250px;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 1.5rem 1rem 2rem;
-  /* Undo the pill styling inherited from .tabNav: straight edges, items from the top. */
-  flex-wrap: nowrap;
-  justify-content: flex-start;
-  padding-top: 7.5rem;
-  border: 0;
-  border-right: 1px solid var(--rule);
-  border-radius: 0;
-  box-shadow: none;
-  background: var(--sheet);
-  backdrop-filter: blur(18px);
-  z-index: 50;
-}
 
-.leftNav .tabItem {
-  width: 100%;
-  padding: 0.95rem 1rem;
-  border-radius: 12px;
-  text-align: left;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 0.95rem;
-}
-
-.leftNav .tabItem:hover {
-  transform: none;
-  background: var(--inset);
-  color: var(--ink);
-}
-
-.leftNav .active,
-.leftNav .active:hover {
-  background: var(--accent);
-  color: var(--on-accent);
-  box-shadow: none;
-}
-
-.leftNav .fullLabel {
-  display: inline;
-}
-
-.leftNav .shortLabel {
-  display: none;
-}
-
-@media (max-width: 1100px) {
-  .leftNav {
-    display: none;
-  }
-}
-
-/* Above 1100px the left sidebar is the menu, so hide the top tab bar
-   instead of showing the same links twice. */
 @media (min-width: 1101px) {
   .topNav {
     display: none;

@@ -4,22 +4,63 @@ import { Button } from './ui/Button';
 import ConfirmDialog from './ConfirmDialog';
 import { getSubjectBadgeStyle } from '../lib/subjectColors';
 import { normalizeChapter } from '../lib/normalizeChapter';
+import { subjectIcon } from '../lib/subjectIcons';
+import { Search, ArrowLeft } from 'lucide-react';
 
 const PAGE_SIZE = 10;
+
+const ALL_SUBJECTS = 'All Subjects';
+const ALL_CHAPTERS = 'All Chapters';
+
+function Chips({ label, items, selected, allValue, allLabel, onSelect }) {
+  return (
+    <div className={styles.chips} role="group" aria-label={label}>
+      {items.map((item) => (
+        <button
+          key={item}
+          type="button"
+          className={item === selected ? `${styles.chip} ${styles.chipActive}` : styles.chip}
+          aria-pressed={item === selected}
+          onClick={() => onSelect(item)}
+        >
+          {item === allValue ? allLabel : item}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export default function QuestionList({
   questions = [],
   subjects = [],
   chapters = [],
-  selectedSubject = 'All Subjects',
-  selectedChapter = 'All Chapters',
+  selectedSubject = ALL_SUBJECTS,
+  selectedChapter = ALL_CHAPTERS,
   onSubjectChange,
   onChapterChange,
   onDelete,
   onEdit,
   isAdmin,
+  classOptions = [],
+  selectedClass,
+  isClassRestricted,
+  onClassChange,
+  formatClass = (c) => c,
 }) {
   const [search, setSearch] = useState('');
+  const [view, setView] = useState('subjects');
+
+  // Tile data: question and chapter counts per subject in this class.
+  const subjectSummary = useMemo(() => {
+    const summary = {};
+    questions.forEach((question) => {
+      const subject = question.subject || 'General';
+      summary[subject] ??= { count: 0, chapters: new Set() };
+      summary[subject].count += 1;
+      summary[subject].chapters.add(normalizeChapter(question.chapter || 'General'));
+    });
+    return summary;
+  }, [questions]);
 
   const filtered = useMemo(() => {
     return questions.filter((question) => {
@@ -27,10 +68,10 @@ export default function QuestionList({
       const questionChapter = normalizeChapter(question.chapter || 'General');
 
       const matchesSubject =
-        selectedSubject === 'All Subjects' || question.subject === selectedSubject;
+        selectedSubject === ALL_SUBJECTS || question.subject === selectedSubject;
 
       const matchesChapter =
-        selectedChapter === 'All Chapters' || questionChapter === selectedChapter;
+        selectedChapter === ALL_CHAPTERS || questionChapter === selectedChapter;
 
       const matchesSearch = questionText.includes(search.toLowerCase());
 
@@ -58,79 +99,134 @@ export default function QuestionList({
       : styles.optionRow;
   }
 
+  const showTiles = view === 'subjects' && selectedSubject === ALL_SUBJECTS && !search.trim();
+  const subjectNames = subjects.filter((subject) => subject !== ALL_SUBJECTS);
+
+  function switchView(next) {
+    setView(next);
+    onSubjectChange?.(ALL_SUBJECTS);
+  }
+
   return (
-    <section className={styles.bankCard}>
-      <div className={styles.titles}>
-        <div>
-          <h2>Question Bank</h2>
-          <p>
-            {isAdmin
-              ? 'Search, filter, and manage your quizzes with a modern card view.'
-              : 'Search and review questions from your assigned class or exam category.'}
-          </p>
+    <section className={styles.bank}>
+      <div className={styles.toolbar}>
+        <div className={styles.viewSwitch} role="tablist" aria-label="Browse questions">
+          {[
+            ['subjects', 'By subject'],
+            ['all', 'All questions'],
+          ].map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              aria-selected={view === id}
+              className={view === id ? `${styles.viewTab} ${styles.viewTabActive}` : styles.viewTab}
+              onClick={() => switchView(id)}
+            >
+              {label}
+            </button>
+          ))}
         </div>
 
-        <div className={styles.filterGroup}>
-          <div className={styles.filterField}>
-            <label htmlFor="subject-filter" className="sr-only">
-              Filter subject
+        <div className={styles.toolbarRight}>
+          {!isClassRestricted && classOptions.length > 0 && (
+            <label className={styles.classPicker}>
+              <span className="sr-only">Class or exam</span>
+              <select value={selectedClass} onChange={(event) => onClassChange?.(event.target.value)}>
+                {classOptions.map((level) => (
+                  <option key={level} value={level}>
+                    {formatClass(level)}
+                  </option>
+                ))}
+              </select>
             </label>
-
-            <select
-              id="subject-filter"
-              value={selectedSubject}
-              onChange={(event) => {
-                onSubjectChange?.(event.target.value);
-              }}
-            >
-              {subjects.map((subject) => (
-                <option key={subject} value={subject}>
-                  {subject}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className={styles.filterField}>
-            <label htmlFor="chapter-filter" className="sr-only">
-              Filter chapter
-            </label>
-
-            <select
-              id="chapter-filter"
-              value={selectedChapter}
-              onChange={(event) => {
-                onChapterChange?.(event.target.value);
-              }}
-            >
-              {chapters.map((chapter) => (
-                <option key={chapter} value={chapter}>
-                  {chapter}
-                </option>
-              ))}
-            </select>
-          </div>
+          )}
+          <label className={styles.searchField}>
+            <Search size={18} aria-hidden />
+            <span className="sr-only">Search questions</span>
+            <input
+              type="search"
+              enterKeyHint="search"
+              placeholder="Search questions"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
+          </label>
         </div>
       </div>
 
-      <div className={styles.controls}>
-        <label className={styles.searchField}>
-          <span aria-hidden>🔎</span>
-          <span className="sr-only">Search questions</span>
-          <input
-            type="search"
-            enterKeyHint="search"
-            placeholder="Search questions"
-            value={search}
-            onChange={(event) => {
-              setSearch(event.target.value);
-            }}
-          />
-        </label>
-        <span className={styles.resultCount}>
-          {filtered.length} question{filtered.length === 1 ? '' : 's'}
-        </span>
-      </div>
+      {showTiles ? (
+        subjectNames.length === 0 ? (
+          <p className={styles.emptyState}>No questions yet for this class.</p>
+        ) : (
+          <div className={styles.tileGrid}>
+            {subjectNames.map((subject) => {
+              const { Icon, tint } = subjectIcon(subject);
+              const info = subjectSummary[subject] || { count: 0, chapters: new Set() };
+              return (
+                <button
+                  key={subject}
+                  type="button"
+                  className={`${styles.tile} ${styles[tint]}`}
+                  onClick={() => onSubjectChange?.(subject)}
+                >
+                  <span className={styles.tileIcon} aria-hidden>
+                    <Icon size={26} strokeWidth={2} />
+                  </span>
+                  <strong>{subject}</strong>
+                  <small>
+                    {info.count} question{info.count === 1 ? '' : 's'}, {info.chapters.size} chapter
+                    {info.chapters.size === 1 ? '' : 's'}
+                  </small>
+                </button>
+              );
+            })}
+          </div>
+        )
+      ) : (
+        <>
+          <div className={styles.listHeader}>
+            {selectedSubject !== ALL_SUBJECTS && (
+              <button
+                type="button"
+                className={styles.back}
+                onClick={() => onSubjectChange?.(ALL_SUBJECTS)}
+              >
+                <ArrowLeft size={16} aria-hidden /> All subjects
+              </button>
+            )}
+            <div className={styles.listTitleRow}>
+              <h2 className={styles.listTitle}>
+                {search.trim()
+                  ? `Results for "${search.trim()}"`
+                  : selectedSubject === ALL_SUBJECTS
+                    ? 'All questions'
+                    : selectedSubject}
+              </h2>
+              <span className={styles.resultCount}>
+                {filtered.length} question{filtered.length === 1 ? '' : 's'}
+              </span>
+            </div>
+            {selectedSubject === ALL_SUBJECTS ? (
+              <Chips
+                label="Filter by subject"
+                items={[ALL_SUBJECTS, ...subjectNames]}
+                selected={selectedSubject}
+                allValue={ALL_SUBJECTS}
+                allLabel="All subjects"
+                onSelect={(subject) => onSubjectChange?.(subject)}
+              />
+            ) : (
+              <Chips
+                label="Filter by chapter"
+                items={chapters}
+                selected={selectedChapter}
+                allValue={ALL_CHAPTERS}
+                allLabel="All chapters"
+                onSelect={(chapter) => onChapterChange?.(chapter)}
+              />
+            )}
+          </div>
 
       {filtered.length === 0 ? (
         <p className={styles.emptyState}>No questions match this filter.</p>
@@ -230,6 +326,9 @@ export default function QuestionList({
             Show {Math.min(PAGE_SIZE, remaining)} more
           </Button>
         </div>
+      )}
+
+        </>
       )}
 
       <ConfirmDialog

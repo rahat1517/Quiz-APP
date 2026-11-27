@@ -3,7 +3,7 @@
   padding: 1.5rem 1.25rem 1rem;
   border-top: 1px solid var(--rule);
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   background: var(--sheet);
 }
 
@@ -34,18 +34,18 @@
 
 .copyright {
   color: var(--ink);
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
 }
 
 .copyright strong {
   color: var(--accent);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 .honorName {
   color: var(--ink);
-  font-weight: 600;
-  font-size: 0.9rem;
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
   background: var(--accent-soft);
   padding: 0.4rem 0.75rem;
   border-radius: 8px;
@@ -69,12 +69,12 @@
   }
 
   .footer p {
-    font-size: 0.85rem;
+    font-size: var(--text-sm);
   }
 
   .honorName {
     padding: 0.35rem 0.6rem;
-    font-size: 0.85rem;
+    font-size: var(--text-sm);
     width: fit-content;
     margin: 0 auto;
   }

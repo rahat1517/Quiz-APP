@@ -1,6 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
+import { ClipboardList, CircleCheck, CircleX, CircleMinus } from 'lucide-react';
 import { Button } from './ui/Button';
+import { subjectIcon } from '../lib/subjectIcons';
 import styles from './Result.module.css';
+
+const ALL = 'All';
+const MISTAKES_PAGE = 20;
+
+function shortDate(value) {
+  if (!value) return '';
+  return new Date(value).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function scoreTone(percentage) {
+  if (percentage >= 80) return 'high';
+  if (percentage >= 50) return 'mid';
+  return 'low';
+}
 
 export default function Result({
   result,
@@ -8,8 +24,12 @@ export default function Result({
   loading = false,
   error = '',
   onRestart,
+  initialTab = 'exams',
 }) {
   const [selectedExam, setSelectedExam] = useState(null);
+  const [tab, setTab] = useState(initialTab);
+  const [subjectFilter, setSubjectFilter] = useState(ALL);
+  const [mistakeLimit, setMistakeLimit] = useState(MISTAKES_PAGE);
 
   const currentResultId = result?.id;
 
@@ -222,6 +242,20 @@ export default function Result({
   }
 
   const selectedExamAnswers = getAnswerList(selectedExam);
+
+  // History tabs: subjects present, exams filtered by subject, and every
+  // wrongly answered question across all saved quizzes (newest first).
+  const historySubjects = Array.from(
+    new Set(history.map((exam) => exam.subject).filter((subject) => subject && subject !== 'All Subjects'))
+  ).sort();
+  const matchesSubject = (exam) => subjectFilter === ALL || exam.subject === subjectFilter;
+  const filteredHistory = displayedHistory.filter(matchesSubject);
+  const allMistakes = history.flatMap((exam) =>
+    getAnswerList(exam)
+      .filter((answer) => String(answer.status || '').toLowerCase() === 'wrong')
+      .map((answer, index) => ({ key: `${exam.id}-${answer.question_id ?? index}`, exam, answer }))
+  );
+  const filteredMistakes = allMistakes.filter(({ exam }) => matchesSubject(exam));
   const resultPercentage = Number(latestResult?.percentage) || 0;
   const performance =
     resultPercentage >= 85
@@ -232,24 +266,6 @@ export default function Result({
 
   return (
     <div className={styles.resultPage}>
-      <div className={styles.headerRow}>
-        <div>
-          <span className={styles.pageEyebrow}>Performance center</span>
-          <h2>Your quiz results</h2>
-          <p>Understand your score, review answers, and keep improving.</p>
-        </div>
-
-        {onRestart && (
-          <Button
-            type="button"
-            className={styles.primaryButton}
-            onClick={onRestart}
-          >
-            Try another quiz <span aria-hidden>→</span>
-          </Button>
-        )}
-      </div>
-
       {latestResult && (
         <section className={styles.currentResultCard}>
           <div className={styles.resultHero}>
@@ -269,13 +285,20 @@ export default function Result({
               </span>
               <h3>You scored {latestResult.score} out of {latestResult.total_questions}</h3>
               <p>{performance.message}</p>
-              <Button
-                type="button"
-                className={styles.reviewButton}
-                onClick={() => setSelectedExam(latestResult)}
-              >
-                Review your answers <span aria-hidden>→</span>
-              </Button>
+              <div className={styles.resultActions}>
+                <Button
+                  type="button"
+                  className={styles.reviewButton}
+                  onClick={() => setSelectedExam(latestResult)}
+                >
+                  Review your answers
+                </Button>
+                {onRestart && (
+                  <Button type="button" className={styles.secondaryButton} onClick={onRestart}>
+                    Try another quiz
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -296,98 +319,148 @@ export default function Result({
         </section>
       )}
 
-      <section className={styles.historySection}>
-        <div className={styles.sectionTitleRow}>
-          <div>
-            <span className={styles.pageEyebrow}>Your journey</span>
-            <h3>Past Exams</h3>
-            <p>Open any attempt to review each question and explanation.</p>
-          </div>
-          <span className={styles.historyCount}>{displayedHistory.length} attempts</span>
+      <section className={styles.historySection} aria-label="Your quizzes">
+        <div className={styles.historyTabs} role="tablist" aria-label="History">
+          {[
+            ['exams', 'Exams', displayedHistory.length],
+            ['mistakes', 'Past mistakes', allMistakes.length],
+          ].map(([id, label, count]) => (
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              aria-selected={tab === id}
+              className={tab === id ? `${styles.historyTab} ${styles.historyTabActive}` : styles.historyTab}
+              onClick={() => {
+                setTab(id);
+                setMistakeLimit(MISTAKES_PAGE);
+              }}
+            >
+              {label}
+              <span className={styles.tabCount}>{count}</span>
+            </button>
+          ))}
         </div>
 
-        {loading && (
-          <div className={styles.statusBox}>Loading past exams...</div>
+        {historySubjects.length > 1 && (
+          <div className={styles.subjectChips} role="group" aria-label="Filter by subject">
+            {[ALL, ...historySubjects].map((subject) => (
+              <button
+                key={subject}
+                type="button"
+                aria-pressed={subjectFilter === subject}
+                className={subjectFilter === subject ? `${styles.chip} ${styles.chipActive}` : styles.chip}
+                onClick={() => {
+                  setSubjectFilter(subject);
+                  setMistakeLimit(MISTAKES_PAGE);
+                }}
+              >
+                {subject === ALL ? 'All subjects' : subject}
+              </button>
+            ))}
+          </div>
         )}
+
+        {loading && <div className={styles.statusBox}>Loading your quizzes…</div>}
 
         {error && <div className={styles.errorBox}>{error}</div>}
 
-        {!loading && !error && displayedHistory.length === 0 && (
-          <div className={styles.statusBox}>No past exam result found.</div>
+        {!loading && !error && history.length === 0 && (
+          <div className={styles.emptyHistory}>
+            <span className={styles.emptyIcon} aria-hidden>
+              <ClipboardList size={26} />
+            </span>
+            <p className={styles.emptyTitle}>No quizzes yet</p>
+            <p className={styles.emptyText}>Finished quizzes and the questions you missed show up here.</p>
+            {onRestart && (
+              <Button type="button" className={styles.reviewButton} onClick={onRestart}>
+                Take a quiz
+              </Button>
+            )}
+          </div>
         )}
 
-        {!loading && !error && displayedHistory.length > 0 && (
-          <div className={styles.tableWrapper}>
-            <table className={styles.resultTable}>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Class</th>
-                  <th>Subject</th>
-                  <th>Total</th>
-                  <th>Correct</th>
-                  <th>Wrong</th>
-                  <th>Skipped</th>
-                  <th>Score</th>
-                  <th>Percentage</th>
-                  <th>Details</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {displayedHistory.map((exam) => {
-                  const isSelected = selectedExam?.id === exam.id;
-
-                  return (
-                    <tr
-                      key={exam.id}
-                      className={isSelected ? styles.selectedExamRow : ''}
+        {!loading && !error && history.length > 0 && tab === 'exams' && (
+          filteredHistory.length === 0 ? (
+            <p className={styles.emptyText}>No exams in this subject yet.</p>
+          ) : (
+            <ul className={styles.examList}>
+              {filteredHistory.map((exam) => {
+                const { Icon, tint } = subjectIcon(exam.subject);
+                const percentage = Math.round(Number(exam.percentage) || 0);
+                return (
+                  <li key={exam.id}>
+                    <button
+                      type="button"
+                      className={styles.examRow}
+                      onClick={() => setSelectedExam(exam)}
+                      aria-label={`${exam.subject || 'Mixed'}, ${shortDate(exam.created_at)}, ${percentage}%. Open details`}
                     >
-                      <td data-label="Date">{formatDate(exam.created_at)}</td>
+                      <span className={`${styles.examIcon} ${styles[tint]}`} aria-hidden>
+                        <Icon size={18} strokeWidth={2.2} />
+                      </span>
+                      <span className={styles.examMain}>
+                        <strong>{exam.subject || 'Mixed'}</strong>
+                        <small>{shortDate(exam.created_at)}</small>
+                      </span>
+                      <span className={styles.examCounts} aria-hidden>
+                        <span className={styles.countCorrect}><CircleCheck size={14} /> {exam.correct_answers ?? 0}</span>
+                        <span className={styles.countWrong}><CircleX size={14} /> {exam.wrong_answers ?? 0}</span>
+                        <span className={styles.countSkipped}><CircleMinus size={14} /> {exam.skipped_answers ?? 0}</span>
+                      </span>
+                      <span className={`${styles.scorePill} ${styles[scoreTone(percentage)]}`}>{percentage}%</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )
+        )}
 
-                      <td data-label="Class">
-                        {exam.class_level ? `${exam.class_level}` : '-'}
-                      </td>
-
-                      <td data-label="Subject">{exam.subject || '-'}</td>
-
-                      <td data-label="Total">{exam.total_questions ?? 0}</td>
-
-                      <td data-label="Correct" className={styles.correctText}>
-                        {exam.correct_answers ?? 0}
-                      </td>
-
-                      <td data-label="Wrong" className={styles.wrongText}>
-                        {exam.wrong_answers ?? 0}
-                      </td>
-
-                      <td data-label="Skipped" className={styles.skippedText}>
-                        {exam.skipped_answers ?? 0}
-                      </td>
-
-                      <td data-label="Score">{exam.score ?? 0}</td>
-
-                      <td data-label="Percentage">{exam.percentage ?? 0}%</td>
-
-                      <td data-label="Details">
-                        <Button
-                          type="button"
-                          className={
-                            isSelected
-                              ? `${styles.detailsButton} ${styles.activeDetailsButton}`
-                              : styles.detailsButton
-                          }
-                          onClick={() => setSelectedExam(exam)}
-                        >
-                          {isSelected ? 'Viewing' : 'Details'}
-                        </Button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+        {!loading && !error && history.length > 0 && tab === 'mistakes' && (
+          filteredMistakes.length === 0 ? (
+            <div className={styles.emptyHistory}>
+              <span className={styles.emptyIcon} aria-hidden>
+                <CircleCheck size={26} />
+              </span>
+              <p className={styles.emptyTitle}>No mistakes here</p>
+              <p className={styles.emptyText}>Questions you answer wrongly are collected here to review.</p>
+            </div>
+          ) : (
+            <>
+              <ul className={styles.mistakeList}>
+                {filteredMistakes.slice(0, mistakeLimit).map(({ key, exam, answer }) => (
+                  <li key={key} className={styles.mistakeCard}>
+                    <div className={styles.mistakeMeta}>
+                      <span>{exam.subject || 'Mixed'}</span>
+                      <span>{shortDate(exam.created_at)}</span>
+                    </div>
+                    <p className={styles.mistakeQuestion}>{answer.question || answer.question_text || 'Question'}</p>
+                    <div className={styles.mistakeAnswers}>
+                      <p className={styles.yourAnswer}>
+                        <CircleX size={16} aria-hidden />
+                        <span><span className="sr-only">Your answer: </span>{getUserAnswerDisplay(answer)}</span>
+                      </p>
+                      <p className={styles.rightAnswer}>
+                        <CircleCheck size={16} aria-hidden />
+                        <span><span className="sr-only">Correct answer: </span>{getCorrectAnswerDisplay(answer)}</span>
+                      </p>
+                    </div>
+                    {getExplanation(answer) && <p className={styles.mistakeExplanation}>{getExplanation(answer)}</p>}
+                  </li>
+                ))}
+              </ul>
+              {filteredMistakes.length > mistakeLimit && (
+                <Button
+                  type="button"
+                  className={styles.secondaryButton}
+                  onClick={() => setMistakeLimit((n) => n + MISTAKES_PAGE)}
+                >
+                  Show {Math.min(MISTAKES_PAGE, filteredMistakes.length - mistakeLimit)} more
+                </Button>
+              )}
+            </>
+          )
         )}
       </section>
 

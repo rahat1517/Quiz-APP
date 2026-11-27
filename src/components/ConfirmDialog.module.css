@@ -31,7 +31,7 @@
   border-radius: 20px;
   color: var(--on-accent);
   background: var(--accent);
-  font-weight: 900;
+  font-weight: var(--weight-bold);
 }
 
 .iconDanger {
@@ -40,7 +40,7 @@
 
 .title {
   margin: 1rem 0 0.4rem;
-  font-size: 1.3rem;
+  font-size: var(--text-xl);
 }
 
 .description {
@@ -61,7 +61,7 @@
   min-height: 46px;
   border: 0;
   border-radius: 14px;
-  font-weight: 800;
+  font-weight: var(--weight-semibold);
   cursor: pointer;
 }
 

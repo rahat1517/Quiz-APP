@@ -1,0 +1,3 @@
+# Netlify: serve the app for every path so client-side routes like
+# /auth/callback (the email-verification link) open the app instead of a 404.
+/*    /index.html    200

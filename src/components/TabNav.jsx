@@ -1,40 +1,31 @@
 import styles from './TabNav.module.css';
 import { Button } from './ui/Button';
+import { navItemsFor } from '../lib/navItems';
 
-const tabs = [
-  { id: 'dashboard', label: 'Dashboard', shortLabel: 'Home' },
-  { id: 'profile', label: 'Profile', shortLabel: 'Profile' },
-  { id: 'add', label: 'Add Question', shortLabel: 'Add' },
-  { id: 'bank', label: 'Question Bank', shortLabel: 'Bank' },
-  { id: 'quiz', label: 'Quiz', shortLabel: 'Quiz' },
-  { id: 'results', label: 'Results', shortLabel: 'Results' },
-];
-
+// Top tabs on tablets (781–1100px) and the bottom tab bar on phones.
+// Desktop uses <Sidebar>.
 export default function TabNav({ activeTab, onChange, variant, isAdmin }) {
   const navClass =
-    variant === 'bottom'
-      ? `${styles.tabNav} ${styles.bottomNav}`
-      : variant === 'left'
-      ? `${styles.tabNav} ${styles.leftNav}`
-      : `${styles.tabNav} ${styles.topNav}`;
-  const availableTabs = isAdmin ? tabs : tabs.filter((tab) => tab.id !== 'add');
+    variant === 'bottom' ? `${styles.tabNav} ${styles.bottomNav}` : `${styles.tabNav} ${styles.topNav}`;
+  const items = navItemsFor(isAdmin);
 
   return (
     <nav
       className={navClass}
       aria-label="Main navigation"
-      style={{ '--tab-count': availableTabs.length }}
+      style={{ '--tab-count': items.length }}
     >
-      {availableTabs.map((tab) => (
+      {items.map(({ id, label, shortLabel, Icon }) => (
         <Button
-          key={tab.id}
+          key={id}
           type="button"
-          className={activeTab === tab.id ? `${styles.tabItem} ${styles.active}` : styles.tabItem}
-          onClick={() => onChange(tab.id)}
-          aria-current={activeTab === tab.id ? 'page' : undefined}
+          className={activeTab === id ? `${styles.tabItem} ${styles.active}` : styles.tabItem}
+          onClick={() => onChange(id)}
+          aria-current={activeTab === id ? 'page' : undefined}
         >
-          <span className={styles.fullLabel}>{tab.label}</span>
-          <span className={styles.shortLabel}>{tab.shortLabel}</span>
+          {variant === 'bottom' && <Icon className={styles.tabIcon} size={20} aria-hidden />}
+          <span className={styles.fullLabel}>{label}</span>
+          <span className={styles.shortLabel}>{shortLabel}</span>
         </Button>
       ))}
     </nav>
