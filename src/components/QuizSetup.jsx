@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Zap, SlidersHorizontal, ArrowLeft, Shuffle } from 'lucide-react';
+import { Zap, SlidersHorizontal, ArrowLeft, Shuffle, Check } from 'lucide-react';
 import { Button } from './ui/Button';
 import { subjectIcon } from '../lib/subjectIcons';
 import styles from './QuizSetup.module.css';
@@ -8,6 +8,7 @@ const QUICK = { questionCount: '5', timeLimit: '5' };
 const ALL = 'All Subjects';
 
 function Stepper({ id, label, value, onChange, min, max, unit, hint }) {
+  // hint is optional; without it the stepper fits the compact bottom bar.
   const clamp = (n) => String(Math.min(max, Math.max(min, Number.isInteger(n) ? n : min)));
   return (
     <div className={styles.field}>
@@ -26,14 +27,14 @@ function Stepper({ id, label, value, onChange, min, max, unit, hint }) {
           value={value}
           onChange={(event) => onChange(event.target.value)}
           onBlur={() => onChange(clamp(Number(value)))}
-          aria-describedby={`${id}-hint`}
+          aria-describedby={hint ? `${id}-hint` : undefined}
         />
         {unit && <span className={styles.unit}>{unit}</span>}
         <Button type="button" onClick={() => onChange(clamp((Number(value) || 0) + 1))} aria-label={`Increase ${label.toLowerCase()}`}>
           +
         </Button>
       </div>
-      <small id={`${id}-hint`} className={styles.hint}>{hint}</small>
+      {hint && <small id={`${id}-hint`} className={styles.hint}>{hint}</small>}
     </div>
   );
 }
@@ -47,13 +48,12 @@ export default function QuizSetup({
   questionCounts = {},
   bestBySubject = {},
   chapters = [],
+  chapterCounts = {},
   classOptions = [],
   selectedClass,
   isClassRestricted,
   onClassChange,
   formatClass = (c) => c,
-  selectedChapter,
-  onChapterChange,
   questionCount,
   onQuestionCountChange,
   timeLimit,
@@ -67,6 +67,8 @@ export default function QuizSetup({
   const [mode, setMode] = useState('quick');
   const [picked, setPicked] = useState(null);
   const [pending, setPending] = useState(null);
+  // Chapters ticked on the setup page; empty means every chapter.
+  const [ticked, setTicked] = useState([]);
   const total = Object.values(questionCounts).reduce((sum, n) => sum + n, 0);
   const topics = [ALL, ...subjects];
 
@@ -76,9 +78,19 @@ export default function QuizSetup({
       setPending(subject);
       onQuickStart(subject, QUICK);
     } else {
+      setTicked([]);
       setPicked(subject);
     }
   }
+
+  const chapterNames = picked && picked !== ALL ? chapters.filter((c) => c !== 'All Chapters') : [];
+  const chapterTotal = chapterNames.reduce((sum, c) => sum + (chapterCounts[c] || 0), 0);
+  const pickedTotal =
+    picked === ALL
+      ? total
+      : ticked.length
+        ? ticked.reduce((sum, c) => sum + (chapterCounts[c] || 0), 0)
+        : questionCounts[picked] || chapterTotal;
 
   const tabs = [
     { id: 'quick', label: 'Quick practice', Icon: Zap },
@@ -177,51 +189,78 @@ export default function QuizSetup({
         </>
       ) : (
         <div className={styles.customPanel}>
-          <Button type="button" className={styles.back} onClick={() => setPicked(null)}>
-            <ArrowLeft size={16} aria-hidden /> All topics
-          </Button>
-          <h2 className={styles.title}>{picked === ALL ? 'All subjects' : picked}</h2>
-
-          <div className={styles.fields}>
-            <div className={styles.field}>
-              <label htmlFor="setup-chapter" className={styles.fieldLabel}>Chapter</label>
-              <select
-                id="setup-chapter"
-                className={styles.select}
-                value={selectedChapter}
-                onChange={(event) => onChapterChange(event.target.value)}
-              >
-                {chapters.map((chapter) => (
-                  <option key={chapter} value={chapter}>
-                    {chapter}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <Stepper
-              id="quiz-count"
-              label="Questions"
-              value={questionCount}
-              onChange={onQuestionCountChange}
-              min={1}
-              max={100}
-              hint="Between 1 and 100."
-            />
-            <Stepper
-              id="quiz-time"
-              label="Time limit"
-              value={timeLimit}
-              onChange={onTimeLimitChange}
-              min={1}
-              max={180}
-              unit="min"
-              hint="Between 1 and 180 minutes."
-            />
+          <div className={styles.panelHeader}>
+            <Button type="button" className={styles.back} onClick={() => setPicked(null)} aria-label="Back to topics">
+              <ArrowLeft size={18} aria-hidden />
+            </Button>
+            <h2 className={styles.title}>{picked === ALL ? 'All subjects' : picked}</h2>
+            <span className={styles.panelCount}>
+              {pickedTotal} question{pickedTotal === 1 ? '' : 's'}
+            </span>
           </div>
 
-          <Button type="button" className={styles.start} onClick={() => onStart()} disabled={loading}>
-            {loading ? 'Loading questions…' : 'Start quiz'}
-          </Button>
+          {chapterNames.length > 0 && (
+            <fieldset className={styles.chapterList}>
+              <legend className={styles.listLegend}>Chapters</legend>
+              <label className={`${styles.chapterRow} ${ticked.length === 0 ? styles.rowOn : ''}`}>
+                <input
+                  type="checkbox"
+                  checked={ticked.length === 0}
+                  onChange={() => setTicked([])}
+                />
+                <span className={styles.box} aria-hidden><Check size={14} strokeWidth={3} /></span>
+                <span className={styles.chapterName}>All chapters</span>
+                <span className={styles.chapterCount}>{chapterTotal}</span>
+              </label>
+              {chapterNames.map((chapter) => {
+                const on = ticked.includes(chapter);
+                return (
+                  <label key={chapter} className={`${styles.chapterRow} ${on ? styles.rowOn : ''}`}>
+                    <input
+                      type="checkbox"
+                      checked={on}
+                      onChange={() =>
+                        setTicked((list) => (on ? list.filter((c) => c !== chapter) : [...list, chapter]))
+                      }
+                    />
+                    <span className={styles.box} aria-hidden><Check size={14} strokeWidth={3} /></span>
+                    <span className={styles.chapterName}>{chapter}</span>
+                    <span className={styles.chapterCount}>{chapterCounts[chapter] || 0}</span>
+                  </label>
+                );
+              })}
+            </fieldset>
+          )}
+
+          <div className={styles.setupBar}>
+            <div className={styles.barFields}>
+              <Stepper
+                id="quiz-count"
+                label="Questions"
+                value={questionCount}
+                onChange={onQuestionCountChange}
+                min={1}
+                max={100}
+              />
+              <Stepper
+                id="quiz-time"
+                label="Time"
+                value={timeLimit}
+                onChange={onTimeLimitChange}
+                min={1}
+                max={180}
+                unit="min"
+              />
+            </div>
+            <Button
+              type="button"
+              className={styles.start}
+              onClick={() => onStart({ chapters: ticked })}
+              disabled={loading}
+            >
+              {loading ? 'Loading questions…' : 'Start quiz'}
+            </Button>
+          </div>
         </div>
       )}
     </section>
