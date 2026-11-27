@@ -23,7 +23,7 @@ import SkeletonLoader from './components/SkeletonLoader';
 import TabNav from './components/TabNav';
 import Sidebar from './components/Sidebar';
 import QuizSetup from './components/QuizSetup';
-import { Flame, Star, LogOut } from 'lucide-react';
+import { Flame, Star, Menu } from 'lucide-react';
 import { quizStats } from './lib/quizStats';
 import { pageTitle } from './lib/navItems';
 import Hero from './components/Hero';
@@ -60,6 +60,9 @@ export default function App() {
   const [resultsError, setResultsError] = useState('');
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [resultsStartTab, setResultsStartTab] = useState('exams');
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
   const [authLoading, setAuthLoading] = useState(true);
   const [isAuthCallback, setIsAuthCallback] = useState(
     () => window.location.pathname === '/auth/callback'
@@ -323,6 +326,10 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
       setQuizStarted(false);
     }
 
+    if (tab !== 'results') {
+      setResultsStartTab('exams');
+    }
+
     setActiveTab(tab);
   }
 
@@ -579,6 +586,17 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
         <header className={styles.appBar}>
           <Button
             type="button"
+            className={styles.barMenu}
+            onClick={() => setMenuOpen(true)}
+            aria-label="Open menu"
+            aria-expanded={menuOpen}
+            aria-controls="app-drawer"
+          >
+            <Menu size={22} aria-hidden />
+          </Button>
+
+          <Button
+            type="button"
             className={styles.barBrand}
             onClick={() => handleTabChange('dashboard')}
             aria-label="Quiz World, go to dashboard"
@@ -607,28 +625,8 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
               {stats.points}
               <span className={styles.statUnit}>points</span>
             </span>
-
-            <Button
-              type="button"
-              className={styles.barAvatar}
-              onClick={() => handleTabChange('profile')}
-              aria-label={`Profile: ${displayName}`}
-            >
-              {userInitial}
-            </Button>
-            <Button
-              type="button"
-              className={styles.barLogout}
-              onClick={handleSignOut}
-              aria-label="Log out"
-              title="Log out"
-            >
-              <LogOut size={18} aria-hidden />
-            </Button>
           </div>
         </header>
-
-        <TabNav activeTab={activeTab} onChange={handleTabChange} isAdmin={isAdmin} />
 
         {loading && <SkeletonLoader />}
 
@@ -648,7 +646,11 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
               classLabel={assignedClassLabel || selectedClassLevel}
               subjects={subjects.filter((subject) => subject !== 'All Subjects')}
               history={quizHistory}
-              onNavigate={handleTabChange}
+              bestBySubject={bestScoreBySubject}
+              onNavigate={(tab, options) => {
+                setResultsStartTab(options?.tab || 'exams');
+                handleTabChange(tab);
+              }}
               onStartSubject={(subject) => {
                 setSelectedSubject(subject);
                 setSelectedChapter('All Chapters');
@@ -807,6 +809,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
               loading={resultsLoading}
               error={resultsError}
               onRestart={handleRestartQuiz}
+              initialTab={resultsStartTab}
             />
           </section>
         )}
@@ -815,14 +818,22 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
       </div>
 
       <Sidebar
+        open={menuOpen}
+        onClose={closeMenu}
         activeTab={activeTab}
-        onChange={handleTabChange}
+        onChange={(tab) => {
+          setMenuOpen(false);
+          handleTabChange(tab);
+        }}
         isAdmin={isAdmin}
         classLabel={isAdmin ? 'Admin' : formatClassLabel(assignedClassLabel) || null}
         displayName={displayName}
         userInitial={userInitial}
         roleLabel={isAdmin ? 'Admin' : formatClassLabel(assignedClassLabel) || 'Student'}
-        onSignOut={handleSignOut}
+        onSignOut={() => {
+          setMenuOpen(false);
+          handleSignOut();
+        }}
       />
 
       <TabNav

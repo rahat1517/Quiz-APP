@@ -24,9 +24,10 @@ export default function Result({
   loading = false,
   error = '',
   onRestart,
+  initialTab = 'exams',
 }) {
   const [selectedExam, setSelectedExam] = useState(null);
-  const [tab, setTab] = useState('exams');
+  const [tab, setTab] = useState(initialTab);
   const [subjectFilter, setSubjectFilter] = useState(ALL);
   const [mistakeLimit, setMistakeLimit] = useState(MISTAKES_PAGE);
 

@@ -711,40 +711,34 @@
   fill: var(--skip);
 }
 
-.barAvatar,
-.barLogout {
+/* Menu button: opens the drawer below 1100px. */
+.barMenu {
   display: none;
   place-items: center;
-  width: 36px;
-  height: 36px;
-  min-height: 36px;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
   padding: 0;
+  border: 0;
+  border-radius: 10px;
+  color: var(--ink);
+  background: transparent;
   cursor: pointer;
 }
 
-.barAvatar {
-  border: 0;
-  border-radius: 50%;
-  color: var(--on-accent);
-  background: var(--accent);
-  font-weight: var(--weight-bold);
+.barMenu:hover {
+  background: var(--inset);
 }
 
-.barLogout {
-  border: 1px solid var(--rule);
-  border-radius: 10px;
-  color: var(--muted);
-  background: var(--sheet);
-}
-
-.barLogout:hover {
-  color: var(--wrong-ink);
-  border-color: var(--wrong);
-}
-
+/* Tablet and phone: menu button, brand, then the pills. */
 @media (max-width: 1100px) {
   .appBar {
     margin-top: -1rem;
+  }
+
+  .barMenu {
+    display: grid;
   }
 
   .barBrand {
@@ -753,11 +747,6 @@
 
   .pageTitle {
     display: none;
-  }
-
-  .barAvatar,
-  .barLogout {
-    display: grid;
   }
 }
 

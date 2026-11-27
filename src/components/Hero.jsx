@@ -1,8 +1,20 @@
-import { BookOpen, ClipboardList, ChartColumn, UserRound, Lock, Inbox, Check } from 'lucide-react';
+import {
+  BookOpen,
+  ClipboardList,
+  ChartColumn,
+  UserRound,
+  Lock,
+  Inbox,
+  Check,
+  Shuffle,
+  SlidersHorizontal,
+  CircleX,
+} from 'lucide-react';
 import styles from './Hero.module.css';
 import { Button } from './ui/Button';
 import { formatClassLevel } from '../lib/normalizeClassLevel';
 import { quizStats } from '../lib/quizStats';
+import { subjectIcon } from '../lib/subjectIcons';
 
 const REPORT_UNLOCK = 3;
 
@@ -13,6 +25,76 @@ const QUICK_ACTIONS = [
   { id: 'profile', label: 'Profile', Icon: UserRound, tint: 'violet' },
 ];
 
+const STUDY_TILES = [
+  { id: 'bank', label: 'Question Bank', Icon: BookOpen, tint: 'orange' },
+  { id: 'quiz', label: 'Custom quiz', Icon: SlidersHorizontal, tint: 'rose' },
+  { id: 'results', label: 'Results', Icon: ChartColumn, tint: 'teal' },
+  { id: 'results', label: 'Past mistakes', Icon: CircleX, tint: 'rose', key: 'mistakes' },
+  { id: 'profile', label: 'Profile', Icon: UserRound, tint: 'violet' },
+];
+
+// Phone home: section cards with a coloured header and a two-column grid of
+// tiles. Shown instead of the card dashboard at 780px and below.
+function PhoneHome({ subjects, bestBySubject, onNavigate, onStartSubject }) {
+  return (
+    <div className={styles.phoneHome}>
+      <section className={styles.block} aria-labelledby="practice-block">
+        <h2 id="practice-block" className={styles.blockTitle}>Practice by subject</h2>
+        {subjects.length === 0 ? (
+          <p className={styles.blockEmpty}>No questions yet for your class.</p>
+        ) : (
+          <div className={styles.tileGrid}>
+            <Button type="button" className={styles.tile} onClick={() => onNavigate?.('quiz')}>
+              <span className={`${styles.tileIcon} ${styles.blue}`} aria-hidden>
+                <Shuffle size={18} />
+              </span>
+              <span className={styles.tileLabel}>All subjects</span>
+            </Button>
+            {subjects.map((subject) => {
+              const { Icon, tint } = subjectIcon(subject);
+              const best = bestBySubject[subject];
+              return (
+                <Button
+                  key={subject}
+                  type="button"
+                  className={styles.tile}
+                  onClick={() => onStartSubject?.(subject)}
+                  aria-label={`${subject}${best != null ? `, best score ${best}%` : ''}`}
+                >
+                  <span className={`${styles.tileIcon} ${styles[tint]}`} aria-hidden>
+                    <Icon size={18} />
+                  </span>
+                  <span className={styles.tileLabel}>{subject}</span>
+                  {best == null && <span className={styles.newDot} aria-hidden />}
+                </Button>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      <section className={styles.block} aria-labelledby="study-block">
+        <h2 id="study-block" className={styles.blockTitle}>Study</h2>
+        <div className={styles.tileGrid}>
+          {STUDY_TILES.map(({ id, key, label, Icon, tint }) => (
+            <Button
+              key={key || id}
+              type="button"
+              className={styles.tile}
+              onClick={() => onNavigate?.(id, key ? { tab: key } : undefined)}
+            >
+              <span className={`${styles.tileIcon} ${styles[tint]}`} aria-hidden>
+                <Icon size={18} />
+              </span>
+              <span className={styles.tileLabel}>{label}</span>
+            </Button>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function shortDate(value) {
   return new Date(value).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
 }
@@ -22,6 +104,7 @@ export default function Hero({
   classLabel,
   subjects = [],
   history = [],
+  bestBySubject = {},
   onNavigate,
   onStartSubject,
 }) {
@@ -39,6 +122,13 @@ export default function Hero({
   const setupPercent = Math.round((doneCount / steps.length) * 100);
 
   return (
+    <>
+    <PhoneHome
+      subjects={subjects}
+      bestBySubject={bestBySubject}
+      onNavigate={onNavigate}
+      onStartSubject={onStartSubject}
+    />
     <div className={styles.dashboard}>
       <div className={styles.mainColumn}>
         <nav className={`${styles.card} ${styles.quickActions}`} aria-label="Quick actions">
@@ -171,5 +261,6 @@ export default function Hero({
         </section>
       </div>
     </div>
+    </>
   );
 }

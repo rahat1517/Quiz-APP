@@ -1,11 +1,15 @@
-import { Settings, LogOut } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { Settings, LogOut, X } from 'lucide-react';
 import { Button } from './ui/Button';
 import { navItemsFor } from '../lib/navItems';
 import styles from './Sidebar.module.css';
 
-// Desktop navigation (above 1100px): brand and class at the top, the main
-// destinations with icon tiles, and the signed-in user at the bottom.
+// Navigation: brand and class at the top, the main destinations with icon
+// tiles, and the signed-in user at the bottom. Fixed on desktop (above
+// 1100px); below that it is a drawer opened from the app bar's menu button.
 export default function Sidebar({
+  open = false,
+  onClose,
   activeTab,
   onChange,
   isAdmin,
@@ -15,8 +19,34 @@ export default function Sidebar({
   roleLabel,
   onSignOut,
 }) {
+  const closeRef = useRef(null);
+
+  // Drawer: Esc closes, focus moves in and back, the page behind can't scroll.
+  useEffect(() => {
+    if (!open) return undefined;
+    const opener = document.activeElement;
+    const { overflow } = document.body.style;
+    document.body.style.overflow = 'hidden';
+    closeRef.current?.focus();
+    const onKey = (event) => {
+      if (event.key === 'Escape') onClose?.();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = overflow;
+      if (opener instanceof HTMLElement) opener.focus();
+    };
+  }, [open, onClose]);
+
   return (
-    <aside className={styles.sidebar}>
+    <>
+    {open && <div className={styles.backdrop} onClick={onClose} aria-hidden />}
+    <aside
+      id="app-drawer"
+      className={open ? `${styles.sidebar} ${styles.open}` : styles.sidebar}
+      aria-label="Menu"
+    >
       <div className={styles.top}>
         <Button
           type="button"
@@ -28,6 +58,15 @@ export default function Sidebar({
           <span className={styles.brandName}>Quiz World</span>
         </Button>
         {classLabel && <span className={styles.classPill}>{classLabel}</span>}
+        <Button
+          ref={closeRef}
+          type="button"
+          className={`${styles.iconButton} ${styles.close}`}
+          onClick={onClose}
+          aria-label="Close menu"
+        >
+          <X size={20} aria-hidden />
+        </Button>
       </div>
 
       <nav className={styles.nav} aria-label="Main navigation">
@@ -76,5 +115,6 @@ export default function Sidebar({
         </Button>
       </div>
     </aside>
+    </>
   );
 }
