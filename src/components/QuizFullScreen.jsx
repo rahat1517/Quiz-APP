@@ -40,12 +40,26 @@ export default function QuizFullScreen(props) {
   }, [inProgress, onProgressChange]);
 
   useEffect(() => () => onProgressChange?.(false), [onProgressChange]);
+
+  // Focus mode on phones: while an attempt runs, the bottom tab bar steps
+  // aside (see TabNav.module.css) so the question and all options fit.
+  useEffect(() => {
+    if (!inProgress) return undefined;
+    document.body.dataset.exam = 'running';
+    return () => {
+      delete document.body.dataset.exam;
+    };
+  }, [inProgress]);
   const q = questions[currentIndex];
   const progress = totalQuestions > 0 ? ((currentIndex + 1) / totalQuestions) * 100 : 0;
   const completion = totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0;
   const classLabel = formatClassLevel(props.classLevel) || 'Your class';
 
   const currentExplanation = q?.explanation || q?.answer_explanation || '';
+  // Short answers (numbers, symbols, single words) sit two to a row.
+  const shortOptions = OPTION_KEYS.every(
+    (key) => String(q?.[`option_${key.toLowerCase()}`] ?? '').length <= 18
+  );
   const timeLow = timeLeft <= 60;
   const timeText = `${minutes}:${String(seconds).padStart(2, '0')}`;
 
@@ -125,16 +139,15 @@ export default function QuizFullScreen(props) {
     return (
       <section className={styles.startScreen}>
         <div className={styles.startCard}>
-          <span className={styles.startBadge}>Quiz ready</span>
-          <div className={styles.startIcon}>Q</div>
+          <span className={styles.startBadge}>Quiz ready · {classLabel}</span>
+          <div className={styles.startIcon} aria-hidden>Q</div>
           <h2>Ready to challenge yourself?</h2>
-          <p>Stay focused, choose your best answer, and learn from the result.</p>
+          <p className={styles.startTagline}>Stay focused, choose your best answer, and learn from the result.</p>
           <div className={styles.startStats}>
             <div><strong>{totalQuestions}</strong><span>Questions</span></div>
             <div><strong>{props.durationMinutes}</strong><span>Minutes</span></div>
             <div><strong>{props.subject || 'Mixed'}</strong><span>Subject</span></div>
           </div>
-          <p className={styles.startClass}>{classLabel}</p>
           <div className={styles.startActions}>
             <Button
               type="button"
@@ -215,7 +228,7 @@ export default function QuizFullScreen(props) {
         <div
           role="radiogroup"
           aria-label={`Options for question ${currentIndex + 1}`}
-          className={styles.optionsGrid}
+          className={shortOptions ? `${styles.optionsGrid} ${styles.optionsShort}` : styles.optionsGrid}
         >
           {OPTION_KEYS.map((opt, optIndex) => {
             const text = q[`option_${opt.toLowerCase()}`];

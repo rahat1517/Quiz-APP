@@ -126,3 +126,10 @@
     display: none;
   }
 }
+
+/* Focus mode: hidden while a quiz attempt is running (set by QuizFullScreen). */
+@media (max-width: 780px) {
+  :global(body[data-exam='running']) .bottomNav {
+    display: none;
+  }
+}
