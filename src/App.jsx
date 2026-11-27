@@ -32,6 +32,33 @@ import { Button } from './components/ui/Button';
 import styles from './App.module.css';
 import './index.css';
 
+function shuffle(items) {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+// One chapter (or none) is a single request. Several chapters: ask each for
+// up to the full count, drop duplicates, mix them and keep the first `limit`.
+async function fetchQuizQuestions(classLevel, subject, chapterList, limit) {
+  if (chapterList.length <= 1) {
+    return getRandomQuestions(classLevel, subject, chapterList[0] ?? null, limit);
+  }
+  const batches = await Promise.all(
+    chapterList.map((chapter) => getRandomQuestions(classLevel, subject, chapter, limit))
+  );
+  const seen = new Set();
+  const merged = batches.flat().filter((question) => {
+    if (!question || seen.has(question.id)) return false;
+    seen.add(question.id);
+    return true;
+  });
+  return shuffle(merged).slice(0, limit);
+}
+
 export default function App() {
   const [questions, setQuestions] = useState([]);
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -157,6 +184,17 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
     ).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 
     return ['All Chapters', ...unique];
+  }, [availableQuestions, selectedSubject]);
+
+  const chapterCounts = useMemo(() => {
+    const counts = {};
+    availableQuestions
+      .filter((question) => selectedSubject === 'All Subjects' || question.subject === selectedSubject)
+      .forEach((question) => {
+        const chapter = normalizeChapter(question.chapter || 'General');
+        counts[chapter] = (counts[chapter] || 0) + 1;
+      });
+    return counts;
   }, [availableQuestions, selectedSubject]);
 
   const questionCountsBySubject = useMemo(() => {
@@ -343,6 +381,8 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
   async function handleStartQuiz(overrides = {}) {
     const subject = overrides.subject ?? selectedSubject;
     const chapter = overrides.chapter ?? selectedChapter;
+    // Several chapters ticked on the setup page; empty means every chapter.
+    const chapterList = overrides.chapters ?? (chapter && chapter !== 'All Chapters' ? [chapter] : []);
     const questionCount = overrides.questionCount ?? selectedQuestionCount;
     const timeLimit = overrides.timeLimit ?? selectedTimeLimit;
 
@@ -352,7 +392,6 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
 
     try {
       const subjectFilter = subject === 'All Subjects' ? null : subject;
-      const chapterFilter = chapter === 'All Chapters' ? null : chapter;
       const classLevelToUse = String( isClassRestricted ? assignedClassLabel : selectedClassLevel ).trim();
 
       if (!classLevelToUse) {
@@ -385,10 +424,10 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
         return;
       }
 
-      const questions = await getRandomQuestions(
+      const questions = await fetchQuizQuestions(
         classLevelToUse,
         subjectFilter,
-        chapterFilter,
+        chapterList,
         requestedQuestionCount
       );
 
@@ -741,6 +780,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
                 questionCounts={questionCountsBySubject}
                 bestBySubject={bestScoreBySubject}
                 chapters={chapters}
+                chapterCounts={chapterCounts}
                 classOptions={Array.from(
                   new Set(
                     isClassRestricted && assignedClassLabel
@@ -757,8 +797,6 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
                   setSelectedChapter('All Chapters');
                 }}
                 formatClass={formatClassLabel}
-                selectedChapter={selectedChapter}
-                onChapterChange={setSelectedChapter}
                 questionCount={selectedQuestionCount}
                 onQuestionCountChange={setSelectedQuestionCount}
                 timeLimit={selectedTimeLimit}
@@ -772,7 +810,7 @@ const selectedClass = isClassRestricted ? assignedClassLabel : selectedClassLeve
                   setSelectedTimeLimit(quick.timeLimit);
                   handleStartQuiz({ subject, chapter: 'All Chapters', ...quick });
                 }}
-                onStart={() => handleStartQuiz()}
+                onStart={(options) => handleStartQuiz(options)}
                 loading={quizLoading}
                 error={quizError}
               />
